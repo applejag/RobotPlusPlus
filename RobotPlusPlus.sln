@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotPlusPlus.Console", "RobotPlusPlus.Console\RobotPlusPlus.Console.csproj", "{023A5556-8B0E-4461-86C1-177F1FFEC82F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotPlusPlus.Compiler", "RobotPlusPlus.Compiler\RobotPlusPlus.Compiler.csproj", "{9D778718-0574-4BD7-BA50-DCF5CE6FC34C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotPlusPlus", "RobotPlusPlus.Compiler\RobotPlusPlus.csproj", "{9D778718-0574-4BD7-BA50-DCF5CE6FC34C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotPlusPlus.Tests.Compiler", "RobotPlusPlus.Tests.Compiler\RobotPlusPlus.Tests.Compiler.csproj", "{470D0BFF-7D52-4AD7-8324-9F497DB67225}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotPlusPlus.Tests", "RobotPlusPlus.Tests.Compiler\RobotPlusPlus.Tests.csproj", "{470D0BFF-7D52-4AD7-8324-9F497DB67225}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RobotPlusPlus.Compiler\RobotPlusPlus.Compiler.csproj" />
+    <ProjectReference Include="..\RobotPlusPlus.Compiler\RobotPlusPlus.csproj" />
   </ItemGroup>
 
 </Project>

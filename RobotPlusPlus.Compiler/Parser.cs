@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 
-namespace RobotPlusPlus.Compiler
+namespace RobotPlusPlus
 {
 	public static class Parser
 	{

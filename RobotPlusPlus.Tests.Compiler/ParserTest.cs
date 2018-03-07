@@ -1,8 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Compiler;
 
-namespace RobotPlusPlus.Tests.Compiler
+namespace RobotPlusPlus.Tests
 {
     [TestClass]
     public class ParserTest
