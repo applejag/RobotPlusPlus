@@ -7,16 +7,15 @@ namespace RobotPlusPlus.Utility
 {
 	public static class AttributesUtilities
 	{
-		public static TAttr GetEnumAttribute<TAttr>(this Enum enumVal) where TAttr : Attribute
+		public static TAttr GetEnumAttribute<TAttr>(this Enum enumVal)
 		{
 			return enumVal.GetEnumAttributes<TAttr>().FirstOrDefault();
 		}
 
-		public static TAttr[] GetEnumAttributes<TAttr>(this Enum enumVal) where TAttr : Attribute
+		public static TAttr[] GetEnumAttributes<TAttr>(this Enum enumVal)
 		{
 			MemberInfo[] memInfo = enumVal.GetType().GetMember(enumVal.ToString());
-			object[] attributes = memInfo[0].GetCustomAttributes(typeof(TAttr), true);
-			return (TAttr[])attributes;
+			return memInfo[0].GetCustomAttributes(typeof(TAttr), true).OfType<TAttr>().ToArray();
 		}
 
 		public static TAttr GetPropertyAttribute<TClass, TAttr>(string propertyName)

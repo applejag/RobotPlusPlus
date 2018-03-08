@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using RobotPlusPlus.Attributes;
 using RobotPlusPlus.Utility;
 
@@ -21,12 +22,12 @@ namespace RobotPlusPlus.Tokenizing
 
 			foreach (TokenType type in values)
 			{
-				var attribute = type.GetEnumAttribute<TokenRegexAttribute>();
+				ITokenFilter[] attributes = type.GetEnumAttributes<ITokenFilter>();
 
-				if (attribute == null)
-					throw new ParseException($"Missing token pattern for \"{type.ToString()}\".", line);
-
-				if (attribute.Evaluate(input))
+				if (attributes.Length == 0)
+					throw new ParseException($"Missing token filter for \"{type.ToString()}\".", line);
+				
+				if (attributes.All(f => f.Evaluate(input)))
 					return type;
 			}
 
