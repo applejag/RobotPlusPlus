@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Tokenizing
 			Source = source;
 		}
 
-		public static TokenType EvaluateType(string input, int line)
+		public static (TokenType type, int length) EvaluateType(string input, int line)
 		{
 			var values = (TokenType[]) Enum.GetValues(typeof(TokenType));
 
@@ -27,11 +27,16 @@ namespace RobotPlusPlus.Tokenizing
 				if (attributes.Length == 0)
 					throw new ParseException($"Missing token filter for \"{type.ToString()}\".", line);
 				
-				if (attributes.All(f => f.Evaluate(input)))
-					return type;
+				// Lowest matching length amoung the filters
+				int length = attributes.Min(f => f.MatchingLength(input));
+				if (length > 0)
+				{
+					return (type: type, length: length);
+				}
 			}
-
-			throw new ParseException("Unable to evaluate token type.", line);
+			
+			string inputPreview = input.Length > 24 ? input.Substring(0, 32) + "..." : input;
+			throw new ParseException($"Unable to evaluate token type on segment \"{inputPreview}\".", line);
 		}
 	}
 }

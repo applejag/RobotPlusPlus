@@ -17,9 +17,9 @@ namespace RobotPlusPlus.Attributes
 			this.options = options;
 		}
 
-		public bool Evaluate(string input)
+		public int MatchingLength(string input)
 		{
-			return Regex.IsMatch(input, $@"^{pattern}$", options);
+			return Regex.Match(input, $@"^{pattern}", options).Length;
 		}
 	}
 }
