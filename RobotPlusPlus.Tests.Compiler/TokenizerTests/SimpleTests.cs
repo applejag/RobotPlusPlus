@@ -21,7 +21,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 		public void Tokenize_Whitespace()
 		{
 			// Act
-			Token[] result = Tokenizer.Tokenize("   	 		  ");
+			Token[] result = Tokenizer.Tokenize("   \t\t  \r\n \t  \n");
 
 			// Assert
 			Assert.IsNotNull(result);
