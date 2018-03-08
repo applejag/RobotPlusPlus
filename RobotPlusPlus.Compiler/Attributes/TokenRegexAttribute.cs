@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
-namespace RobotPlusPlus.Tokenizing
+namespace RobotPlusPlus.Attributes
 {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
 	public class TokenRegexAttribute : Attribute
