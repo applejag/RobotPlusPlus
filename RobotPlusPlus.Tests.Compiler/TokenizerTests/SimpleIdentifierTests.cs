@@ -1,36 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using System.Collections.Generic;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Tests.TokenizerTests
 {
 	[TestClass]
-	public class TokenizerSimpleTests
-	{
-		[TestMethod]
-		public void Tokenize_Null()
-		{
-			// Act
-			Token[] result = Tokenizer.Tokenize(null);
-
-			// Assert
-			Assert.IsNotNull(result);
-			Assert.AreEqual(0, result.Length);
-		}
-
-		[TestMethod]
-		public void Tokenize_Whitespace()
-		{
-			// Act
-			Token[] result = Tokenizer.Tokenize("   	 		  ");
-
-			// Assert
-			Assert.IsNotNull(result);
-			Assert.AreEqual(0, result.Length);
-		}
-
+    public class SimpleIdentifierTests
+    {
 		private static void AssertSingleIdentifier(string input, IReadOnlyList<Token> result)
 		{
 			Assert.IsNotNull(result);
@@ -66,7 +42,7 @@ namespace RobotPlusPlus.Tests
 			// Assert
 			AssertSingleIdentifier(input, result);
 		}
-		
+
 		[TestMethod]
 		public void Tokenize_SingleIdentifierMultipleCharWithSpaces()
 		{
