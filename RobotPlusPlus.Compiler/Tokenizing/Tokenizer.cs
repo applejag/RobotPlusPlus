@@ -33,6 +33,11 @@ namespace RobotPlusPlus.Tokenizing
 			"true", "false", "null"
 		};
 
+		private static readonly IReadOnlyCollection<char> punctuators = new[]
+		{
+			'.', ',', ':', ';', '(', ')', '[', ']', '{', '}', '?'
+		};
+
 		private Tokenizer(string sourceCode)
 		{
 			SourceCode = sourceCode;
@@ -86,6 +91,10 @@ namespace RobotPlusPlus.Tokenizing
 			// Numbers
 			if ((length = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) > 0)
 				return (TokenType.Literal, length);
+
+			// Punctuators
+			if (punctuators.Contains(remainingCode[0]))
+				return (TokenType.Punctuators, 1);
 
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
