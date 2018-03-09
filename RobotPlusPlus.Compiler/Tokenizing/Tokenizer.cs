@@ -28,6 +28,11 @@ namespace RobotPlusPlus.Tokenizing
 			'"', '\''
 		};
 
+		private static readonly IReadOnlyCollection<string> literalKeywords = new[]
+		{
+			"true", "false", "null"
+		};
+
 		private Tokenizer(string sourceCode)
 		{
 			SourceCode = sourceCode;
@@ -54,6 +59,10 @@ namespace RobotPlusPlus.Tokenizing
 			if ((length = MatchingRegex(@"\s+")) > 0)
 				return (TokenType.Whitespace, length);
 
+			// Literal keywords
+			if ((length = MatchingWordsInList(literalKeywords, ignoreCase: false)) > 0)
+				return (TokenType.Literal, length);
+
 			// Keywords
 			if ((length = MatchingWordsInList(keywords, ignoreCase: false)) > 0)
 				return (TokenType.Keyword, length);
@@ -73,8 +82,7 @@ namespace RobotPlusPlus.Tokenizing
 				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") > 0)
 					throw new ParseException("Nonterminated string literal.", CurrentRow);
 			}
-
-
+			
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
