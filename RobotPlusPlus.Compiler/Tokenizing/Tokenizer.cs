@@ -126,6 +126,14 @@ namespace RobotPlusPlus.Tokenizing
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
 
+		private static Token CreateToken(TokenType type, string source)
+		{
+			if (type == TokenType.Literal)
+				return new LiteralToken(source);
+
+			return new Token(type, source);
+		}
+
 		public void Iterate()
 		{
 			if (IsParsingComplete) throw new InvalidOperationException("The Tokenizer has already finished!");
@@ -137,7 +145,7 @@ namespace RobotPlusPlus.Tokenizing
 
 				// Create token
 				string tokenSegment = remainingCode.Substring(0, length);
-				tokens.Add(new Token(type, tokenSegment));
+				tokens.Add(CreateToken(type, tokenSegment));
 
 				// Update remaining code
 				remainingCode = remainingCode.Substring(length);
@@ -153,6 +161,11 @@ namespace RobotPlusPlus.Tokenizing
 			{
 				ParseException = e;
 				throw;
+			}
+			catch (Exception e)
+			{
+				ParseException = new ParseException("Unkown exception during parsing!", CurrentRow, e);
+				throw ParseException;
 			}
 		}
 
