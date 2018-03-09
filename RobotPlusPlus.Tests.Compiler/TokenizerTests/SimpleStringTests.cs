@@ -107,5 +107,26 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			Assert.AreEqual(input, result[0].Source);
 		}
+		
+		[TestMethod]
+		public void Tokenize_TwoStrings()
+		{
+			// Arrange
+			const string str1 = @"""hello world""";
+			const string str2 = @"'some sheep don\'t sleep'";
+			string input = $"{str1} {str2}";
+
+			// Act
+			Token[] result = Tokenizer.Tokenize(input);
+
+			// Assert
+			Utility.AssertTokenTypes(result,
+				TokenType.Literal,
+				TokenType.Whitespace,
+				TokenType.Literal);
+
+			Assert.AreEqual(str1, result[0].Source);
+			Assert.AreEqual(str2, result[2].Source);
+		}
 	}
 }
