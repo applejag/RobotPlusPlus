@@ -19,7 +19,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -35,7 +35,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -51,7 +51,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -67,7 +67,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -83,7 +83,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -99,7 +99,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Utility.AssertTokenTypes(result,
 				TokenType.Literal);
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 	}

@@ -7,10 +7,8 @@ namespace RobotPlusPlus
 		public int Line { get; }
 
 		public ParseException(string msg, int line)
-			: base(msg)
-		{
-			Line = line;
-		}
+			: this(msg, line, null)
+		{}
 
 		public ParseException(string msg, int line, Exception innerException)
 			: base(msg, innerException)

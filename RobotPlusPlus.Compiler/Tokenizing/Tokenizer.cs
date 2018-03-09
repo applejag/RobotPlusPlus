@@ -126,12 +126,19 @@ namespace RobotPlusPlus.Tokenizing
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
 
-		private static Token CreateToken(TokenType type, string source)
+		private static Token CreateToken(TokenType type, string sourceCode, int sourceLine)
 		{
-			if (type == TokenType.Literal)
-				return new LiteralToken(source);
+			switch (type)
+			{
+				case TokenType.Literal:
+					return new LiteralToken(sourceCode, sourceLine);
 
-			return new Token(type, source);
+				case TokenType.Operator:
+					return new OperatorToken(sourceCode, sourceLine);
+
+				default:
+					return new Token(type, sourceCode, sourceLine);
+			}
 		}
 
 		public void Iterate()
@@ -145,7 +152,7 @@ namespace RobotPlusPlus.Tokenizing
 
 				// Create token
 				string tokenSegment = remainingCode.Substring(0, length);
-				tokens.Add(CreateToken(type, tokenSegment));
+				tokens.Add(CreateToken(type, tokenSegment, CurrentRow));
 
 				// Update remaining code
 				remainingCode = remainingCode.Substring(length);
