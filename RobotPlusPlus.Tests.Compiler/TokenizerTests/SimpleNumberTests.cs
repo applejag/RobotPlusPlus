@@ -102,5 +102,69 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Assert.AreEqual(input, result[0].Source);
 		}
 
+		[TestMethod]
+		public void Tokenize_OneIntegerNegative()
+		{
+			// Arrange
+			const string input = @"-666";
+
+			// Act
+			Token[] result = Tokenizer.Tokenize(input);
+
+			// Assert
+			Utility.AssertTokenTypes(result,
+				TokenType.Literal);
+
+			Assert.AreEqual(input, result[0].Source);
+		}
+
+		[TestMethod]
+		public void Tokenize_OneRealNegative()
+		{
+			// Arrange
+			const string input = @"-13.37";
+
+			// Act
+			Token[] result = Tokenizer.Tokenize(input);
+
+			// Assert
+			Utility.AssertTokenTypes(result,
+				TokenType.Literal);
+
+			Assert.AreEqual(input, result[0].Source);
+		}
+
+		[TestMethod]
+		public void Tokenize_OneRealNegativeNothingBeforePoint()
+		{
+			// Arrange
+			const string input = @"-.5";
+
+			// Act
+			Token[] result = Tokenizer.Tokenize(input);
+
+			// Assert
+			Utility.AssertTokenTypes(result,
+				TokenType.Literal);
+
+			Assert.AreEqual(input, result[0].Source);
+		}
+
+		[TestMethod]
+		public void Tokenize_OneRealNegativeNothingAfterPoint()
+		{
+			// Arrange
+			const string input = @"-10.";
+
+			// Act
+			Token[] result = Tokenizer.Tokenize(input);
+
+			// Assert
+			Utility.AssertTokenTypes(result,
+				TokenType.Literal);
+
+			Assert.AreEqual(input, result[0].Source);
+		}
+
 	}
 }
