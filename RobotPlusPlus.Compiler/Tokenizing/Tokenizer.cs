@@ -38,6 +38,22 @@ namespace RobotPlusPlus.Tokenizing
 			'.', ',', ':', ';', '(', ')', '[', ']', '{', '}', '?'
 		};
 
+		private static readonly IReadOnlyCollection<string> operators = new[]
+		{
+			// Comparisons
+			"==", "<=", ">=", "!=",
+			// Assignment
+			"=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
+			// Math
+			"++", "--", "+", "-", "*", "/", "%",
+			// Boolean
+			"&&", "||", "!",
+			// Binary
+			"&", "|", "^", "<<", ">>", "~",
+			// Comparisons 2
+			"<", ">",
+		};
+
 		private Tokenizer(string sourceCode)
 		{
 			SourceCode = sourceCode;
@@ -101,6 +117,10 @@ namespace RobotPlusPlus.Tokenizing
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
 				return (TokenType.Punctuators, 1);
+
+			// Operators
+			if ((length = MatchingStringInList(operators)) > 0)
+				return (TokenType.Operator, length);
 
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
@@ -169,6 +189,27 @@ namespace RobotPlusPlus.Tokenizing
 
 			foreach (string word in words)
 			{
+				if (match.Equals(word, option))
+				{
+					return word.Length;
+				}
+			}
+
+			return 0;
+		}
+
+		public int MatchingStringInList(
+			[NotNull, ItemNotNull] IReadOnlyCollection<string> samples,
+			bool ignoreCase = false)
+		{
+			StringComparison option = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+
+			foreach (string word in samples)
+			{
+				if (remainingCode.Length < word.Length) continue;
+
+				string match = remainingCode.Substring(0, word.Length);
+
 				if (match.Equals(word, option))
 				{
 					return word.Length;
