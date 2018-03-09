@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using RobotPlusPlus.Attributes;
 using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Tokenizing
