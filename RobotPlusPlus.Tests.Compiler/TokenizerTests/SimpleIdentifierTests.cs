@@ -7,15 +7,6 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 	[TestClass]
     public class SimpleIdentifierTests
     {
-		private static void AssertSingleIdentifier(string input, IReadOnlyList<Token> result)
-		{
-			Assert.IsNotNull(result);
-			Assert.AreEqual(1, result.Count);
-
-			Assert.IsNotNull(result[0]);
-			Assert.AreEqual(result[0].Type, TokenType.Identifier);
-			Assert.AreEqual(input.Trim(), result[0].Source);
-		}
 
 		[TestMethod]
 		public void Tokenize_SingleIdentifierSingleChar()
@@ -27,7 +18,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			AssertSingleIdentifier(input, result);
+			Utility.AssertTokenTypes(result,
+				TokenType.Identifier);
 		}
 
 		[TestMethod]
@@ -40,7 +32,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			AssertSingleIdentifier(input, result);
+			Utility.AssertTokenTypes(result,
+				TokenType.Identifier);
 		}
 
 		[TestMethod]
@@ -53,7 +46,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			AssertSingleIdentifier(input, result);
+			Utility.AssertTokenTypes(result,
+				TokenType.Whitespace,
+				TokenType.Identifier,
+				TokenType.Whitespace);
 		}
 
 		[TestMethod]
@@ -79,20 +75,12 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Assert.IsNotNull(result);
-			Assert.AreEqual(3, result.Length);
-
-			Assert.IsNotNull(result[0]);
-			Assert.AreEqual(result[0].Type, TokenType.Identifier);
-			Assert.AreEqual("my", result[0].Source);
-
-			Assert.IsNotNull(result[1]);
-			Assert.AreEqual(result[1].Type, TokenType.Identifier);
-			Assert.AreEqual("varIab13s", result[1].Source);
-
-			Assert.IsNotNull(result[2]);
-			Assert.AreEqual(result[2].Type, TokenType.Identifier);
-			Assert.AreEqual("shine", result[2].Source);
+			Utility.AssertTokenTypes(result,
+				TokenType.Identifier,
+				TokenType.Whitespace,
+				TokenType.Identifier,
+				TokenType.Whitespace,
+				TokenType.Identifier);
 		}
 	}
 }
