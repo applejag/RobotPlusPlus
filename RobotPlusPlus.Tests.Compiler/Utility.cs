@@ -28,5 +28,25 @@ namespace RobotPlusPlus.Tests
 				Assert.AreEqual(type, tokens[i].Type, $"tokens[{i}] wrong type.");
 			}
 		}
+
+		public static void ActAndAssert(IEnumerable<string> samples, params TokenType[] expected)
+		{
+			foreach (string input in samples)
+			{
+				try
+				{
+					// Act
+					Token[] result = Tokenizer.Tokenize(input);
+
+					// Assert
+					AssertTokenTypes(result, expected);
+				}
+				catch (ParseException e)
+				{
+					throw new AssertFailedException($"Failed on:<{input}>. {e.Message}", e);
+				}
+			}
+		}
+
 	}
 }
