@@ -17,5 +17,16 @@ namespace RobotPlusPlus.Tests
 				Assert.AreEqual(types[i], tokens[i].Type, $"tokens[{i}] wrong type.");
 			}
 		}
+
+		public static void AssertTokenTypesAllSame(IReadOnlyList<Token> tokens, TokenType type)
+		{
+			Assert.IsNotNull(tokens, "Tokens list is null.");
+
+			for (var i = 0; i < tokens.Count; i++)
+			{
+				Assert.IsNotNull(tokens[i], $"tokens[{i}] is null.");
+				Assert.AreEqual(type, tokens[i].Type, $"tokens[{i}] wrong type.");
+			}
+		}
 	}
 }
