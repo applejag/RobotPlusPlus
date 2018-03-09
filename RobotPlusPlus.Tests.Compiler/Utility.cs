@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
 
@@ -11,20 +12,19 @@ namespace RobotPlusPlus.Tests
 			Assert.IsNotNull(tokens, "Tokens list is null.");
 			Assert.AreEqual(types.Length, tokens.Count, "Wrong token count in result.");
 
-			for (var i = 0; i < tokens.Count; i++)
-			{
-				Assert.IsNotNull(tokens[i], $"tokens[{i}] is null.");
-				Assert.AreEqual(types[i], tokens[i].Type, $"tokens[{i}] wrong type.");
-			}
+			CollectionAssert.AllItemsAreNotNull(tokens.ToList());
+
+			TokenType[] actual = tokens.Select(t => t.Type).ToArray();
+			CollectionAssert.AreEqual(types, actual);
 		}
 
-		public static void AssertTokenTypesAllSame(IReadOnlyList<Token> tokens, TokenType type)
+		public static void AssertTokenTypesAllSame(Token[] tokens, TokenType type)
 		{
 			Assert.IsNotNull(tokens, "Tokens list is null.");
-
-			for (var i = 0; i < tokens.Count; i++)
+			CollectionAssert.AllItemsAreNotNull(tokens);
+			
+			for (var i = 0; i < tokens.Length; i++)
 			{
-				Assert.IsNotNull(tokens[i], $"tokens[{i}] is null.");
 				Assert.AreEqual(type, tokens[i].Type, $"tokens[{i}] wrong type.");
 			}
 		}
