@@ -11,7 +11,7 @@ namespace RobotPlusPlus.Tokenizing
 		Identifier,
 
 		/// <summary>Separators and pairing characters. Ex: }, (, ;</summary>
-		Punctuators,
+		Punctuator,
 
 		/// <summary>Assignment and comparisson. Ex: =, >, +</summary>
 		Operator,

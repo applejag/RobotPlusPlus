@@ -23,11 +23,11 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 				TokenType.Operator,     // *
 				TokenType.Identifier,   // x
 				TokenType.Operator,     // +
-				TokenType.Punctuators,  // (
+				TokenType.Punctuator,  // (
 				TokenType.Literal,      // 50
 				TokenType.Operator,     // -
 				TokenType.Identifier,   // z
-				TokenType.Punctuators,  // )
+				TokenType.Punctuator,  // )
 				TokenType.Operator,     // *
 				TokenType.Literal       // .5
 				);

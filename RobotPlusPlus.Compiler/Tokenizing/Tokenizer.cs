@@ -116,7 +116,7 @@ namespace RobotPlusPlus.Tokenizing
 
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
-				return (TokenType.Punctuators, 1);
+				return (TokenType.Punctuator, 1);
 
 			// Operators
 			if ((length = MatchingStringInList(operators)) > 0)
