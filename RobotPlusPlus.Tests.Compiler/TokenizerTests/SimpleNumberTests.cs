@@ -113,6 +113,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
+				TokenType.Operator,
 				TokenType.Literal);
 
 			Assert.AreEqual(input, result[0].Source);
@@ -129,6 +130,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
+				TokenType.Operator,
 				TokenType.Literal);
 
 			Assert.AreEqual(input, result[0].Source);
@@ -145,6 +147,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
+				TokenType.Operator,
 				TokenType.Literal);
 
 			Assert.AreEqual(input, result[0].Source);
@@ -161,6 +164,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
+				TokenType.Operator,
 				TokenType.Literal);
 
 			Assert.AreEqual(input, result[0].Source);

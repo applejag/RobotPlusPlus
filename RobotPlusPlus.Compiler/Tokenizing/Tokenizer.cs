@@ -89,7 +89,7 @@ namespace RobotPlusPlus.Tokenizing
 			}
 
 			// Numbers
-			if ((length = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) > 0)
+			if ((length = MatchingRegex(@"(-?\d+\.?\d*|-?\d*\.\d+)")) > 0)
 				return (TokenType.Literal, length);
 
 			// Punctuators
