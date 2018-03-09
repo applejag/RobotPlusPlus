@@ -82,7 +82,11 @@ namespace RobotPlusPlus.Tokenizing
 				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") > 0)
 					throw new ParseException("Nonterminated string literal.", CurrentRow);
 			}
-			
+
+			// Numbers
+			if ((length = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) > 0)
+				return (TokenType.Literal, length);
+
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
