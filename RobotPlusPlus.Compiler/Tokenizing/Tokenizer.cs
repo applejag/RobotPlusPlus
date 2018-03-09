@@ -89,8 +89,14 @@ namespace RobotPlusPlus.Tokenizing
 			}
 
 			// Numbers
-			if ((length = MatchingRegex(@"(-?\d+\.?\d*|-?\d*\.\d+)")) > 0)
+			if ((length = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) > 0)
+			{
+				// Ending with invalid char?
+				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]") > 0)
+					throw new ParseException("Unexpected character after number.", CurrentRow);
+
 				return (TokenType.Literal, length);
+			}
 
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
@@ -126,6 +132,7 @@ namespace RobotPlusPlus.Tokenizing
 			catch (ParseException e)
 			{
 				ParseException = e;
+				throw;
 			}
 		}
 
@@ -139,9 +146,6 @@ namespace RobotPlusPlus.Tokenizing
 			while (!tokenizer.IsParsingComplete)
 			{
 				tokenizer.Iterate();
-
-				if (tokenizer.ParseException != null)
-					throw tokenizer.ParseException;
 			}
 
 			return tokenizer.Tokens.ToArray();
