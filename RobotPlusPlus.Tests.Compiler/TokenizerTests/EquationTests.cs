@@ -18,19 +18,19 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Identifier,	// y
-				TokenType.Operator,     // =
-				TokenType.Identifier,   // x
-				TokenType.Operator,     // *
-				TokenType.Identifier,   // x
-				TokenType.Operator,     // +
-				TokenType.Punctuator,  // (
-				TokenType.Literal,      // 50
-				TokenType.Operator,     // -
-				TokenType.Identifier,   // z
-				TokenType.Punctuator,  // )
-				TokenType.Operator,     // *
-				TokenType.Literal       // .5
+				typeof(Identifier),   // y
+				typeof(Operator),     // =
+				typeof(Identifier),   // x
+				typeof(Operator),     // *
+				typeof(Identifier),   // x
+				typeof(Operator),     // +
+				typeof(Punctuator),   // (
+				typeof(Literal),      // 50
+				typeof(Operator),     // -
+				typeof(Identifier),   // z
+				typeof(Punctuator),   // )
+				typeof(Operator),     // *
+				typeof(Literal)       // .5
 				);
 		}
 	}

@@ -26,7 +26,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Whitespace);
+				typeof(Whitespace));
 		}
 
 	}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Tokenizing.Tokens.Literals;
 
 namespace RobotPlusPlus.Tokenizing
 {
@@ -19,7 +20,7 @@ namespace RobotPlusPlus.Tokenizing
 		public bool IsParsingSuccessful => ParseException == null;
 		public ParseException ParseException { get; private set; } = null;
 
-		private static readonly IReadOnlyCollection<string> keywords = new[]
+		private static readonly IReadOnlyCollection<string> statements = new[]
 		{
 			"if", "while", "try"
 		};
@@ -61,77 +62,72 @@ namespace RobotPlusPlus.Tokenizing
 			remainingCode = sourceCode;
 		}
 
-		private (TokenType type, int length) EvaluateNextType()
+		private Token EvaluateNextType()
 		{
-			int length;
+			string segment;
 
 			// Block comment
-			if ((length = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) > 0)
-				return (TokenType.Comment, length);
+			if ((segment = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) != null)
+				return new Comment(segment, CurrentRow, isBlock: true);
 
 			// Incomplete block comment
-			if (MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\z") > 0)
+			if (MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\z") != null)
 				throw new ParseException("Nonterminated block comment.", CurrentRow);
-
+			
 			// Singleline comment
-			if ((length = MatchingRegex(@"\/\/.*")) > 0)
-				return (TokenType.Comment, length);
+			if ((segment = MatchingRegex(@"\/\/.*")) != null)
+				return new Comment(segment, CurrentRow, isBlock: false);
 
 			// Whitespace
-			if ((length = MatchingRegex(@"\s+")) > 0)
-				return (TokenType.Whitespace, length);
+			if ((segment = MatchingRegex(@"\s+")) != null)
+				return new Whitespace(segment, CurrentRow);
 
 			// Literal keywords
-			if ((length = MatchingWordsInList(literalKeywords, ignoreCase: false)) > 0)
-				return (TokenType.Literal, length);
+			if ((segment = MatchingWordsInList(literalKeywords, ignoreCase: false)) != null)
+				return new LiteralKeyword(segment, CurrentRow);
 
-			// Keywords
-			if ((length = MatchingWordsInList(keywords, ignoreCase: false)) > 0)
-				return (TokenType.Keyword, length);
+			// Statements
+			if ((segment = MatchingWordsInList(statements, ignoreCase: false)) != null)
+				return new Statement(segment, CurrentRow);
 
 			// Identifiers
-			if ((length = MatchingRegex(@"[\p{L}_][\p{L}_\p{N}]*")) > 0)
-				return (TokenType.Identifier, length);
+			if ((segment = MatchingRegex(@"[\p{L}_][\p{L}_\p{N}]*")) != null)
+				return new Identifier(segment, CurrentRow);
 
 			// Strings
 			foreach (char s in strings)
 			{
 				// Full string
-				if ((length = MatchingRegex($@"{s}([^{s}\\]|\\.)*{s}")) > 0)
-					return (TokenType.Literal, length);
+				if ((segment = MatchingRegex($@"{s}([^{s}\\]|\\.)*{s}")) != null)
+					return new LiteralString(segment, CurrentRow);
 				
 				// Incomplete '' strings
-				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") > 0)
+				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") != null)
 					throw new ParseException("Nonterminated string literal.", CurrentRow);
 			}
 
 			// Numbers
-			if ((length = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) > 0)
+			if ((segment = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) != null)
 			{
 				// Ending with invalid char?
-				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]") > 0)
+				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]") != null)
 					throw new ParseException("Unexpected character after number.", CurrentRow);
 
-				return (TokenType.Literal, length);
+				return new LiteralNumber(segment, CurrentRow);
 			}
 
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
-				return (TokenType.Punctuator, 1);
+				return new Punctuator(remainingCode.Substring(0, 1), CurrentRow);
 
 			// Operators
-			if ((length = MatchingStringInList(operators)) > 0)
-				return (TokenType.Operator, length);
+			if ((segment = MatchingStringInList(operators)) != null)
+				return new Operator(segment, CurrentRow);
 
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
-
-		private TToken CreateTokenOfType<TToken>(int length) where TToken : Token
-		{
-
-		}
-
+		
 		public void Iterate()
 		{
 			if (IsParsingComplete) throw new InvalidOperationException("The Tokenizer has already finished!");
@@ -139,17 +135,14 @@ namespace RobotPlusPlus.Tokenizing
 
 			try
 			{
-				(TokenType type, int length) = EvaluateNextType();
-
-				// Create token
-				string tokenSegment = remainingCode.Substring(0, length);
-				tokens.Add(new Token(type, tokenSegment, CurrentRow));
+				Token token = EvaluateNextType();
+				tokens.Add(token);
 
 				// Update remaining code
-				remainingCode = remainingCode.Substring(length);
+				remainingCode = remainingCode.Substring(token.SourceCode.Length);
 
 				// Update row
-				foreach (char c in tokenSegment)
+				foreach (char c in token.SourceCode)
 				{
 					if (c == '\n')
 						CurrentRow++;
@@ -184,32 +177,28 @@ namespace RobotPlusPlus.Tokenizing
 
 		#region Comparators
 
-		public int MatchingRegex(
+		public string MatchingRegex(
 			[RegexPattern, NotNull] string pattern,
 			RegexOptions options = RegexOptions.IgnoreCase)
 		{
-			return Regex.Match(remainingCode, $@"^{pattern}", options).Length;
+			Match match = Regex.Match(remainingCode, $@"^{pattern}", options);
+
+			return match.Success && match.Length > 0
+				? remainingCode.Substring(0, match.Length)
+				: null;
 		}
 
-		public int MatchingWordsInList(
+		public string MatchingWordsInList(
 			[NotNull, ItemNotNull] IReadOnlyCollection<string> words,
 			bool ignoreCase = false)
 		{
 			string match = Regex.Match(remainingCode, @"^\w*").Value;
 			StringComparison option = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
 
-			foreach (string word in words)
-			{
-				if (match.Equals(word, option))
-				{
-					return word.Length;
-				}
-			}
-
-			return 0;
+			return words.FirstOrDefault(word => match.Equals(word, option));
 		}
 
-		public int MatchingStringInList(
+		public string MatchingStringInList(
 			[NotNull, ItemNotNull] IReadOnlyCollection<string> samples,
 			bool ignoreCase = false)
 		{
@@ -223,11 +212,11 @@ namespace RobotPlusPlus.Tokenizing
 
 				if (match.Equals(word, option))
 				{
-					return word.Length;
+					return word;
 				}
 			}
 
-			return 0;
+			return null;
 		}
 
 		#endregion

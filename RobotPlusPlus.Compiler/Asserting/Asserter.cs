@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RobotPlusPlus.Asserting.Definitions;
 using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Asserting
@@ -10,7 +9,7 @@ namespace RobotPlusPlus.Asserting
 	public class Asserter
 	{
 		private readonly Queue<Token> tokens;
-		private readonly HashSet<Variable> variablePool = new HashSet<Variable>();
+		//private readonly HashSet<Variable> variablePool = new HashSet<Variable>();
 
 		public bool IsParsingComplete => tokens.Count == 0;
 		public bool IsParsingSuccessful => ParseException == null;
@@ -24,8 +23,8 @@ namespace RobotPlusPlus.Asserting
 		private Asserter(Token[] tokens)
 		{
 			// Ignore whitespace and comments
-			this.tokens = new Queue<Token>(tokens
-				.Where(t => t.Type != TokenType.Whitespace && t.Type != TokenType.Comment));
+			//this.tokens = new Queue<Token>(tokens
+			//	.Where(t => t.Type != TokenType.Whitespace && t.Type != TokenType.Comment));
 		}
 
 		private void EvaluateNextDefinition()
@@ -33,22 +32,22 @@ namespace RobotPlusPlus.Asserting
 			Token token = NextToken();
 			if (token == null) return;
 			
-			if (token.Type == TokenType.Identifier)
-			{
-				// Two identifier in a row?
-				if (targetIdentifier != null)
-					throw new ParseException($"Unexpected identifier {token.SourceCode}", token.SourceLine);
+			//if (token.Type == TokenType.Identifier)
+			//{
+			//	// Two identifier in a row?
+			//	if (targetIdentifier != null)
+			//		throw new ParseException($"Unexpected identifier {token.SourceCode}", token.SourceLine);
 
-				targetIdentifier = token;
-				return;
-			}
+			//	targetIdentifier = token;
+			//	return;
+			//}
 			
-			if (token is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
-			{
-				tokens.Enqueue(token);
-				tokens.Enqueue(targetIdentifier);
-				targetIdentifier = null;
-			}
+			//if (token is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
+			//{
+			//	tokens.Enqueue(token);
+			//	tokens.Enqueue(targetIdentifier);
+			//	targetIdentifier = null;
+			//}
 		}
 
 		public Token NextToken()

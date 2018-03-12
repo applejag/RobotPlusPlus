@@ -17,7 +17,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+				typeof(Literal));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -32,7 +32,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+				typeof(Literal));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -73,7 +73,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+				typeof(Literal));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -88,7 +88,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+				typeof(Literal));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -104,11 +104,11 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+				typeof(Literal));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
-		
+
 		[TestMethod]
 		public void Tokenize_TwoStrings()
 		{
@@ -122,9 +122,9 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 
 			// Assert
 			Utility.AssertTokenTypes(result,
-				TokenType.Literal,
-				TokenType.Whitespace,
-				TokenType.Literal);
+				typeof(Literal),
+				typeof(Whitespace),
+				typeof(Literal));
 
 			Assert.AreEqual(str1, result[0].SourceCode);
 			Assert.AreEqual(str2, result[2].SourceCode);

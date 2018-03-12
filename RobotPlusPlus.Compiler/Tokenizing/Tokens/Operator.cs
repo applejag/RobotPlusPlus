@@ -1,15 +1,14 @@
-﻿using RobotPlusPlus.Tokenizing;
-using RobotPlusPlus.Tokenizing.Tokens;
+﻿using RobotPlusPlus.Asserting;
 
-namespace RobotPlusPlus.Asserting.Definitions
+namespace RobotPlusPlus.Tokenizing.Tokens
 {
-	public class OperatorToken : Token
+	public class Operator : Token
 	{
 		public Type OperatorType { get; }
 
-		public OperatorToken(Token token) : this(token.SourceCode, token.SourceLine) { }
+		public Operator(Token token) : this(token.SourceCode, token.SourceLine) { }
 
-		public OperatorToken(string sourceCode, int sourceLine) : base(TokenType.Operator, sourceCode, sourceLine)
+		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
 			switch (sourceCode)
 			{
@@ -46,6 +45,8 @@ namespace RobotPlusPlus.Asserting.Definitions
 				case "&":
 				case "|":
 				case "^":
+				case "<<":
+				case ">>":
 					OperatorType = Type.Math;
 					break;
 
@@ -60,12 +61,17 @@ namespace RobotPlusPlus.Asserting.Definitions
 			}
 		}
 
-		public new enum Type
+		public enum Type
 		{
 			Assignment,
 			Comparator,
 			Unary,
 			Math,
+		}
+
+		public override void AssertToken(Asserter asserter)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

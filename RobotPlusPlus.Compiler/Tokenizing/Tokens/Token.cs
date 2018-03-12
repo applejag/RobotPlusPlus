@@ -2,23 +2,28 @@
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
-	public class Token
+	public abstract class Token
 	{
-		public TokenType Type { get; }
 		public string SourceCode { get; }
 		public int SourceLine { get; }
+		public int NewLines { get; }
 
-		public Token(TokenType type, string sourceCode, int sourceLine)
+		protected Token(string sourceCode, int sourceLine)
 		{
-			Type = type;
 			SourceCode = sourceCode;
 			SourceLine = sourceLine;
+
+			var newLines = 0;
+			foreach (char c in sourceCode)
+			{
+				if (c == '\n')
+					newLines++;
+			}
+
+			NewLines = newLines;
 		}
 
-		public virtual void AssertToken(Asserter asserter)
-		{
-
-		}
+		public abstract void AssertToken(Asserter asserter);
 
 	}
 }
