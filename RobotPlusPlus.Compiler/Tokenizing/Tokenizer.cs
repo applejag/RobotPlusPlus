@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tokenizing
 {
@@ -126,19 +127,9 @@ namespace RobotPlusPlus.Tokenizing
 			throw new ParseException("Unable to parse next token.", CurrentRow);
 		}
 
-		private static Token CreateToken(TokenType type, string sourceCode, int sourceLine)
+		private TToken CreateTokenOfType<TToken>(int length) where TToken : Token
 		{
-			switch (type)
-			{
-				case TokenType.Literal:
-					return new LiteralToken(sourceCode, sourceLine);
 
-				case TokenType.Operator:
-					return new OperatorToken(sourceCode, sourceLine);
-
-				default:
-					return new Token(type, sourceCode, sourceLine);
-			}
 		}
 
 		public void Iterate()
@@ -152,7 +143,7 @@ namespace RobotPlusPlus.Tokenizing
 
 				// Create token
 				string tokenSegment = remainingCode.Substring(0, length);
-				tokens.Add(CreateToken(type, tokenSegment, CurrentRow));
+				tokens.Add(new Token(type, tokenSegment, CurrentRow));
 
 				// Update remaining code
 				remainingCode = remainingCode.Substring(length);

@@ -1,8 +1,9 @@
-﻿using RobotPlusPlus.Asserting.Definitions;
-using RobotPlusPlus.Tokenizing;
+﻿using RobotPlusPlus.Tokenizing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Asserting.Definitions;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Asserting
 {
@@ -47,7 +48,6 @@ namespace RobotPlusPlus.Asserting
 				tokens.Enqueue(token);
 				tokens.Enqueue(targetIdentifier);
 				targetIdentifier = null;
-				new Assignment(this);
 			}
 		}
 

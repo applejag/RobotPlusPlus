@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using RobotPlusPlus.Tokenizing;
-using RobotPlusPlus.Utility;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Asserting.Definitions
 {
@@ -8,6 +8,7 @@ namespace RobotPlusPlus.Asserting.Definitions
 	{
 		public List<Token> tokens = new List<Token>();
 		public Token LastToken => tokens.Count > 0 ? tokens[tokens.Count - 1] : null;
+		
 
 		public Expression ReadParentasesGroup(Asserter asserter)
 		{

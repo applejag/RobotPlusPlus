@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tokenizing
+namespace RobotPlusPlus.Asserting.Definitions
 {
 	public class LiteralToken : Token
 	{

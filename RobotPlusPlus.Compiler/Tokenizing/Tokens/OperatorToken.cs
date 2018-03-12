@@ -1,9 +1,13 @@
-﻿namespace RobotPlusPlus.Tokenizing
+﻿using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
+
+namespace RobotPlusPlus.Asserting.Definitions
 {
 	public class OperatorToken : Token
 	{
-		
 		public Type OperatorType { get; }
+
+		public OperatorToken(Token token) : this(token.SourceCode, token.SourceLine) { }
 
 		public OperatorToken(string sourceCode, int sourceLine) : base(TokenType.Operator, sourceCode, sourceLine)
 		{

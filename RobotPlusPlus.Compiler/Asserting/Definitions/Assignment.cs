@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using RobotPlusPlus.Tokenizing;
+﻿using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Asserting.Definitions
 {
-	public class Assignment
+	public class Assignment : CodeUnit
 	{
 		public Token TargetIdentifier { get; }
 		public OperatorToken Operator { get; }

@@ -1,5 +1,6 @@
-﻿using RobotPlusPlus.Tokenizing;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Asserting.Definitions
 {

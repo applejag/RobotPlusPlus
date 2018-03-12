@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using RobotPlusPlus.Utility;
+﻿using RobotPlusPlus.Asserting;
 
-namespace RobotPlusPlus.Tokenizing
+namespace RobotPlusPlus.Tokenizing.Tokens
 {
 	public class Token
 	{
@@ -16,6 +14,11 @@ namespace RobotPlusPlus.Tokenizing
 			SourceCode = sourceCode;
 			SourceLine = sourceLine;
 		}
-		
+
+		public virtual void AssertToken(Asserter asserter)
+		{
+
+		}
+
 	}
 }
