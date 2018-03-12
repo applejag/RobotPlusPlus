@@ -1,12 +1,11 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Parsing;
-using RobotPlusPlus.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Tests.CompilerTests
 {
     [TestClass]
-    public class ParserTest
+    public class SimpleTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException))]

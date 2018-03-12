@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -17,6 +18,13 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			get => Tokens[1];
 			set => Tokens[1] = value;
 		}
+
+		public bool ContainsValue => Tokens.Any(t =>
+			t is Literal
+			|| t is Identifier
+			|| (t is Punctuator p && p.PunctuatorType == Punctuator.Type.OpeningParentases &&
+			    p.Tokens.Count > 0)
+			|| (t is Operator o && o.ContainsValue));
 
 		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
@@ -131,14 +139,16 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				case Type.BooleanOR:
 					if (prev is Identifier
 						|| prev is Literal
-						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases))
+						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases)
+					    || (prev is Operator op1 && op1.ContainsValue))
 						LHS = parser.TakePrevToken();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 					if (next is Identifier
 						|| next is Literal
-						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases))
+						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases)
+					    || (next is Operator op2 && op2.ContainsValue))
 						RHS = parser.TakeNextToken();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -152,7 +162,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 					if (next is Identifier
 						|| next is Literal
-						|| (next is Punctuator tp2 && tp2.PunctuatorType == Punctuator.Type.OpeningParentases))
+						|| (next is Punctuator tp2 && tp2.PunctuatorType == Punctuator.Type.OpeningParentases)
+						|| (next is Operator op3 && op3.ContainsValue))
 						RHS = parser.TakeNextToken();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);

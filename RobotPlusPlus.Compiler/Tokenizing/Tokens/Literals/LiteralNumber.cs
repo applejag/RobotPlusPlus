@@ -11,9 +11,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 
 		public LiteralNumber(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
-			Value = sourceCode.IndexOf('.') == -1
-				? int.Parse(sourceCode, NumberStyles.None, CultureInfo.InvariantCulture)
-				: double.Parse(sourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+			// ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+			if (sourceCode.IndexOf('.') == -1)
+				Value = int.Parse(sourceCode, NumberStyles.None, CultureInfo.InvariantCulture);
+			else
+				Value = double.Parse(sourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 		}
 
 		public override void ParseToken(Parser parser)

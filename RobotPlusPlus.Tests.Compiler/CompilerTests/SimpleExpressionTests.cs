@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Parsing;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Tests.CompilerTests
 {
 	[TestClass]
-	public class ParserExpressionSimpleTests
+	public class SimpleExpressionTests
 	{
 		[TestMethod]
 		public void Parse_Integer()

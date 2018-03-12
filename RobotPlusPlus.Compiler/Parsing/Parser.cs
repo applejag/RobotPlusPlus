@@ -10,11 +10,13 @@ namespace RobotPlusPlus.Parsing
 	public class Parser
 	{
 		private readonly List<Token> tokens;
-		private int index;
 
 		public Token NextToken => TryGetToken(1);
 		public Token CurrToken => TryGetToken(0);
 		public Token PrevToken => TryGetToken(-1);
+
+		private readonly List<int> indexes = new List<int>();
+		private int topIndex => indexes[indexes.Count - 1];
 
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
 		{
@@ -27,7 +29,7 @@ namespace RobotPlusPlus.Parsing
 
 		public Token TryGetToken(int offset)
 		{
-			offset = offset + index;
+			offset = offset + topIndex;
 			if (offset >= 0 && offset < tokens.Count)
 				return tokens[offset];
 			return null;
@@ -35,47 +37,69 @@ namespace RobotPlusPlus.Parsing
 
 		private Token TakeTokenAt(int i)
 		{
-			if (i == index)
-				throw new InvalidOperationException($"Taking the current token is not allowed (index <{index}>).");
+			if (i == topIndex)
+				throw new InvalidOperationException($"Taking the current token is not allowed (index <{topIndex}>).");
 			if (i < 0 || i >= tokens.Count)
-				throw new IndexOutOfRangeException($"Token at offset <{i-index}> (index <{i}>) does not exist!");
+				throw new IndexOutOfRangeException($"Token at offset <{i - topIndex}> (index <{i}>) does not exist!");
 
 			Token token = tokens[i];
 			tokens.RemoveAt(i);
 
-			if (i > index)
-				FinishIteration(index + 1);
+			if (i > topIndex)
+				FinishIteration(topIndex + 1);
 
-			else if (i < index)
-				index--;
+			else
+			{
+				for (var j = 0; j < indexes.Count; j++)
+				{
+					if (i < indexes[j])
+						indexes[j]--;
+				}
+			}
 
 			return token;
 		}
 
 		public Token TakePrevToken()
 		{
-			return TakeTokenAt(index-1);
+			return TakeTokenAt(topIndex - 1);
 		}
 
 		public Token TakeNextToken()
 		{
-			return TakeTokenAt(index+1);
+			return TakeTokenAt(topIndex + 1);
+		}
+
+		protected void LoopTokens(int start, Action<int> callback)
+		{
+
+			int ii = indexes.Count;
+			indexes.Add(start);
+
+			for (; indexes[ii] < tokens.Count; indexes[ii]++)
+			{
+				callback(indexes[ii]);
+			}
+
+			indexes.RemoveAt(ii);
+
 		}
 
 		protected void ContinueIteration(int start, Predicate<Token> filter)
 		{
-			for (int i = start; i < tokens.Count; i++)
+			LoopTokens(start, i =>
 			{
+
 				Token current = CurrToken;
 				if (current.IsParsed)
-					continue;
+					return;
 
 				if (filter == null || filter(current))
 				{
 					current.IsParsed = true;
 					current.ParseToken(this);
 				}
-			}
+			});
 		}
 
 		protected void ContinueIteration<T>(int start) where T : Token
@@ -112,16 +136,16 @@ namespace RobotPlusPlus.Parsing
 
 		protected void KillWhitespaces()
 		{
-			for (index = 0; index < tokens.Count; index++)
+			LoopTokens(0, i =>
 			{
-				if (CurrToken is Whitespace) continue;
+				if (CurrToken is Whitespace) return;
 
 				if (PrevToken is Whitespace leading)
 					CurrToken.TrailingWhitespace = leading;
 
 				if (NextToken is Whitespace trailing)
 					CurrToken.TrailingWhitespace = trailing;
-			}
+			});
 
 			tokens.RemoveAll(t => t is Whitespace);
 		}
@@ -151,6 +175,6 @@ namespace RobotPlusPlus.Parsing
 		{
 			throw new NotImplementedException();
 		}
-		
+
 	}
 }
