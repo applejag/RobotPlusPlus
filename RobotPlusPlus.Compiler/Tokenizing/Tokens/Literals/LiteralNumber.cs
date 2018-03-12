@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using RobotPlusPlus.Asserting;
+using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 {
@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 				: double.Parse(sourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 		}
 
-		public override void AssertToken(Asserter asserter)
+		public override void ParseToken(Parser parser)
 		{}
 	}
 }

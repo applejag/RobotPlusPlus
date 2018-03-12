@@ -1,4 +1,4 @@
-﻿using RobotPlusPlus.Asserting;
+﻿using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -7,7 +7,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public Whitespace(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{}
 
-		public override void AssertToken(Asserter asserter)
+		public override void ParseToken(Parser parser)
 		{ }
 	}
 }

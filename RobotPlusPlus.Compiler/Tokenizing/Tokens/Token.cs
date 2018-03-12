@@ -1,4 +1,5 @@
-﻿using RobotPlusPlus.Asserting;
+﻿using System.Collections.Generic;
+using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -7,6 +8,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public string SourceCode { get; }
 		public int SourceLine { get; }
 		public int NewLines { get; }
+
+		public List<Token> Tokens = new List<Token>();
 
 		protected Token(string sourceCode, int sourceLine)
 		{
@@ -23,7 +26,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			NewLines = newLines;
 		}
 
-		public abstract void AssertToken(Asserter asserter);
+		public abstract void ParseToken(Parser parser);
 
 	}
 }

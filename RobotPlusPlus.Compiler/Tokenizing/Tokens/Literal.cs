@@ -1,6 +1,4 @@
-﻿using RobotPlusPlus.Asserting;
-
-namespace RobotPlusPlus.Tokenizing.Tokens
+﻿namespace RobotPlusPlus.Tokenizing.Tokens
 {
 	public abstract class Literal : Token
 	{

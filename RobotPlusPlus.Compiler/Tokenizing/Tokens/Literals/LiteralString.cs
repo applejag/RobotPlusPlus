@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using RobotPlusPlus.Asserting;
+using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 {
@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 			Value = Regex.Unescape(sourceCode.Substring(1, sourceCode.Length - 2));
 		}
 
-		public override void AssertToken(Asserter asserter)
+		public override void ParseToken(Parser parser)
 		{ }
 	}
 }
