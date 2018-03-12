@@ -2,6 +2,7 @@
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
+	/// <summary>Ignored code. Ex: //line, /*block*/</summary>
 	public class Comment : Token
 	{
 		public bool IsBlockComment { get; }

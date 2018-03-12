@@ -8,8 +8,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public string SourceCode { get; }
 		public int SourceLine { get; }
 		public int NewLines { get; }
+		public Whitespace LeadingWhitespace { get; set; }
+		public Whitespace TrailingWhitespace { get; set; }
 
 		public List<Token> Tokens = new List<Token>();
+		public bool IsParsed { get; internal set; }
 
 		protected Token(string sourceCode, int sourceLine)
 		{

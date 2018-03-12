@@ -1,5 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests
 {
@@ -14,7 +16,7 @@ namespace RobotPlusPlus.Tests
 			const string input = null;
 
 			// Act
-			Parser.Parse(input);
+			Parser.Compile(input);
 
 			// Assert
 			Assert.Fail("Should've thrown an error on parseing");
@@ -27,7 +29,7 @@ namespace RobotPlusPlus.Tests
 			const string input = "";
 
 			// Act
-			string output = Parser.Parse(input);
+			string output = Parser.Compile(input);
 
 			// Assert
 			Assert.AreEqual(input, output);
