@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Parsing
 {
@@ -14,9 +16,9 @@ namespace RobotPlusPlus.Parsing
 		private int topIndex => indexes[indexes.Count - 1];
 		private readonly HashSet<Token> currentlyParsing = new HashSet<Token>();
 
-		public Token NextToken => TryGetToken(1);
-		public Token CurrToken => TryGetToken(0);
-		public Token PrevToken => TryGetToken(-1);
+		public Token NextToken => TryPeekToken(1);
+		public Token CurrToken => TryPeekToken(0);
+		public Token PrevToken => TryPeekToken(-1);
 
 
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
@@ -28,47 +30,111 @@ namespace RobotPlusPlus.Parsing
 			this.tokens = tokens.ToList();
 		}
 
-		public Token TryGetToken(int offset)
+		private struct TokenInList
 		{
-			offset = offset + topIndex;
-			if (offset >= 0 && offset < tokens.Count)
-				return tokens[offset];
+			public readonly IList<Token> parent;
+			public readonly Token token;
+			public readonly int index;
+
+			public TokenInList(IList<Token> parent, int index)
+			{
+				this.parent = parent;
+				this.index = index;
+				token = parent[index];
+			}
+
+			public override string ToString()
+			{
+				return $"parent{{{string.Join(", ", parent)}}} list[{index}]: {token?.ToString() ?? "null"}";
+			}
+		}
+
+		private List<TokenInList> FlattenTokensList(int direction)
+		{
+			var list = new List<TokenInList>();
+
+			void AddRangeToList(IList<Token> tokensList, int start, int stop)
+			{
+				for (int i = start; i < stop; i++)
+				{
+					if (tokensList[i] == null) continue;
+					list.Add(new TokenInList(tokensList, i));
+					AddRangeToList(tokensList[i], 0, tokensList[i].Count);
+				}
+			}
+
+			if (direction > 0)
+			{
+				AddRangeToList(tokens, start: topIndex + 1, stop: tokens.Count);
+			}
+			else if (direction < 0)
+			{
+				AddRangeToList(tokens, start: 0, stop: topIndex);
+			}
+			else
+				list.Add(new TokenInList(tokens, topIndex));
+
+			return list;
+		}
+
+		public Token TryPeekToken(int offset)
+		{
+			List<TokenInList> list = FlattenTokensList(offset);
+
+			if (offset < 0)
+				offset = list.Count + offset;
+			else if (offset > 0)
+				offset--;
+			
+			if (offset >= 0 && offset < list.Count)
+				return list[offset].token;
+
 			return null;
 		}
 
-		private Token TakeTokenAt(int i)
+		private Token TakeToken(int offset)
 		{
-			if (i == topIndex)
-				throw new InvalidOperationException($"Taking the current token is not allowed (index <{topIndex}>).");
-			if (i < 0 || i >= tokens.Count)
-				throw new IndexOutOfRangeException($"Token at offset <{i - topIndex}> (index <{i}>) does not exist!");
+			List<TokenInList> list = FlattenTokensList(offset);
+			int index = offset < 0 ? list.Count + offset : offset - 1;
 
-			Token token = tokens[i];
-			tokens.RemoveAt(i);
+			if (offset == 0)
+				throw new InvalidOperationException($"Taking the current token is not allowed (offset <{offset}>).");
 
-			if (i > topIndex)
-				FinishIteration(topIndex + 1);
+			if (index < 0 || index >= list.Count)
+				throw new IndexOutOfRangeException($"Token at offset <{offset}> (topIndex <{topIndex}>) does not exist!");
 
-			else
+			TokenInList tokenInList = list[index];
+			tokenInList.parent.RemoveAt(tokenInList.index);
+
+			if (offset > 0)
 			{
+				// Parse the following before proceeding
+				FinishIteration(topIndex + 1);
+			}
+			else if (ReferenceEquals(tokenInList.parent, tokens))
+			{
+				// Move all indexes so we don't mess up the iterations
 				for (var j = 0; j < indexes.Count; j++)
 				{
-					if (i < indexes[j])
+					// Token that disappeared was before it's counter?
+					if (tokenInList.index < indexes[j])
 						indexes[j]--;
 				}
 			}
 
-			return token;
+			// TODO: Parse the stolen token
+
+			return tokenInList.token;
 		}
 
 		public Token TakePrevToken()
 		{
-			return TakeTokenAt(topIndex - 1);
+			return TakeToken(-1);
 		}
 
 		public Token TakeNextToken()
 		{
-			return TakeTokenAt(topIndex + 1);
+			return TakeToken(+1);
 		}
 
 		public bool IsTokenParsing(Func<Token, bool> predicate)
@@ -83,7 +149,6 @@ namespace RobotPlusPlus.Parsing
 
 		protected void LoopTokens(int start, Action<int> callback)
 		{
-
 			int ii = indexes.Count;
 			indexes.Add(start);
 
@@ -93,48 +158,45 @@ namespace RobotPlusPlus.Parsing
 			}
 
 			indexes.RemoveAt(ii);
-
 		}
 
-		protected void ContinueIteration(int start, Predicate<Token> filter)
+		protected void ParseTokens(int start, Predicate<Token> filter = null)
 		{
 			LoopTokens(start, i =>
 			{
-
 				Token current = CurrToken;
 				if (current.IsParsed)
 					return;
 
-				if (filter == null || filter(current))
-				{
-					current.IsParsed = true;
-					currentlyParsing.Add(current);
-					current.ParseToken(this);
-					currentlyParsing.Remove(current);
-				}
+				if (filter?.Invoke(current) == false) return;
+
+				current.IsParsed = true;
+				currentlyParsing.Add(current);
+				current.ParseToken(this);
+				currentlyParsing.Remove(current);
 			});
 		}
 
-		protected void ContinueIteration<T>(int start) where T : Token
+		protected void ParseTokens<T>(int start) where T : Token
 		{
-			ContinueIteration(start, t => t is T);
+			ParseTokens(start, t => t is T);
 		}
 
-		protected void ContinueIteration<T>(int start, Predicate<T> filter) where T : Token
+		protected void ParseTokens<T>(int start, Predicate<T> filter) where T : Token
 		{
-			ContinueIteration(start, t => t is T f && filter(f));
+			ParseTokens(start, t => t is T f && filter(f));
 		}
 
 		protected void FinishIteration(int start)
 		{
-			ContinueIteration<Punctuator>(start);
+			ParseTokens<Punctuator>(start);
 
 			foreach (Operator.Type type in Enum.GetValues(typeof(Operator.Type)))
 			{
-				ContinueIteration<Operator>(start, o => o.OperatorType == type);
+				ParseTokens<Operator>(start, o => o.OperatorType == type);
 			}
 
-			ContinueIteration(start, null);
+			ParseTokens(start);
 		}
 
 		protected void FullIteration()

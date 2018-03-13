@@ -13,6 +13,25 @@ namespace RobotPlusPlus.Tests.ParserTests
 		public void Parse_SimpleAssignment()
 		{
 			// Arrange
+			const string input = "x = 4";
+
+			// Act
+			Token[] tokenized = Tokenizer.Tokenize(input);
+			Token[] parsed = Parser.Parse(tokenized);
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(parsed);
+
+			Token assi = parsed[0];
+			Assert.That.TokenIsOperator(assi, Operator.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<Identifier>(assi[0], "x");
+			Assert.That.TokenIsLiteralInteger(assi[1], 4);
+		}
+
+		[TestMethod]
+		public void Parse_SimpleAssignmentWithOperation()
+		{
+			// Arrange
 			const string input = "x = 4 * 3";
 
 			// Act
@@ -20,7 +39,7 @@ namespace RobotPlusPlus.Tests.ParserTests
 			Token[] parsed = Parser.Parse(tokenized);
 
 			// Assert
-			Assert.IsNotNull(parsed);
+			CollectionAssert.That.TokensAreParsed(parsed);
 
 			Token assi = parsed[0];
 			Assert.That.TokenIsOperator(assi, Operator.Type.Assignment, "=");
@@ -43,8 +62,8 @@ namespace RobotPlusPlus.Tests.ParserTests
 			Token[] parsed = Parser.Parse(tokenized);
 
 			// Assert
-			Assert.IsNotNull(parsed);
-			
+			CollectionAssert.That.TokensAreParsed(parsed);
+
 			Token minus = parsed[0];
 			Assert.That.TokenIsOperator(minus, Operator.Type.Additive, "-");
 			Assert.That.TokenIsLiteralInteger(minus[0], 60);

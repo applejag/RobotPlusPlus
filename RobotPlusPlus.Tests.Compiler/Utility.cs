@@ -94,6 +94,26 @@ namespace RobotPlusPlus.Tests
 			Assert.AreEqual(token.SourceCode, expectedSource);
 		}
 
+		private static void TokensAreParsed(
+			IReadOnlyList<Token> tokens, string listSuffix = "")
+		{
+			Assert.IsNotNull(tokens, $"Tokens list{listSuffix} is null.");
+			for (var i = 0; i < tokens.Count; i++)
+			{
+				Token token = tokens[i];
+				if (token == null) continue;
+				Assert.IsTrue(token.IsParsed, $"Token at list{listSuffix}[{i}] is not parsed!");
+				TokensAreParsed(token, $"{listSuffix}[{i}]");
+			}
+		}
+
+		[AssertionMethod]
+		public static void TokensAreParsed(this CollectionAssert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] IReadOnlyList<Token> tokens)
+		{
+			TokensAreParsed(tokens);
+		}
+
 		[AssertionMethod]
 		public static void TokensAreOfTypes(this CollectionAssert assert,
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] IReadOnlyList<Token> tokens, params Type[] types)
