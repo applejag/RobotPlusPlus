@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -39,9 +40,9 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public override string ToString()
 		{
-			return SourceCode == null
-				? $"{{{GetType().Name}, source=null}}"
-				: $"{{{GetType().Name}, source=\"{SourceCode}\"}}";
+			return Tokens.Count == 0 
+				? SourceCode
+				: $"{SourceCode}[{string.Join(", ", Tokens.Select(t => t?.ToString() ?? "null"))}]";
 		}
 	}
 }
