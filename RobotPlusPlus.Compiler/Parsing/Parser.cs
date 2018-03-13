@@ -104,15 +104,12 @@ namespace RobotPlusPlus.Parsing
 				throw new IndexOutOfRangeException($"Token at offset <{offset}> (topIndex <{topIndex}>) does not exist!");
 
 			TokenInList tokenInList = list[index];
-			tokenInList.parent.RemoveAt(tokenInList.index);
 
-			if (offset > 0)
+			if (ReferenceEquals(tokenInList.parent, tokens))
 			{
-				// Parse the following before proceeding
-				FinishIteration(topIndex + 1);
-			}
-			else if (ReferenceEquals(tokenInList.parent, tokens))
-			{
+				// Parse the token
+				ParseTokenAt(tokenInList.index);
+
 				// Move all indexes so we don't mess up the iterations
 				for (var j = 0; j < indexes.Count; j++)
 				{
@@ -122,7 +119,14 @@ namespace RobotPlusPlus.Parsing
 				}
 			}
 
-			// TODO: Parse the stolen token
+			// Delete from parent
+			tokenInList.parent.RemoveAt(tokenInList.index);
+
+			if (offset > 0)
+			{
+				// Parse the following before proceeding
+				FinishIteration(topIndex + 1);
+			}
 
 			return tokenInList.token;
 		}
@@ -135,6 +139,11 @@ namespace RobotPlusPlus.Parsing
 		public Token TakeNextToken()
 		{
 			return TakeToken(+1);
+		}
+
+		public bool IsTokenParsing(Token token)
+		{
+			return currentlyParsing.Contains(token);
 		}
 
 		public bool IsTokenParsing(Func<Token, bool> predicate)
@@ -160,20 +169,35 @@ namespace RobotPlusPlus.Parsing
 			indexes.RemoveAt(ii);
 		}
 
+		protected void ParseTokenAt(int index)
+		{
+			int ii = indexes.Count;
+			indexes.Add(index);
+
+			ParseSingleToken();
+
+			indexes.RemoveAt(ii);
+		}
+
+		protected void ParseSingleToken(Predicate<Token> filter = null)
+		{
+			Token current = CurrToken;
+			if (current.IsParsed || IsTokenParsing(current))
+				return;
+
+			if (filter?.Invoke(current) == false) return;
+
+			current.IsParsed = true;
+			currentlyParsing.Add(current);
+			current.ParseToken(this);
+			currentlyParsing.Remove(current);
+		}
+
 		protected void ParseTokens(int start, Predicate<Token> filter = null)
 		{
 			LoopTokens(start, i =>
 			{
-				Token current = CurrToken;
-				if (current.IsParsed)
-					return;
-
-				if (filter?.Invoke(current) == false) return;
-
-				current.IsParsed = true;
-				currentlyParsing.Add(current);
-				current.ParseToken(this);
-				currentlyParsing.Remove(current);
+				ParseSingleToken(filter);
 			});
 		}
 
