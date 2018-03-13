@@ -17,7 +17,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Identifier),   // y
 				typeof(Operator),     // =
 				typeof(Identifier),   // x

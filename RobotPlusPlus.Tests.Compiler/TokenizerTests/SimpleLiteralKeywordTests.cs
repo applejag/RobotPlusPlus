@@ -15,7 +15,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("true");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(LiteralKeyword));
 		}
 
@@ -26,7 +26,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("false");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(LiteralKeyword));
 		}
 
@@ -37,7 +37,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("null");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(LiteralKeyword));
 		}
 		

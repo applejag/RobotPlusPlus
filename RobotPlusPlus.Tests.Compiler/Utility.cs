@@ -9,7 +9,8 @@ namespace RobotPlusPlus.Tests
 {
 	public static class Utility
 	{
-		public static void AssertTokenTypes(IReadOnlyList<Token> tokens, params Type[] types)
+
+		public static void TokensAreOfTypes(this CollectionAssert assert, IReadOnlyList<Token> tokens, params Type[] types)
 		{
 			Assert.IsNotNull(tokens, "Tokens list is null.");
 			Assert.AreEqual(types.Length, tokens.Count, "Wrong token count in result.");
@@ -22,7 +23,7 @@ namespace RobotPlusPlus.Tests
 			}
 		}
 
-		public static void AssertTokenTypesAllSame(Token[] tokens, Type type)
+		public static void TokensAreSameType(this CollectionAssert assert, Token[] tokens, Type type)
 		{
 			Assert.IsNotNull(tokens, "Tokens list is null.");
 			CollectionAssert.AllItemsAreNotNull(tokens);
@@ -33,7 +34,7 @@ namespace RobotPlusPlus.Tests
 			}
 		}
 
-		public static void ActAndAssert(IEnumerable<string> samples, params Type[] expected)
+		public static void TokenizeAndAssert(IEnumerable<string> samples, params Type[] expected)
 		{
 			foreach (string input in samples)
 			{
@@ -43,7 +44,7 @@ namespace RobotPlusPlus.Tests
 					Token[] result = Tokenizer.Tokenize(input);
 
 					// Assert
-					AssertTokenTypes(result, expected);
+					CollectionAssert.That.TokensAreOfTypes(result, expected);
 				}
 				catch (ParseException e)
 				{
@@ -51,6 +52,6 @@ namespace RobotPlusPlus.Tests
 				}
 			}
 		}
-
+		
 	}
 }

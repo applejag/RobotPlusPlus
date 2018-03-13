@@ -19,7 +19,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Identifier));
 		}
 
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Identifier));
 		}
 
@@ -47,7 +47,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Whitespace),
 				typeof(Identifier),
 				typeof(Whitespace));
@@ -76,7 +76,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Identifier),
 				typeof(Whitespace),
 				typeof(Identifier),

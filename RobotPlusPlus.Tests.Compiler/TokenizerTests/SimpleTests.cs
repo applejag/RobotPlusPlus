@@ -25,7 +25,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("   \t\t  \r\n \r\t  \n");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
+			CollectionAssert.That.TokensAreOfTypes(result,
 				typeof(Whitespace));
 		}
 
