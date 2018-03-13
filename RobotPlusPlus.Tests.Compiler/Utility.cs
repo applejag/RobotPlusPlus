@@ -72,7 +72,7 @@ namespace RobotPlusPlus.Tests
 			Assert.IsNotNull(last, "Parentases group doesn't contain any tokens.");
 			Assert.IsInstanceOfType(last, typeof(Punctuator), "Parentases group doesn't end with punctuator.");
 			Assert.AreEqual(((Punctuator)last).PunctuatorType, Punctuator.Type.ClosingParentases, "Parentases group doesn't end with a closing punctuator.");
-			Assert.AreEqual(((Punctuator)token).Character, Punctuator.GetMatchingParentases(expectedOpeningChar), "Parentases group doesn't end with a closing punctuator of correct type.");
+			Assert.AreEqual(((Punctuator)last).Character, Punctuator.GetMatchingParentases(expectedOpeningChar), "Parentases group doesn't end with a closing punctuator of correct type.");
 		}
 
 		[AssertionMethod]
@@ -102,7 +102,7 @@ namespace RobotPlusPlus.Tests
 			{
 				Token token = tokens[i];
 				if (token == null) continue;
-				Assert.IsTrue(token.IsParsed, $"Token at list{listSuffix}[{i}] is not parsed!");
+				Assert.IsTrue(token.IsParsed, $"Token {{{token}}} at list{listSuffix}[{i}] is not parsed!");
 				TokensAreParsed(token, $"{listSuffix}[{i}]");
 			}
 		}

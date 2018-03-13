@@ -6,17 +6,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	/// <summary>Reserved words. Ex: if, while, try</summary>
 	public class Statement : Token
 	{
-		public Token Condition
-		{
-			get => Tokens[0];
-			set => Tokens[0] = value;
-		}
-
-		public Token CodeBlock
-		{
-			get => Tokens[1];
-			set => Tokens[1] = value;
-		}
+		public Token Condition => Tokens[0];
+		public Token CodeBlock => Tokens[1];
 
 		public Statement(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
@@ -25,8 +16,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public override void ParseToken(Parser parser)
 		{
-			Condition = parser.TakeNextToken();
-			CodeBlock = parser.TakeNextToken();
+			parser.TakeNextToken(0);
+			parser.TakeNextToken(1);
 		}
 	}
 }

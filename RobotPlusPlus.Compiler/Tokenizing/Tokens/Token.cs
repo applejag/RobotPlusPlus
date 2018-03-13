@@ -61,7 +61,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public void Insert(int index, Token item)
 		{
-			Tokens.Insert(index, item);
+			if (index >= 0 && index < Tokens.Count && Tokens[index] == null)
+				Tokens[index] = item;
+			else
+				Tokens.Insert(index, item);
 		}
 
 		public void RemoveAt(int index)

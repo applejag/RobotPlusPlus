@@ -92,7 +92,7 @@ namespace RobotPlusPlus.Parsing
 			return null;
 		}
 
-		private Token TakeToken(int offset)
+		private Token TakeToken(int offset, int insertionIndex)
 		{
 			List<TokenInList> list = FlattenTokensList(offset);
 			int index = offset < 0 ? list.Count + offset : offset - 1;
@@ -104,12 +104,13 @@ namespace RobotPlusPlus.Parsing
 				throw new IndexOutOfRangeException($"Token at offset <{offset}> (topIndex <{topIndex}>) does not exist!");
 
 			TokenInList tokenInList = list[index];
+			Token current = CurrToken;
 
-			if (ReferenceEquals(tokenInList.parent, tokens))
+			// Parse the token
+			ParseTokenAt(tokenInList.index);
+
+			if (offset < 0 && ReferenceEquals(tokenInList.parent, tokens))
 			{
-				// Parse the token
-				ParseTokenAt(tokenInList.index);
-
 				// Move all indexes so we don't mess up the iterations
 				for (var j = 0; j < indexes.Count; j++)
 				{
@@ -119,7 +120,8 @@ namespace RobotPlusPlus.Parsing
 				}
 			}
 
-			// Delete from parent
+			// Transfer
+			current.Insert(insertionIndex, tokenInList.token);
 			tokenInList.parent.RemoveAt(tokenInList.index);
 
 			if (offset > 0)
@@ -131,14 +133,14 @@ namespace RobotPlusPlus.Parsing
 			return tokenInList.token;
 		}
 
-		public Token TakePrevToken()
+		public Token TakePrevToken(int insertionIndex)
 		{
-			return TakeToken(-1);
+			return TakeToken(-1, insertionIndex);
 		}
 
-		public Token TakeNextToken()
+		public Token TakeNextToken(int insertionIndex)
 		{
-			return TakeToken(+1);
+			return TakeToken(+1, insertionIndex);
 		}
 
 		public bool IsTokenParsing(Token token)
