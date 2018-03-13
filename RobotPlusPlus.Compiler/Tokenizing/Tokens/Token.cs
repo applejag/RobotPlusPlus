@@ -29,7 +29,19 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			NewLines = newLines;
 		}
 
+		public Token this[int index]
+		{
+			get => Tokens[index];
+			set => Tokens[index] = value;
+		}
+
 		public abstract void ParseToken(Parser parser);
 
+		public override string ToString()
+		{
+			return SourceCode == null
+				? $"{{{GetType().Name}, source=null}}"
+				: $"{{{GetType().Name}, source=\"{SourceCode}\"}}";
+		}
 	}
 }

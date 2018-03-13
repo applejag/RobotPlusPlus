@@ -6,7 +6,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	/// <summary>Separators and pairing characters. Ex: }, (, ;</summary>
 	public class Punctuator : Token
 	{
-		private static readonly Dictionary<char, char> parentasesPairs = new Dictionary<char, char>
+		private static readonly Bictionary<char, char> parentasesPairs = new Bictionary<char, char>
 		{
 			{ '(', ')' },
 			{ '[', ']' },
@@ -37,7 +37,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					while (true)
 					{
 						if (parser.NextToken == null)
-							throw new ParseException($"Unexpected EOF, expected <{parentasesPairs[Character]}>!", parser.CurrToken);
+							throw new ParseException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
 
 						Token nextToken = parser.TakeNextToken();
 						Tokens.Add(nextToken);
@@ -45,7 +45,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						// Stop when found matching pair
 						if (nextToken is Punctuator punc
 						    && punc.PunctuatorType == Type.ClosingParentases
-						    && punc.Character == parentasesPairs[Character])
+						    && punc.Character == GetMatchingParentases(Character))
 							break;
 					}
 					break;
@@ -53,9 +53,22 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				case Type.Other when Character == '.' && parser.NextToken is Identifier:
 					break;
 
+				case Type.ClosingParentases:
+					bool someoneLookingForMe = parser.IsTokenParsing<Punctuator>(p =>
+						p.PunctuatorType == Type.OpeningParentases
+						&& p.Character == GetMatchingParentases(Character));
+					if (!someoneLookingForMe)
+						throw new ParseException($"Unexpected ending parentases <{SourceCode}>.", this);
+					break;
+
 				default:
 					throw new ParseException($"Unexpected punctuator <{SourceCode}>.", this);
 			}
+		}
+
+		public static char GetMatchingParentases(char c)
+		{
+			return parentasesPairs[c];
 		}
 
 		public enum Type

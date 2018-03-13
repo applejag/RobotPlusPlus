@@ -10,13 +10,14 @@ namespace RobotPlusPlus.Parsing
 	public class Parser
 	{
 		private readonly List<Token> tokens;
+		private readonly List<int> indexes = new List<int>();
+		private int topIndex => indexes[indexes.Count - 1];
+		private readonly HashSet<Token> currentlyParsing = new HashSet<Token>();
 
 		public Token NextToken => TryGetToken(1);
 		public Token CurrToken => TryGetToken(0);
 		public Token PrevToken => TryGetToken(-1);
 
-		private readonly List<int> indexes = new List<int>();
-		private int topIndex => indexes[indexes.Count - 1];
 
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
 		{
@@ -70,6 +71,16 @@ namespace RobotPlusPlus.Parsing
 			return TakeTokenAt(topIndex + 1);
 		}
 
+		public bool IsTokenParsing(Func<Token, bool> predicate)
+		{
+			return currentlyParsing.Any(predicate);
+		}
+
+		public bool IsTokenParsing<T>(Func<T, bool> predicate) where T : Token
+		{
+			return currentlyParsing.OfType<T>().Any(predicate);
+		}
+
 		protected void LoopTokens(int start, Action<int> callback)
 		{
 
@@ -97,7 +108,9 @@ namespace RobotPlusPlus.Parsing
 				if (filter == null || filter(current))
 				{
 					current.IsParsed = true;
+					currentlyParsing.Add(current);
 					current.ParseToken(this);
+					currentlyParsing.Remove(current);
 				}
 			});
 		}

@@ -22,43 +22,21 @@ namespace RobotPlusPlus.Tests.ParserTests
 			// Assert
 			Assert.IsNotNull(parsed);
 
-			// assignment
-			var assignment = parsed[0] as Operator;
-			Assert.IsNotNull(assignment);
-			Assert.AreEqual(assignment.OperatorType, Operator.Type.Assignment);
-			Assert.AreEqual(assignment.SourceCode, "=");
+			Token assi = parsed[0];
+			Assert.That.TokenIsOperator(assi, Operator.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<Identifier>(assi[0], "x");
 
-			// LHS: identifier x
-			var assignmentLHS = assignment.LHS as Identifier;
-			Assert.IsNotNull(assignmentLHS);
-			Assert.AreEqual(assignmentLHS.SourceCode, "x");
-
-			// RHS: operator *
-			var assignmentRHS = assignment.RHS as Operator;
-			Assert.IsNotNull(assignmentRHS);
-			Assert.AreEqual(assignmentRHS.OperatorType, Operator.Type.Multiplicative);
-			Assert.AreEqual(assignmentRHS.SourceCode, "*");
-
-			// RHS: operator *, LHS: literal 4
-			var mult4 = assignmentRHS.LHS as LiteralNumber;
-			Assert.IsNotNull(mult4);
-			Assert.IsTrue(mult4.IsInteger);
-			Assert.IsFalse(mult4.IsReal);
-			Assert.AreEqual(mult4.Value, 4);
-
-			// RHS: operator *, RHS: literal 3
-			var mult3 = assignmentRHS.RHS as LiteralNumber;
-			Assert.IsNotNull(mult3);
-			Assert.IsTrue(mult3.IsInteger);
-			Assert.IsFalse(mult3.IsReal);
-			Assert.AreEqual(mult3.Value, 3);
+			Token mult = assi[1];
+			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
+			Assert.That.TokenIsLiteralInteger(mult[0], 4);
+			Assert.That.TokenIsLiteralInteger(mult[1], 3);
 		}
 
 		[TestMethod]
 		public void Parse_SimplePriorityCheck()
 		{
 			// Arrange
-			const string input = "60 - 15 / (2 - 5)";
+			const string input = "60 - 15 / (2 + 5)";
 
 			// Act
 			Token[] tokenized = Tokenizer.Tokenize(input);
@@ -66,36 +44,22 @@ namespace RobotPlusPlus.Tests.ParserTests
 
 			// Assert
 			Assert.IsNotNull(parsed);
+			
+			Token minus = parsed[0];
+			Assert.That.TokenIsOperator(minus, Operator.Type.Additive, "-");
+			Assert.That.TokenIsLiteralInteger(minus[0], 60);
 
-			// assignment
-			var assignment = parsed[0] as Operator;
-			Assert.IsNotNull(assignment);
-			Assert.AreEqual(assignment.SourceCode, "=");
+			Token div = minus[1];
+			Assert.That.TokenIsOperator(div, Operator.Type.Multiplicative, "/");
+			Assert.That.TokenIsLiteralInteger(div[0], 15);
 
-			// LHS: identifier x
-			var assignmentLHS = assignment.LHS as Identifier;
-			Assert.IsNotNull(assignmentLHS);
-			Assert.AreEqual(assignmentLHS.SourceCode, "x");
+			Token par = div[1];
+			Assert.That.TokenIsParentases(par, '(', 1);
 
-			// RHS: operator *
-			var assignmentRHS = assignment.RHS as Operator;
-			Assert.IsNotNull(assignmentRHS);
-			Assert.AreEqual(assignmentRHS.OperatorType, Operator.Type.Multiplicative);
-			Assert.AreEqual(assignmentRHS.SourceCode, "*");
-
-			// RHS: operator *, LHS: literal 4
-			var mult4 = assignmentRHS.LHS as LiteralNumber;
-			Assert.IsNotNull(mult4);
-			Assert.IsTrue(mult4.IsInteger);
-			Assert.IsFalse(mult4.IsReal);
-			Assert.AreEqual(mult4.Value, 4);
-
-			// RHS: operator *, RHS: literal 3
-			var mult3 = assignmentRHS.RHS as LiteralNumber;
-			Assert.IsNotNull(mult3);
-			Assert.IsTrue(mult3.IsInteger);
-			Assert.IsFalse(mult3.IsReal);
-			Assert.AreEqual(mult3.Value, 3);
+			Token plus = par.Tokens[0];
+			Assert.That.TokenIsOperator(plus, Operator.Type.Additive, "+");
+			Assert.That.TokenIsLiteralInteger(plus[0], 2);
+			Assert.That.TokenIsLiteralInteger(plus[1], 5);
 		}
 	}
 }

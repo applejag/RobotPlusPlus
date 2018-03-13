@@ -5,7 +5,9 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 {
 	public class LiteralNumber : Literal
 	{
+		/// <summary><see cref="Value"/> is <seealso cref="double"/></summary>
 		public bool IsReal => Value is double;
+		/// <summary><see cref="Value"/> is <seealso cref="int"/></summary>
 		public bool IsInteger => Value is int;
 		public object Value { get; }
 

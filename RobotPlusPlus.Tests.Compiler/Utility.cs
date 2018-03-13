@@ -1,16 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Tokenizing.Tokens.Literals;
 
 namespace RobotPlusPlus.Tests
 {
 	public static class Utility
 	{
+		[AssertionMethod]
+		public static void TokenIsOperator(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, Operator.Type type)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(Operator));
+			Assert.AreEqual(((Operator)token).OperatorType, type);
+		}
 
-		public static void TokensAreOfTypes(this CollectionAssert assert, IReadOnlyList<Token> tokens, params Type[] types)
+		[AssertionMethod]
+		public static void TokenIsOperator(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, Operator.Type type, string expectedSource)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(Operator));
+			Assert.AreEqual(((Operator)token).OperatorType, type);
+			Assert.AreEqual(((Operator)token).SourceCode, expectedSource);
+		}
+
+		[AssertionMethod]
+		public static void TokenIsLiteralInteger(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, int value)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(LiteralNumber));
+			Assert.IsTrue(((LiteralNumber)token).IsInteger);
+			Assert.AreEqual(((LiteralNumber)token).Value, value);
+		}
+
+		[AssertionMethod]
+		public static void TokenIsLiteralReal(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, double value)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(LiteralNumber));
+			Assert.IsTrue(((LiteralNumber)token).IsReal);
+			Assert.AreEqual(((LiteralNumber)token).Value, value);
+		}
+
+		[AssertionMethod]
+		public static void TokenIsLiteralString(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, string value)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(LiteralString));
+			Assert.AreEqual(((LiteralString)token).Value, value);
+		}
+
+		[AssertionMethod]
+		public static void TokenIsParentases(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, char expectedOpeningChar)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(Punctuator));
+			Assert.AreEqual(((Punctuator)token).PunctuatorType, Punctuator.Type.OpeningParentases, "First token in group isn't marked as parentases group opening.");
+			Assert.AreEqual(((Punctuator)token).Character, expectedOpeningChar, "Parentases group doesn't start with expected parentases.");
+
+			Token last = token.Tokens.LastOrDefault();
+			Assert.IsNotNull(last, "Parentases group doesn't contain any tokens.");
+			Assert.IsInstanceOfType(last, typeof(Punctuator), "Parentases group doesn't end with punctuator.");
+			Assert.AreEqual(((Punctuator)last).PunctuatorType, Punctuator.Type.ClosingParentases, "Parentases group doesn't end with a closing punctuator.");
+			Assert.AreEqual(((Punctuator)token).Character, Punctuator.GetMatchingParentases(expectedOpeningChar), "Parentases group doesn't end with a closing punctuator of correct type.");
+		}
+
+		[AssertionMethod]
+		public static void TokenIsParentases(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, char expectedOpeningChar, int expectedContainedTokens)
+		{
+			Assert.That.TokenIsParentases(token, expectedOpeningChar);
+			// -1 to exclude the closing parentases
+			Assert.AreEqual(((Punctuator)token).Tokens.Count - 1, expectedContainedTokens);
+		}
+
+		[AssertionMethod]
+		public static void TokenIsOfType<T>(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, string expectedSource)
+			where T : Token
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(T));
+			Assert.AreEqual(token.SourceCode, expectedSource);
+		}
+
+		[AssertionMethod]
+		public static void TokensAreOfTypes(this CollectionAssert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] IReadOnlyList<Token> tokens, params Type[] types)
 		{
 			Assert.IsNotNull(tokens, "Tokens list is null.");
 			Assert.AreEqual(types.Length, tokens.Count, "Wrong token count in result.");
@@ -23,7 +109,9 @@ namespace RobotPlusPlus.Tests
 			}
 		}
 
-		public static void TokensAreSameType(this CollectionAssert assert, Token[] tokens, Type type)
+		[AssertionMethod]
+		public static void TokensAreSameType(this CollectionAssert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token[] tokens, Type type)
 		{
 			Assert.IsNotNull(tokens, "Tokens list is null.");
 			CollectionAssert.AllItemsAreNotNull(tokens);
