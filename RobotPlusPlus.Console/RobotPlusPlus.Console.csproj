@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\RobotPlusPlus.Compiler\RobotPlusPlus.Compiler.csproj" />
 	</ItemGroup>
 
