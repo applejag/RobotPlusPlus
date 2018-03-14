@@ -21,6 +21,7 @@ namespace RobotPlusPlus.Tests.ParserTests
 
 			// Assert
 			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(1, parsed.Length);
 
 			Token assi = parsed[0];
 			Assert.That.TokenIsOperator(assi, Operator.Type.Assignment, "=");
@@ -40,6 +41,7 @@ namespace RobotPlusPlus.Tests.ParserTests
 
 			// Assert
 			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(1, parsed.Length);
 
 			Token assi = parsed[0];
 			Assert.That.TokenIsOperator(assi, Operator.Type.Assignment, "=");
@@ -63,6 +65,7 @@ namespace RobotPlusPlus.Tests.ParserTests
 
 			// Assert
 			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(1, parsed.Length);
 
 			Token minus = parsed[0];
 			Assert.That.TokenIsOperator(minus, Operator.Type.Additive, "-");
@@ -79,6 +82,92 @@ namespace RobotPlusPlus.Tests.ParserTests
 			Assert.That.TokenIsOperator(plus, Operator.Type.Additive, "+");
 			Assert.That.TokenIsLiteralInteger(plus[0], 2);
 			Assert.That.TokenIsLiteralInteger(plus[1], 5);
+		}
+
+		[TestMethod]
+		public void Parse_SimpleTwoExpressions()
+		{
+			// Arrange
+			const string input = "10 - 12 5 * 25";
+
+			// Act
+			Token[] tokenized = Tokenizer.Tokenize(input);
+			Token[] parsed = Parser.Parse(tokenized);
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(2, parsed.Length);
+
+			Token minus = parsed[0];
+			Assert.That.TokenIsOperator(minus, Operator.Type.Additive, "-");
+			Assert.That.TokenIsLiteralInteger(minus[0], 10);
+			Assert.That.TokenIsLiteralInteger(minus[1], 12);
+
+			Token mult = parsed[1];
+			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
+			Assert.That.TokenIsLiteralInteger(mult[0], 5);
+			Assert.That.TokenIsLiteralInteger(mult[1], 25);
+		}
+
+
+		[TestMethod]
+		public void Parse_SimpleTwoAssignments()
+		{
+			// Arrange
+			const string input = "x = 10 y+= .5*x";
+
+			// Act
+			Token[] tokenized = Tokenizer.Tokenize(input);
+			Token[] parsed = Parser.Parse(tokenized);
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(2, parsed.Length);
+
+			Token x = parsed[0];
+			Assert.That.TokenIsOperator(x, Operator.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<Identifier>(x[0], "x");
+			Assert.That.TokenIsLiteralInteger(x[1], 10);
+
+			Token y = parsed[1];
+			Assert.That.TokenIsOperator(y, Operator.Type.Assignment, "+=");
+			Assert.That.TokenIsOfType<Identifier>(y[0], "y");
+
+			Token mult = y[1];
+			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
+			Assert.That.TokenIsLiteralReal(mult[0], 0.5d);
+			Assert.That.TokenIsOfType<Identifier>(mult[1], "x");
+		}
+
+		[TestMethod]
+		public void Parse_SimpleTwoAssignmentsSemicolon()
+		{
+			// Arrange
+			const string input = "x = 10; y+= .5*x";
+
+			// Act
+			Token[] tokenized = Tokenizer.Tokenize(input);
+			Token[] parsed = Parser.Parse(tokenized);
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(parsed);
+			Assert.AreEqual(3, parsed.Length);
+
+			Token x = parsed[0];
+			Assert.That.TokenIsOperator(x, Operator.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<Identifier>(x[0], "x");
+			Assert.That.TokenIsLiteralInteger(x[1], 10);
+
+			Assert.That.TokenIsOfType<Punctuator>(parsed[1], ";");
+
+			Token y = parsed[2];
+			Assert.That.TokenIsOperator(y, Operator.Type.Assignment, "+=");
+			Assert.That.TokenIsOfType<Identifier>(y[0], "y");
+
+			Token mult = y[1];
+			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
+			Assert.That.TokenIsLiteralReal(mult[0], 0.5d);
+			Assert.That.TokenIsOfType<Identifier>(mult[1], "x");
 		}
 	}
 }
