@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 
 namespace RobotPlusPlus.Utility
 {
@@ -31,8 +34,34 @@ namespace RobotPlusPlus.Utility
 			{
 				range.Add(list[i]);
 			}
-
+			
 			return range;
+		}
+
+		public static bool TryFirst<TSource>(this IEnumerable<TSource> source, out TSource value)
+		{
+			foreach (TSource item in source)
+			{
+				value = item;
+				return true;
+			}
+
+			value = default;
+			return false;
+		}
+
+		public static bool TryFirst<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate, out TSource value)
+		{
+			foreach (TSource item in source)
+			{
+				if (!predicate(item)) continue;
+
+				value = item;
+				return true;
+			}
+
+			value = default;
+			return false;
 		}
 	}
 }

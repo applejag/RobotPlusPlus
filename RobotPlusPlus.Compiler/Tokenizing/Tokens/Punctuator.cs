@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RobotPlusPlus.Parsing;
 
@@ -16,7 +17,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		private static readonly IReadOnlyCollection<char> separators = new []
 		{
-			';', ','
+			';', ',', ':'
 		};
 
 		public char Character { get; }
@@ -24,6 +25,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public Punctuator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
+			
 			Character = sourceCode[0];
 
 			if (parentasesPairs.ContainsKey(Character))

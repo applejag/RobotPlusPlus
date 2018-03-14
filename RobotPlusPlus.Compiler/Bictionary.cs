@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus
 {
@@ -13,10 +14,11 @@ namespace RobotPlusPlus
 					&& TryGetValue(key, out T2 value)
 					&& value is T1 item)
 					return item;
+				
+				if (this.TryFirst(x => x.Value.Equals(index), out KeyValuePair<T1, T2> pair))
+					return pair.Key;
 
-				if (!this.Any(x => x.Value.Equals(index)))
-					throw new KeyNotFoundException();
-				return this.First(x => x.Value.Equals(index)).Key;
+				throw new KeyNotFoundException();
 			}
 		}
 	}
