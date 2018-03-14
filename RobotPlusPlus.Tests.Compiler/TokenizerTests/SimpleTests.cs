@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
@@ -24,8 +25,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("   \t\t  \r\n \r\t  \n");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Whitespace);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Whitespace));
 		}
 
 	}

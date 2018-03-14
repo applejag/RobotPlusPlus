@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
@@ -18,8 +19,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Operator);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Operator));
 		}
 
 		[TestMethod]
@@ -32,9 +33,9 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Operator,
-				TokenType.Operator);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Operator),
+				typeof(Operator));
 		}
 
 		[TestMethod]
@@ -44,11 +45,11 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			string[] samples = {
 				"+x", "-x", "!x", "~x", "++x", "--x"
 			};
-			
+
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -61,10 +62,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			};
 
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Identifier,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Identifier),
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 
@@ -78,10 +79,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			};
 
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Identifier,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Identifier),
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -93,10 +94,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			};
 
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Identifier,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Identifier),
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -109,10 +110,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			};
 
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Identifier,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Identifier),
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -129,10 +130,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			};
 
 			// Act & assert
-			Utility.ActAndAssert(samples,
-				TokenType.Identifier,
-				TokenType.Operator,
-				TokenType.Identifier);
+			Utility.TokenizeAndAssert(samples,
+				typeof(Identifier),
+				typeof(Operator),
+				typeof(Identifier));
 		}
 
 

@@ -1,10 +1,12 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Parsing;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Tests.CompilerTests
 {
     [TestClass]
-    public class ParserTest
+    public class SimpleTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException))]
@@ -14,7 +16,7 @@ namespace RobotPlusPlus.Tests
 			const string input = null;
 
 			// Act
-			Parser.Parse(input);
+			Compiler.Compile(input);
 
 			// Assert
 			Assert.Fail("Should've thrown an error on parseing");
@@ -27,7 +29,7 @@ namespace RobotPlusPlus.Tests
 			const string input = "";
 
 			// Act
-			string output = Parser.Parse(input);
+			string output = Compiler.Compile(input);
 
 			// Assert
 			Assert.AreEqual(input, output);

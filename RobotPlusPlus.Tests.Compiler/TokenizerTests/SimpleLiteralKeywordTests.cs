@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Tokenizing.Tokens.Literals;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
@@ -13,8 +15,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("true");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(LiteralKeyword));
 		}
 
 		[TestMethod]
@@ -24,8 +26,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("false");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(LiteralKeyword));
 		}
 
 		[TestMethod]
@@ -35,8 +37,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize("null");
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(LiteralKeyword));
 		}
 		
 		[TestMethod]
@@ -48,7 +50,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			// Assert
 			Assert.IsNotNull(result, "Tokens list is null.");
 			Assert.IsNotNull(result[0], "tokens[0] is null.");
-			Assert.AreNotEqual(TokenType.Literal, result[0]);
+			Assert.IsNotInstanceOfType(result[0], typeof(LiteralKeyword));
 		}
 	}
 }

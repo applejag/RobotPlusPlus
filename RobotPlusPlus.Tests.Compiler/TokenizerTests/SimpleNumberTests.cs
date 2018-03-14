@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
@@ -16,10 +17,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -32,10 +33,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -48,10 +49,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -64,10 +65,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -80,10 +81,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 		[TestMethod]
@@ -96,10 +97,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Literal);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Literal));
 
-			Assert.AreEqual(input, result[0].Source);
+			Assert.AreEqual(input, result[0].SourceCode);
 		}
 
 	}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
@@ -17,8 +18,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Punctuator);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Punctuator));
 		}
 
 		[TestMethod]
@@ -31,9 +32,9 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Punctuator,
-				TokenType.Punctuator);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Punctuator),
+				typeof(Punctuator));
 		}
 
 
@@ -47,7 +48,7 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypesAllSame(result, TokenType.Punctuator);
+			CollectionAssert.That.TokensAreSameType(result, typeof(Punctuator));
 			Assert.AreEqual(input.Length, result.Length, "Wrong token count in result.");
 		}
 	}

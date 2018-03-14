@@ -1,12 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Tokenizing;
 using System.Collections.Generic;
+using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {
 	[TestClass]
-    public class SimpleIdentifierTests
-    {
+	public class SimpleIdentifierTests
+	{
 
 		[TestMethod]
 		public void Tokenize_SingleIdentifierSingleChar()
@@ -18,8 +19,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Identifier);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -32,8 +33,8 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Identifier);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Identifier));
 		}
 
 		[TestMethod]
@@ -46,10 +47,10 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Whitespace,
-				TokenType.Identifier,
-				TokenType.Whitespace);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Whitespace),
+				typeof(Identifier),
+				typeof(Whitespace));
 		}
 
 		[TestMethod]
@@ -75,12 +76,12 @@ namespace RobotPlusPlus.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			Utility.AssertTokenTypes(result,
-				TokenType.Identifier,
-				TokenType.Whitespace,
-				TokenType.Identifier,
-				TokenType.Whitespace,
-				TokenType.Identifier);
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Identifier),
+				typeof(Whitespace),
+				typeof(Identifier),
+				typeof(Whitespace),
+				typeof(Identifier));
 		}
 	}
 }
