@@ -22,7 +22,14 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 
 		public override string CompileToken(Compiler compiler)
 		{
-			return $"‴{Value.EscapeString()}‴";
+			string escaped = Value.EscapeString();
+			if (escaped != Value)
+			{
+				compiler.assignmentNeedsCSSnipper = true;
+				return $"\"{escaped}\"";
+			}
+
+			return $"‴{escaped}‴";
 		}
 	}
 }

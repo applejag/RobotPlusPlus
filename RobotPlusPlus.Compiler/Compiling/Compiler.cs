@@ -13,6 +13,8 @@ namespace RobotPlusPlus.Compiling
 	{
 		private readonly StringBuilder output = new StringBuilder();
 		private readonly HashSet<string> registeredVariables = new HashSet<string>();
+		
+		public bool assignmentNeedsCSSnipper;
 
 		public void RegisterVariable([NotNull] Identifier identifier)
 		{
@@ -36,6 +38,7 @@ namespace RobotPlusPlus.Compiling
 				if (compiler.output.Length > 0)
 					compiler.output.Append('\n');
 
+				compiler.assignmentNeedsCSSnipper = false;
 				compiler.output.Append(token.CompileToken(compiler));
 			}
 

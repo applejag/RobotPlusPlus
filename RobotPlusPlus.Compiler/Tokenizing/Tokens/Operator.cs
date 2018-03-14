@@ -15,7 +15,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public Token RHS => Tokens[_RHS];
 		public const int _LHS = 0;
 		public const int _RHS = 1;
-
+		
 		public bool ContainsValue => Tokens.Any(t =>
 			t is Literal
 			|| t is Identifier
@@ -178,10 +178,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
 					string c_lhs = LHS.CompileToken(compiler);
 
-					return string.Format(SourceCode == "=" ? "{0}={2}" : "{0}={0}{1}{2}",
-						c_lhs,
-						SourceCode.Substring(0, SourceCode.Length - 1),
-						c_rhs);
+					string formatString = compiler.assignmentNeedsCSSnipper
+						? SourceCode == "=" ? "{0}=⊂{2}⊃" : "{0}=⊂{0}{1}{2}⊃"
+						: SourceCode == "=" ? "{0}={2}" : "{0}={0}{1}{2}";
+
+					return string.Format(formatString, c_lhs, SourceCode.Substring(0, SourceCode.Length - 1), c_rhs);
 
 				default:
 					return string.Format("{0}{1}{2}", LHS?.CompileToken(compiler), SourceCode, RHS?.CompileToken(compiler));
