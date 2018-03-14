@@ -4,6 +4,8 @@ using System.Linq;
 using RobotPlusPlus.Compiling;
 using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -174,6 +176,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			switch (OperatorType)
 			{
 				case Type.Assignment:
+					if (this.AnyRecursive(t => t is LiteralNumber)
+					    && this.AnyRecursive(t => t is LiteralString))
+						compiler.assignmentNeedsCSSnipper = true;
+
 					string c_rhs = RHS.CompileToken(compiler);
 					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
 					string c_lhs = LHS.CompileToken(compiler);

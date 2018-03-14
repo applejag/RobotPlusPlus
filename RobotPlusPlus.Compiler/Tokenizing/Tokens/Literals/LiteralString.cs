@@ -23,13 +23,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 		public override string CompileToken(Compiler compiler)
 		{
 			string escaped = Value.EscapeString();
-			if (escaped != Value)
-			{
-				compiler.assignmentNeedsCSSnipper = true;
-				return $"\"{escaped}\"";
-			}
+			if (escaped == Value && !compiler.assignmentNeedsCSSnipper)
+				return $"‴{Value}‴";
 
-			return $"‴{escaped}‴";
+			compiler.assignmentNeedsCSSnipper = true;
+			return $"\"{escaped}\"";
 		}
 	}
 }
