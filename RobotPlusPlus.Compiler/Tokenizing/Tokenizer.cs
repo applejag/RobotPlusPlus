@@ -107,10 +107,10 @@ namespace RobotPlusPlus.Tokenizing
 			}
 
 			// Numbers
-			if ((segment = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)")) != null)
+			if ((segment = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[fF]?")) != null)
 			{
 				// Ending with invalid char?
-				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]") != null)
+				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]*") != segment)
 					throw new ParseException("Unexpected character after number.", CurrentRow);
 
 				return new LiteralNumber(segment, CurrentRow);

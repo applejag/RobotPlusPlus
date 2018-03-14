@@ -20,8 +20,9 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 
 		public LiteralNumber(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
-			// ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-			if (sourceCode.IndexOf('.') == -1)
+			if (sourceCode.EndsWith('f', ignoreCase: true))
+				Value = double.Parse(sourceCode.Substring(0, sourceCode.Length - 1), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+			else if (sourceCode.IndexOf('.') == -1)
 				Value = int.Parse(sourceCode, NumberStyles.None, CultureInfo.InvariantCulture);
 			else
 				Value = double.Parse(sourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);

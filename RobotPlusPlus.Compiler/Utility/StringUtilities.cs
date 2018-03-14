@@ -33,5 +33,15 @@ namespace RobotPlusPlus.Utility
 			return escaped.ToString();
 		}
 
+		public static bool EndsWith([NotNull] this string value, char c, bool ignoreCase)
+		{
+			if (value.Length == 0)
+				return false;
+
+			if (ignoreCase)
+				return char.ToUpperInvariant(value[value.Length - 1]) == char.ToUpperInvariant(c);
+
+			return value[value.Length - 1] == c;
+		}
 	}
 }
