@@ -20,13 +20,8 @@ namespace RobotPlusPlus.Parsing
 		public Token CurrToken => TryPeekToken(0);
 		public Token PrevToken => TryPeekToken(-1);
 
-
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
 		{
-			// Ignore whitespace and comments
-			//this.tokens = new Queue<Token>(tokens
-			//	.Where(t => t.Type != TokenType.Whitespace && t.Type != TokenType.Comment));
-
 			this.tokens = tokens.ToList();
 		}
 
@@ -265,11 +260,6 @@ namespace RobotPlusPlus.Parsing
 
 			// Kdone
 			return parser.tokens.ToArray();
-		}
-
-		public static Token[] Parse(string code)
-		{
-			return Tokenizer.Tokenize(code);
 		}
 
 		public static string Compile(string code)

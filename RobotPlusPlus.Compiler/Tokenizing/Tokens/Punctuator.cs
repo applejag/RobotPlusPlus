@@ -49,13 +49,16 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						if (parser.NextToken == null)
 							throw new ParseException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
 
-						Token nextToken = parser.TakeNextToken(Count);
+						Token takenToken = parser.TakeNextToken(Count);
 
 						// Stop when found matching pair
-						if (nextToken is Punctuator punc
-							&& punc.PunctuatorType == Type.ClosingParentases
-							&& punc.Character == GetMatchingParentases(Character))
+						if (takenToken is Punctuator punc
+						    && punc.PunctuatorType == Type.ClosingParentases
+						    && punc.Character == GetMatchingParentases(Character))
+						{
+							this.Remove(takenToken);
 							break;
+						}
 					}
 					break;
 
