@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -13,6 +14,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			{ '{', '}' },
 		};
 
+		private static readonly IReadOnlyCollection<char> separators = new []
+		{
+			';', ','
+		};
+
 		public char Character { get; }
 		public Type PunctuatorType { get; }
 
@@ -24,6 +30,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				PunctuatorType = Type.OpeningParentases;
 			else if (parentasesPairs.ContainsValue(Character))
 				PunctuatorType = Type.ClosingParentases;
+			else if (separators.Contains(Character))
+				PunctuatorType = Type.Separator;
 			else
 				PunctuatorType = Type.Other;
 		}
@@ -49,7 +57,12 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					}
 					break;
 
+				case Type.Separator:
+					break;
+
 				case Type.Other when Character == '.' && parser.NextToken is Identifier:
+					if (TrailingWhitespace != null)
+						throw new ParseException($"Unexpected whitespace after punctuator <{Character}> before identifier <{parser.NextToken.SourceCode}>.", this);
 					break;
 
 				case Type.ClosingParentases:
@@ -74,6 +87,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		{
 			OpeningParentases,
 			ClosingParentases,
+			Separator,
 			Other,
 		}
 	}
