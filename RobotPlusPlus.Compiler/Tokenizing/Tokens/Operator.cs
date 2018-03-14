@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RobotPlusPlus.Parsing;
 
@@ -132,7 +133,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					if (prev is Identifier
 						|| prev is Literal
 						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases)
-					    || (prev is Operator op1 && op1.ContainsValue))
+						|| (prev is Operator op1 && op1.ContainsValue))
 						parser.TakePrevToken(_LHS);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
@@ -140,7 +141,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					if (next is Identifier
 						|| next is Literal
 						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases)
-					    || (next is Operator op2 && op2.ContainsValue))
+						|| (next is Operator op2 && op2.ContainsValue))
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -160,6 +161,26 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
+
+				default:
+					throw new ParseException($"Unexpected operator type <{OperatorType}>.", this);
+			}
+		}
+
+		public override string CompileToken()
+		{
+			switch (OperatorType)
+			{
+				case Type.Assignment when SourceCode != "=":
+					string op = SourceCode.Substring(1);
+					//return string.Format("{0}=⊂{0}{1}{2}⊃", LHS.CompileToken(), op, RHS.CompileToken());
+					return string.Format("{0}={0}{1}{2}", LHS.CompileToken(), op, RHS.CompileToken());
+
+				case Type.Assignment:
+					//return string.Format("{0}=⊂{1}⊃", LHS.CompileToken(), RHS.CompileToken());
+
+				default:
+					return string.Format("{0}{1}{2}", LHS?.CompileToken(), SourceCode, RHS?.CompileToken());
 			}
 		}
 

@@ -1,5 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 {
@@ -14,5 +18,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 
 		public override void ParseToken(Parser parser)
 		{ }
+
+		public override string CompileToken()
+		{
+			return $"‴{Value.EscapeString()}‴";
+		}
 	}
 }

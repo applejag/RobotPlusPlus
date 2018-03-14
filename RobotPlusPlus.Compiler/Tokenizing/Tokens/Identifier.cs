@@ -11,5 +11,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public override void ParseToken(Parser parser)
 		{ }
+
+		public override string CompileToken()
+		{
+			return $"♥{SourceCode}";
+		}
 	}
 }

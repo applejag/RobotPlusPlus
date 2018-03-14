@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Compiling;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -32,6 +33,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		}
 
 		public abstract void ParseToken(Parser parser);
+		public abstract string CompileToken();
 
 		public override string ToString()
 		{

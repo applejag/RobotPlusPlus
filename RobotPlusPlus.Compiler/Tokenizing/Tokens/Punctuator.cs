@@ -49,14 +49,13 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						if (parser.NextToken == null)
 							throw new ParseException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
 
-						Token takenToken = parser.TakeNextToken(Count);
+						Token takenToken = parser.TakeNextToken();
 
 						// Stop when found matching pair
 						if (takenToken is Punctuator punc
 						    && punc.PunctuatorType == Type.ClosingParentases
 						    && punc.Character == GetMatchingParentases(Character))
 						{
-							this.Remove(takenToken);
 							break;
 						}
 					}
@@ -67,7 +66,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 				case Type.Other when Character == '.' && parser.NextToken is Identifier:
 					if (TrailingWhitespace != null)
-						throw new ParseException($"Unexpected whitespace after punctuator <{Character}> before identifier <{parser.NextToken.SourceCode}>.", this);
+						throw new ParseException(
+							$"Unexpected whitespace after punctuator <{Character}> before identifier <{parser.NextToken.SourceCode}>.",
+							this);
+					else
+						parser.TakeNextToken();
 					break;
 
 				case Type.ClosingParentases:
@@ -81,6 +84,11 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				default:
 					throw new ParseException($"Unexpected punctuator <{SourceCode}>.", this);
 			}
+		}
+
+		public override string CompileToken()
+		{
+			throw new NotImplementedException();
 		}
 
 		public static char GetMatchingParentases(char c)

@@ -20,5 +20,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			parser.TakeNextToken(_Condition);
 			parser.TakeNextToken(_CodeBlock);
 		}
+
+		public override string CompileToken()
+		{
+			throw new System.NotImplementedException();
+		}
 	}
 }

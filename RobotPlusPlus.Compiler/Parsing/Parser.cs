@@ -133,9 +133,19 @@ namespace RobotPlusPlus.Parsing
 			return TakeToken(-1, insertionIndex);
 		}
 
+		public Token TakePrevToken()
+		{
+			return TakePrevToken(CurrToken.Count);
+		}
+
 		public Token TakeNextToken(int insertionIndex)
 		{
 			return TakeToken(+1, insertionIndex);
+		}
+
+		public Token TakeNextToken()
+		{
+			return TakeNextToken(CurrToken.Count);
 		}
 
 		public bool IsTokenParsing(Token token)
@@ -260,11 +270,6 @@ namespace RobotPlusPlus.Parsing
 
 			// Kdone
 			return parser.tokens.ToArray();
-		}
-
-		public static string Compile(string code)
-		{
-			throw new NotImplementedException();
 		}
 
 	}

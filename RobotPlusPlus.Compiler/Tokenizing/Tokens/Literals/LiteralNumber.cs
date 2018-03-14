@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 {
@@ -7,8 +8,14 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 	{
 		/// <summary><see cref="Value"/> is <seealso cref="double"/></summary>
 		public bool IsReal => Value is double;
+
+		public double RealValue => (double) Value;
+
 		/// <summary><see cref="Value"/> is <seealso cref="int"/></summary>
 		public bool IsInteger => Value is int;
+
+		public int IntegerValue => (int) Value;
+
 		public object Value { get; }
 
 		public LiteralNumber(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
@@ -21,6 +28,13 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 		}
 
 		public override void ParseToken(Parser parser)
-		{}
+		{ }
+
+		public override string CompileToken()
+		{
+			return IsReal
+				? RealValue.ToString("0.0#############################", CultureInfo.InvariantCulture)
+				: IntegerValue.ToString(CultureInfo.InvariantCulture);
+		}
 	}
 }
