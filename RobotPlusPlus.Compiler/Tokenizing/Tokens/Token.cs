@@ -13,7 +13,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public Whitespace LeadingWhitespace { get; set; }
 		public Whitespace TrailingWhitespace { get; set; }
 
-		public List<Token> Tokens = new List<Token>();
+		public List<Token> Tokens { get; } = new List<Token>();
 		public bool IsParsed { get; internal set; }
 
 		protected Token(string sourceCode, int sourceLine)
@@ -30,7 +30,6 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 			NewLines = newLines;
 		}
-
 
 		public abstract void ParseToken(Parser parser);
 
@@ -50,8 +49,23 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public Token this[int index]
 		{
-			get => Tokens[index];
-			set => Tokens[index] = value;
+			get => index >= 0 && index < Tokens.Count ? Tokens[index] : null;
+			set => FlexibleSetTokenAt(index, value);
+		}
+
+		private void FlexibleSetTokenAt(int index, Token item)
+		{
+			if (index >= Tokens.Count)
+				Tokens.AddRange(new Token[index - Tokens.Count + 1]);
+
+			Tokens[index] = item;
+			TrimTokens();
+		}
+
+		public void TrimTokens()
+		{
+			while (Tokens.Count > 0 && Tokens[Tokens.Count-1] == null)
+				Tokens.RemoveAt(Tokens.Count - 1);
 		}
 
 		public int IndexOf(Token item)
@@ -61,8 +75,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public void Insert(int index, Token item)
 		{
-			if (index >= 0 && index < Tokens.Count && Tokens[index] == null)
-				Tokens[index] = item;
+			if (index > Tokens.Count)
+				FlexibleSetTokenAt(index, item);
 			else
 				Tokens.Insert(index, item);
 		}
@@ -70,6 +84,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public void RemoveAt(int index)
 		{
 			Tokens.RemoveAt(index);
+			TrimTokens();
 		}
 
 		public void Add(Token item)

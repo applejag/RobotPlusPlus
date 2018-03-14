@@ -8,10 +8,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	public class Operator : Token
 	{
 		public Type OperatorType { get; }
-		public Token LHS => Tokens[iLHS];
-		public Token RHS => Tokens[iRHS];
-		public const int iLHS = 0;
-		public const int iRHS = 1;
+		public Token LHS => Tokens[_LHS];
+		public Token RHS => Tokens[_RHS];
+		public const int _LHS = 0;
+		public const int _RHS = 1;
 
 		public bool ContainsValue => Tokens.Any(t =>
 			t is Literal
@@ -22,8 +22,6 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
-			Tokens = new List<Token> { null, null };
-
 			switch (sourceCode)
 			{
 				case "++":
@@ -110,14 +108,14 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			{
 				// Expression
 				case Type.Expression when prev is Identifier:
-					parser.TakePrevToken(iLHS); // LHS
+					parser.TakePrevToken(_LHS); // LHS
 					break;
 				case Type.Expression:
 					throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 				// Unary
 				case Type.Unary:
-					parser.TakeNextToken(iRHS);
+					parser.TakeNextToken(_RHS);
 					break;
 
 				// Two sided expressions
@@ -135,7 +133,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						|| prev is Literal
 						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases)
 					    || (prev is Operator op1 && op1.ContainsValue))
-						parser.TakePrevToken(iLHS);
+						parser.TakePrevToken(_LHS);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
@@ -143,14 +141,14 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						|| next is Literal
 						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases)
 					    || (next is Operator op2 && op2.ContainsValue))
-						parser.TakeNextToken(iRHS);
+						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				case Type.Assignment:
 					if (prev is Identifier)
-						parser.TakePrevToken(iLHS);
+						parser.TakePrevToken(_LHS);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
@@ -158,7 +156,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						|| next is Literal
 						|| (next is Punctuator tp2 && tp2.PunctuatorType == Punctuator.Type.OpeningParentases)
 						|| (next is Operator op3 && op3.ContainsValue))
-						parser.TakeNextToken(iRHS);
+						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
