@@ -99,26 +99,5 @@ namespace RobotPlusPlus.Tests.CompilerTests
 			Assert.AreEqual("♥x=true", output);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(UnassignedVariableException))]
-		public void Compile_VariableUnassigned()
-		{
-			// Act
-			Compiler.Compile("x = y");
-
-			// Assert
-			Assert.Fail();
-		}
-
-		[TestMethod]
-		public void Compile_VariableAssigned()
-		{
-			// Act
-			string output = Compiler.Compile("y = 42     x = y");
-
-			// Assert
-			Assert.AreEqual("♥y=42\n♥x=♥y", output);
-		}
-
 	}
 }
