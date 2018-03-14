@@ -8,6 +8,7 @@ namespace RobotPlusPlus.Console
 		public static void Main(string[] args)
 		{
 			Console.WriteLine("Hello World!");
+			Console.WriteLine(string.Join("\n", args));
 			Console.ReadKey(true);
 		}
 	}
