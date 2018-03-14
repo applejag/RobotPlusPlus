@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Exceptions;
 
 namespace RobotPlusPlus.Tests.CompilerTests
 {
@@ -8,7 +8,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 	public class SimpleExpressionTests
 	{
 		[TestMethod]
-		public void Parse_Integer()
+		public void Compile_Integer()
 		{
 			// Act
 			string output = Compiler.Compile("x=1");
@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_IntegerWithSpaces()
+		public void Compile_IntegerWithSpaces()
 		{
 			// Act
 			string output = Compiler.Compile("x = 1");
@@ -28,7 +28,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_IntegerWithLottaSpaces()
+		public void Compile_IntegerWithLottaSpaces()
 		{
 			// Act
 			string output = Compiler.Compile("	x   =		  1   ");
@@ -38,7 +38,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_DecimalPoint()
+		public void Compile_DecimalPoint()
 		{
 			// Act
 			string pointzero = Compiler.Compile("x = 1.0");
@@ -52,7 +52,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_DecimalSuffix()
+		public void Compile_DecimalSuffix()
 		{
 			// Act
 			string suffixupper = Compiler.Compile("x = 1F");
@@ -64,7 +64,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_DecimalPointAndSuffix()
+		public void Compile_DecimalPointAndSuffix()
 		{
 			// Act
 			string pointzero_suffixupper = Compiler.Compile("x = 1.0F");
@@ -80,7 +80,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_String()
+		public void Compile_String()
 		{
 			// Act
 			string output = Compiler.Compile(@"x = ""foo""");
@@ -90,7 +90,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_Boolean()
+		public void Compile_Boolean()
 		{
 			// Act
 			string output = Compiler.Compile("x = true");
@@ -100,13 +100,24 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_Variable()
+		[ExpectedException(typeof(UnassignedVariableException))]
+		public void Compile_VariableUnassigned()
 		{
 			// Act
-			string output = Compiler.Compile("x = y");
+			Compiler.Compile("x = y");
 
 			// Assert
-			Assert.AreEqual("♥x=♥y", output);
+			Assert.Fail();
+		}
+
+		[TestMethod]
+		public void Compile_VariableAssigned()
+		{
+			// Act
+			string output = Compiler.Compile("y = 42     x = y");
+
+			// Assert
+			Assert.AreEqual("♥y=42\n♥x=♥y", output);
 		}
 
 	}

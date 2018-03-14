@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -167,20 +169,22 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			}
 		}
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			switch (OperatorType)
 			{
-				case Type.Assignment when SourceCode != "=":
-					string op = SourceCode.Substring(1);
-					//return string.Format("{0}=⊂{0}{1}{2}⊃", LHS.CompileToken(), op, RHS.CompileToken());
-					return string.Format("{0}={0}{1}{2}", LHS.CompileToken(), op, RHS.CompileToken());
-
 				case Type.Assignment:
-					//return string.Format("{0}=⊂{1}⊃", LHS.CompileToken(), RHS.CompileToken());
+					string c_rhs = RHS.CompileToken(compiler);
+					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
+					string c_lhs = LHS.CompileToken(compiler);
+
+					return string.Format(SourceCode == "=" ? "{0}={2}" : "{0}={0}{1}{2}",
+						c_lhs,
+						SourceCode.Substring(0, SourceCode.Length - 1),
+						c_rhs);
 
 				default:
-					return string.Format("{0}{1}{2}", LHS?.CompileToken(), SourceCode, RHS?.CompileToken());
+					return string.Format("{0}{1}{2}", LHS?.CompileToken(compiler), SourceCode, RHS?.CompileToken(compiler));
 			}
 		}
 

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using RobotPlusPlus.Compiling;
 using RobotPlusPlus.Parsing;
 using RobotPlusPlus.Utility;
 
@@ -19,7 +20,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 		public override void ParseToken(Parser parser)
 		{ }
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			return $"‴{Value.EscapeString()}‴";
 		}

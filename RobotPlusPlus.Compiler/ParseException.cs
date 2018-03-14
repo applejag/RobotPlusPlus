@@ -17,12 +17,12 @@ namespace RobotPlusPlus
 			: this(msg, line, null)
 		{ }
 
-		public ParseException(string msg, Token source)
-			: this(msg, source.SourceLine, null)
+		public ParseException(string msg, Token variable)
+			: this(msg, variable.SourceLine, null)
 		{ }
 
-		public ParseException(string msg, Token source, Exception innerException)
-			: this(msg, source.SourceLine, innerException)
+		public ParseException(string msg, Token variable, Exception innerException)
+			: this(msg, variable.SourceLine, innerException)
 		{ }
 	}
 }

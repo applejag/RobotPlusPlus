@@ -1,4 +1,5 @@
-﻿using RobotPlusPlus.Parsing;
+﻿using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -15,7 +16,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public override void ParseToken(Parser parser)
 		{ }
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			return string.Empty;
 		}

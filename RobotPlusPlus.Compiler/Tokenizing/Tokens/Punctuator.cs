@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Compiling;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -86,7 +87,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 			}
 		}
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			throw new NotImplementedException();
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using JetBrains.Annotations;
@@ -11,6 +12,17 @@ namespace RobotPlusPlus.Compiling
 	public class Compiler
 	{
 		private readonly StringBuilder output = new StringBuilder();
+		private readonly HashSet<string> registeredVariables = new HashSet<string>();
+
+		public void RegisterVariable([NotNull] Identifier identifier)
+		{
+			registeredVariables.Add(identifier.SourceCode);
+		}
+
+		public bool IsVariableRegistered([CanBeNull] Identifier identifier)
+		{
+			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
+		}
 
 		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
 		{
@@ -22,9 +34,9 @@ namespace RobotPlusPlus.Compiling
 			foreach (Token token in parsedTokens)
 			{
 				if (compiler.output.Length > 0)
-					compiler.output.AppendLine();
+					compiler.output.Append('\n');
 
-				compiler.output.Append(token.CompileToken());
+				compiler.output.Append(token.CompileToken(compiler));
 			}
 
 			return compiler.output.ToString();
