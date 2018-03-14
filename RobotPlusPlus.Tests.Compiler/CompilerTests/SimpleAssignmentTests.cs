@@ -5,7 +5,7 @@ using RobotPlusPlus.Exceptions;
 namespace RobotPlusPlus.Tests.CompilerTests
 {
 	[TestClass]
-	public class SimpleExpressionTests
+	public class SimpleAssignmentTests
 	{
 		[TestMethod]
 		public void Compile_Integer()

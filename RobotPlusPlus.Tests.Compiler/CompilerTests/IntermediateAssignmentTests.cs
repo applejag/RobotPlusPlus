@@ -5,7 +5,7 @@ using RobotPlusPlus.Exceptions;
 namespace RobotPlusPlus.Tests.CompilerTests
 {
 	[TestClass]
-	public class IntermediateExpressionTests
+	public class IntermediateAssignmentTests
 	{
 		[TestMethod]
 		public void Compile_MultipleAssignmentsSpace()
