@@ -1,31 +1,109 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using JetBrains.Annotations;
 using McMaster.Extensions.CommandLineUtils;
+using RobotPlusPlus.CLI.Validation;
 
 namespace RobotPlusPlus.CLI
 {
+	[VersionOptionFromMember(MemberName = nameof(Version))]
 	[HelpOption]
 	public class ProgramOptions
 	{
+		public string Version => "hellodog";
+
+		#region Private option fields
 		[Required]
 		[FileExists]
+		[FileExtensions(Extensions = ".robotpp")]
 		[Argument(0, Name = "Script",
 			Description = "Required. The `.robotpp` script to be parsed.")]
-		public string Script { get; }
+		private string OptScript { get; } = null;
 
-		[Option(ShortName = "d", LongName = "Destination", ValueName = "Folder",
-			Description = "The destination for the compiled `.robot` script. " +
-			              "If none is supplied, it will be same folder and filename " +
-			              "as the `.robotpp` script (with `.robot` extension).")]
-		public string Destination { get; }
+		[ValidPathCharacters(ErrorMessage = "The output folder must not contains invalid characters!")]
+		[Option("-d --dest <FOLDER>",
+			Description = "The destination for the compiled `.robot` script.\n" +
+						  "Default: Same folder as <Script>.")]
+		private string OptDestinationFolder { get; } = null;
 
+		[ValidFileNameCharacters(ErrorMessage = "The output filename must not contains invalid characters!")]
+		[Option("-n --name <FILENAME>",
+			Description = "The output filename. The extension `.robot` will be added if one is omitted.\n" +
+						  "Default: Same name as <Script> but with `.robot` extension.")]
+		private string OptDestinationFileName { get; } = null;
+
+		[Option("-p --nopause",
+			Description = "Disables the pause at the end of the compilation.")]
+		private bool OptDontPauseAtEnd { get; } = false;
+
+		[Option("-o --overwrite",
+			Description = "Will overwrite without prompting the user.")]
+		private bool OptOverwriteWithoutPrompt { get; } = false;
+
+		[Option("-q --quiet",
+			Description = "Disables all writing to the console.\n" +
+						  "This flag enables --Overwrite and --NoPause, and disables --Verbose.")]
+		private bool OptQuietMode { get; } = false;
+
+		[Option("-v --verbose",
+			Description = "Show a more verbose output.")]
+		private bool OptVerbose { get; } = false;
+		#endregion
+
+		#region Public option fields
+
+		public string Script => EvalSource();
+
+		public string Destination => EvalDestination();
+
+		public bool PauseAtEnd => !OptDontPauseAtEnd && !OptQuietMode;
+		public bool Verbose => OptVerbose && !OptQuietMode;
+		public bool OverwriteWithoutPrompt => OptOverwriteWithoutPrompt || OptQuietMode;
+
+		#endregion
+
+		[UsedImplicitly]
 		private void OnExecute()
 		{
-			string dest = Path.Combine(Path.GetDirectoryName(Script), Destination ?? "", Path.ChangeExtension(Path.GetFileName(Script), ".robot"));
+			try
+			{
+				Console.WriteLine($"I should use the file \"{EvalSource()}\" apprently, and output to \"{EvalDestination()}\".");
+				
+			}
+			finally
+			{
+				if (OptDontPauseAtEnd == false)
+				{
+					// Clear buffer & colors
+					while (Console.KeyAvailable) Console.ReadKey(true);
+					Console.ResetColor();
+					// Await input
+					Console.Write("\nExecution finished. Press any key to exit...");
+					Console.ReadKey(true);
+					Console.WriteLine();
+				}
+			}
+		}
 
-			Console.WriteLine($"I should use the file \"{Script}\" apprently, and output to \"{dest}\".");
-			Console.ReadLine();
+		private string EvalSource()
+		{
+			return Path.GetFullPath(OptScript);
+		}
+
+		private string EvalDestination()
+		{
+			string source = EvalSource();
+			string filename = OptDestinationFileName;
+			string folder = OptDestinationFolder;
+
+			if (filename == null)
+				filename = Path.ChangeExtension(Path.GetFileName(source), ".robot");
+
+			if (folder == null)
+				folder = Path.GetDirectoryName(source);
+
+			return Path.Combine(folder, filename);
 		}
 	}
 }
