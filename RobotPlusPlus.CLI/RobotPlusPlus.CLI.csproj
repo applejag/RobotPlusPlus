@@ -4,7 +4,7 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>netcoreapp2.0</TargetFramework>
 		<RuntimeIdentifiers>win10-x64;win10-x86;osx-x64;ubuntu-x64</RuntimeIdentifiers>
-		<StartupObject>RobotPlusPlus.Console.Program</StartupObject>
+		<StartupObject>RobotPlusPlus.CLI.Program</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>

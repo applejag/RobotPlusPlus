@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace RobotPlusPlus.Console
+namespace RobotPlusPlus.CLI
 {
-	using System;
-
 	[HelpOption]
 	public class ProgramOptions
 	{
