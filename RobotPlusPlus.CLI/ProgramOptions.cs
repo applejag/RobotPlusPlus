@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using McMaster.Extensions.CommandLineUtils;
 using RobotPlusPlus.CLI.Validation;
@@ -49,6 +50,10 @@ namespace RobotPlusPlus.CLI
 		[Option("-v --verbose",
 			Description = "Show a more verbose output.")]
 		private bool OptVerbose { get; } = false;
+
+		[Option("-t --test",
+			Description = "Only try to compile. Don't write anything to the destination.")]
+		private bool OptDryRun { get; } = false;
 		#endregion
 
 		#region Public option fields
@@ -59,21 +64,36 @@ namespace RobotPlusPlus.CLI
 
 		public bool PauseAtEnd => !OptDontPauseAtEnd && !OptQuietMode;
 		public bool Verbose => OptVerbose && !OptQuietMode;
+		public bool QuietMode => OptQuietMode;
 		public bool OverwriteWithoutPrompt => OptOverwriteWithoutPrompt || OptQuietMode;
+
+		public bool DryRun => OptDryRun;
 
 		#endregion
 
+		public static Task<int> ExecuteAsync(string[] args)
+			=> CommandLineApplication.ExecuteAsync<ProgramOptions>(args);
+
 		[UsedImplicitly]
-		private void OnExecute()
+		private async Task OnExecuteAsync()
 		{
+			IConsole console = QuietMode ? NullConsole.Singleton : PhysicalConsole.Singleton;
+			
 			try
 			{
-				Console.WriteLine($"I should use the file \"{EvalSource()}\" apprently, and output to \"{EvalDestination()}\".");
-				
+				var rw = new ReaderWriter(this);
+
+				await rw.ReadCodeFromFile(console);
+				rw.TokenizeCode(console);
+
+				if (!DryRun)
+				{
+					rw.WriteCompiledToDestination(console);
+				}
 			}
 			finally
 			{
-				if (OptDontPauseAtEnd == false)
+				if (PauseAtEnd)
 				{
 					// Clear buffer & colors
 					while (Console.KeyAvailable) Console.ReadKey(true);

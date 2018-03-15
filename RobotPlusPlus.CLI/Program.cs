@@ -1,8 +1,5 @@
-﻿
-using System;
-using System.Diagnostics;
+﻿using System;
 using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.Abstractions;
 
 namespace RobotPlusPlus.CLI
 {
@@ -10,10 +7,9 @@ namespace RobotPlusPlus.CLI
 	{
 		public static int Main(string[] args)
 		{
-
 			try
 			{
-				return CommandLineApplication.Execute<ProgramOptions>(args);
+				return ProgramOptions.ExecuteAsync(args).GetAwaiter().GetResult();
 			}
 			catch (Exception e)
 			{
