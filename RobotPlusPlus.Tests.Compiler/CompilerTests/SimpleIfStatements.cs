@@ -43,7 +43,7 @@ namespace RobotPlusPlus.Tests.CompilerTests
 			// Arrange
 			const string code = "if true { x = 1 }";
 			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-									"♥x=1" +
+									"♥x=1\n" +
 									"➜noif";
 
 			// Act
