@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Tokenizing.Tokens;
 using RobotPlusPlus.Tokenizing.Tokens.Literals;
 

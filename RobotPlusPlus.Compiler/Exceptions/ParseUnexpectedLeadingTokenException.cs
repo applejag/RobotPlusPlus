@@ -1,9 +1,9 @@
 ﻿using System;
 using RobotPlusPlus.Tokenizing.Tokens;
 
-namespace RobotPlusPlus
+namespace RobotPlusPlus.Exceptions
 {
-	public class ParseUnexpectedLeadingTokenException : ParseException
+	public class ParseUnexpectedLeadingTokenException : ParseTokenException
 	{
 		public ParseUnexpectedLeadingTokenException(Token source, Token leading)
 			: this(source, leading, null)
@@ -13,7 +13,6 @@ namespace RobotPlusPlus
 			: base(
 				$"Unexpected leading token <{(leading == null ? "null" : leading.GetType().Name + ", " + leading.SourceCode)}> before <{source.SourceCode}>.",
 				leading ?? source, innerException)
-		{
-		}
+		{ }
 	}
 }

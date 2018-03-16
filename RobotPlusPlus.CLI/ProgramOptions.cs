@@ -87,7 +87,7 @@ namespace RobotPlusPlus.CLI
 #endif
 				var rw = new ReaderWriter(this, console);
 
-				rw.ReadCodeFromFile().Wait();
+				rw.ReadCodeFromFile();
 				rw.TokenizeCode();
 				rw.CompileCode();
 

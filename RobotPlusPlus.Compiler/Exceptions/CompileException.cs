@@ -3,7 +3,7 @@ using RobotPlusPlus.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Exceptions
 {
-	public class CompileException : ParseException
+	public class CompileException : ParseTokenException
 	{
 		public CompileException(string msg, Token source)
 			: base(msg, source)

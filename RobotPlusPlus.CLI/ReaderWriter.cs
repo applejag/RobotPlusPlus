@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
@@ -29,7 +30,7 @@ namespace RobotPlusPlus.CLI
 			this.console = console;
 		}
 
-		public async Task ReadCodeFromFile()
+		public void ReadCodeFromFile()
 		{
 			sourceFile = options.Script;
 

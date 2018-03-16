@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Tokenizing.Tokens;
 using RobotPlusPlus.Tokenizing.Tokens.Literals;
 

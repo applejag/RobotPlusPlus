@@ -1,4 +1,5 @@
 ﻿using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens.Literals

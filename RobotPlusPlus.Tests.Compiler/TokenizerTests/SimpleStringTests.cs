@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
 

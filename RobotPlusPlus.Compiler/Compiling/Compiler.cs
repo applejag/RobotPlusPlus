@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Parsing;
@@ -32,15 +33,15 @@ namespace RobotPlusPlus.Compiling
 				throw new ArgumentNullException(nameof(parsedTokens));
 
 			var compiler = new Compiler();
+			var rows = new List<string>(parsedTokens.Length);
 
 			foreach (Token token in parsedTokens)
 			{
-				if (compiler.output.Length > 0)
-					compiler.output.Append('\n');
-
 				compiler.assignmentNeedsCSSnipper = false;
-				compiler.output.Append(token.CompileToken(compiler));
+				rows.Add(token.CompileToken(compiler));
 			}
+
+			compiler.output.AppendJoin('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
 
 			return compiler.output.ToString();
 		}
