@@ -39,8 +39,8 @@ namespace RobotPlusPlus.CLI
 			string initVerb = $"Reading from file \"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}\"";
 			const string onErrorVerb = "reading from file";
 
-			(_, sourceCode) = await TryExecActionAsync(initVerb, onErrorVerb, async () => await File.ReadAllTextAsync(options.Script));
-			sourceCode = ReplaceNewLines(sourceCode);
+			if (TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script), out string content))
+				sourceCode = ReplaceNewLines(content);
 		}
 
 		public static string ReplaceNewLines(string multiline)
@@ -100,8 +100,8 @@ namespace RobotPlusPlus.CLI
 			console.ResetColor();
 		}
 
-		private async Task<(bool success, TOut value)> TryExecActionAsync<TOut>(string initVerb,
-			string onErrorVerb, Func<Task<TOut>> action)
+		private bool TryExecAction<TOut>(string initVerb,
+			string onErrorVerb, Func<TOut> action, out TOut value)
 		{
 			Stopwatch watch = Stopwatch.StartNew();
 
@@ -125,42 +125,37 @@ namespace RobotPlusPlus.CLI
 				console.Write($"{initVerb}... ");
 				console.ResetColor();
 
-				TOut value = await action();
+				value = action();
 
 				ReportTime(ConsoleColor.Green, "Done.");
-				return (true, value);
+				return true;
 			}
 			catch (ParseException e)
 			{
 				ReportTime(ConsoleColor.Red, "Error!");
-				
+
 				LogError($"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}:{e.Line}: {e.Message}");
 
 				PrettyConsoleWriter.WriteCodeHighlightError(sourceCode, e, options.Verbose ? -1 : 5, console);
 
 				console.ResetColor();
-				return (false, default);
+				value = default;
+				return false;
 			}
+#if !DEBUG
 			catch (Exception e)
 			{
 				ReportTime(ConsoleColor.Red, "Error!");
 				Console.WriteLine();
 				LogError($"Unexpected error during {onErrorVerb}!");
 				Console.WriteLine();
-#if DEBUG
+				
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(e);
 				Console.ResetColor();
-#endif
-				throw;
+				return false;
 			}
-		}
-
-		private bool TryExecAction<TOut>(string initVerb, string onErrorVerb, Func<TOut> action, out TOut value)
-		{
-			bool success;
-			(success, value) = TryExecActionAsync(initVerb, onErrorVerb, () => Task.FromResult(action())).Result;
-			return success;
+#endif
 		}
 
 	}

@@ -9,7 +9,7 @@ namespace RobotPlusPlus.CLI
 		public static int Main(string[] args)
 		{
 #if DEBUG
-			return ProgramOptions.ExecuteAsync(args).GetAwaiter().GetResult();
+			return ProgramOptions.Execute(args);
 #else
 			try
 			{

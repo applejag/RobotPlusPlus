@@ -71,13 +71,13 @@ namespace RobotPlusPlus.CLI
 
 		#endregion
 
-		public static Task<int> ExecuteAsync(string[] args)
+		public static int Execute(string[] args)
 		{
-			return CommandLineApplication.ExecuteAsync<ProgramOptions>(args);
+			return CommandLineApplication.Execute<ProgramOptions>(args);
 		}
 
 		[UsedImplicitly]
-		private async Task OnExecuteAsync()
+		private void OnExecute()
 		{
 			IConsole console = QuietMode ? NullConsole.Singleton : PhysicalConsole.Singleton;
 
@@ -87,7 +87,7 @@ namespace RobotPlusPlus.CLI
 #endif
 				var rw = new ReaderWriter(this, console);
 
-				await rw.ReadCodeFromFile();
+				rw.ReadCodeFromFile().Wait();
 				rw.TokenizeCode();
 				rw.CompileCode();
 
