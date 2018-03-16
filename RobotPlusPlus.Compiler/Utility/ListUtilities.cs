@@ -85,5 +85,11 @@ namespace RobotPlusPlus.Utility
 		{
 			return source.Any(item => predicate(item) || item.AnyRecursive(predicate));
 		}
+
+		public static bool AllRecursive<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.All(item => predicate(item) && item.AnyRecursive(predicate));
+		}
 	}
 }

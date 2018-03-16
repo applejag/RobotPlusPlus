@@ -69,6 +69,29 @@ namespace RobotPlusPlus.Tests.CompilerTests
 		}
 
 		[TestMethod]
+		[ExpectedException(typeof(UnassignedVariableException))]
+		public void Compile_VariableSelfAssign()
+		{
+			// Act
+			Compiler.Compile("x = x");
+
+			// Assert
+			Assert.Fail();
+		}
+
+
+		[TestMethod]
+		[ExpectedException(typeof(UnassignedVariableException))]
+		public void Compile_VariableSelfIncrementAssign()
+		{
+			// Act
+			Compiler.Compile("x += 10");
+
+			// Assert
+			Assert.Fail();
+		}
+
+		[TestMethod]
 		public void Compile_VariableAssigned()
 		{
 			// Act

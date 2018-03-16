@@ -91,7 +91,7 @@ namespace RobotPlusPlus.Parsing
 			if (offset > 0)
 			{
 				// Parse the following before proceeding
-				ParseAllFollowingTokens(currentTokenIndex);
+				ParseAllFollowingTokens();
 			}
 
 			// Transfer
@@ -102,9 +102,15 @@ namespace RobotPlusPlus.Parsing
 			return target;
 		}
 
-		public void ParseAllFollowingTokens(int beyondIndex)
+		public void AddTokensAfterAndParse(params Token[] unparsedTokens)
 		{
-			var parser = new Parser(this, tokens.PopRangeAfter(beyondIndex, false));
+			tokens.InsertRange(currentTokenIndex + 1, unparsedTokens);
+			ParseAllFollowingTokens();
+		}
+
+		protected void ParseAllFollowingTokens()
+		{
+			var parser = new Parser(this, tokens.PopRangeAfter(currentTokenIndex, false));
 			parser.ParseAllTokenTypes();
 			tokens.AddRange(parser.tokens);
 		}

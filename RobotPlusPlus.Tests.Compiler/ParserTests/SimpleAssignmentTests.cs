@@ -133,7 +133,12 @@ namespace RobotPlusPlus.Tests.ParserTests
 			Assert.That.TokenIsOperator(y, Operator.Type.Assignment, "+=");
 			Assert.That.TokenIsOfType<Identifier>(y[0], "y");
 
-			Token mult = y[1];
+			// should parse to y=(y+(.5*x))
+			Token add = y[1];
+			Assert.That.TokenIsOperator(add, Operator.Type.Additive, "+");
+			Assert.That.TokenIsOfType<Identifier>(add[0], "y");
+
+			Token mult = add[1];
 			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
 			Assert.That.TokenIsLiteralReal(mult[0], 0.5d);
 			Assert.That.TokenIsOfType<Identifier>(mult[1], "x");
@@ -164,7 +169,12 @@ namespace RobotPlusPlus.Tests.ParserTests
 			Assert.That.TokenIsOperator(y, Operator.Type.Assignment, "+=");
 			Assert.That.TokenIsOfType<Identifier>(y[0], "y");
 
-			Token mult = y[1];
+			// should parse to y=(y+(.5*x))
+			Token add = y[1];
+			Assert.That.TokenIsOperator(add, Operator.Type.Additive, "+");
+			Assert.That.TokenIsOfType<Identifier>(add[0], "y");
+
+			Token mult = add[1];
 			Assert.That.TokenIsOperator(mult, Operator.Type.Multiplicative, "*");
 			Assert.That.TokenIsLiteralReal(mult[0], 0.5d);
 			Assert.That.TokenIsOfType<Identifier>(mult[1], "x");

@@ -13,8 +13,8 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	public class Operator : Token
 	{
 		public Type OperatorType { get; }
-		public Token LHS => Tokens[_LHS];
-		public Token RHS => Tokens[_RHS];
+		public Token LHS => this[_LHS];
+		public Token RHS => this[_RHS];
 		public const int _LHS = 0;
 		public const int _RHS = 1;
 
@@ -134,7 +134,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					parser.TakePrevToken(_LHS); // LHS
 					break;
 				case Type.Expression:
-					throw new ParseUnexpectedLeadingTokenException(this, prev);
+					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
@@ -173,6 +173,19 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
+
+					// ex: <<=, +=, %=
+					if (SourceCode != "=")
+					{
+						// Add identifier & operator & old RHS to pool, then take again
+						var id = new Identifier(LHS.SourceCode, LHS.SourceLine);
+						var op = new Operator(SourceCode.Substring(0, SourceCode.Length - 1), SourceLine);
+						Token old_rhs = RHS;
+						this[_RHS] = null;
+
+						parser.AddTokensAfterAndParse(id, op, old_rhs);
+						parser.TakeNextToken(_RHS);
+					}
 					break;
 
 				default:
@@ -194,10 +207,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					string c_lhs = LHS.CompileToken(compiler);
 
 					string formatString = compiler.assignmentNeedsCSSnipper
-						? SourceCode == "=" ? "{0}=⊂{2}⊃" : "{0}=⊂{0}{1}{2}⊃"
-						: SourceCode == "=" ? "{0}={2}" : "{0}={0}{1}{2}";
+						? "{0}=⊂{1}⊃"
+						: "{0}={1}";
 
-					return string.Format(formatString, c_lhs, SourceCode.Substring(0, SourceCode.Length - 1), c_rhs);
+					return string.Format(formatString, c_lhs, c_rhs);
 
 				default:
 					return string.Format("{0}{1}{2}", LHS?.CompileToken(compiler), SourceCode, RHS?.CompileToken(compiler));

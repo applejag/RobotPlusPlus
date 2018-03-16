@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Compiling
 {
@@ -31,6 +33,15 @@ namespace RobotPlusPlus.Compiling
 		{
 			if (parsedTokens == null)
 				throw new ArgumentNullException(nameof(parsedTokens));
+			parsedTokens.AnyRecursive(t =>
+			{
+				if (t == null)
+					throw new NullReferenceException("Token is null!");
+				if (!t.IsParsed)
+					throw new ApplicationException($"Unparsed token <{t.SourceCode}> on line {t.SourceLine}!");
+
+				return false;
+			});
 
 			var compiler = new Compiler();
 			var rows = new List<string>(parsedTokens.Length);
