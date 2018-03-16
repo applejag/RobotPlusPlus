@@ -37,7 +37,7 @@ namespace RobotPlusPlus.CLI
 			if (!File.Exists(sourceFile))
 				throw new FileNotFoundException("Script file was not found!", sourceFile);
 
-			string initVerb = $"Reading from file \"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}\"";
+			string initVerb = $"Reading from file \"{Path.GetFileName(sourceFile)}\"";
 			const string onErrorVerb = "reading from file";
 
 			if (!TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script), out string content))
@@ -90,6 +90,8 @@ namespace RobotPlusPlus.CLI
 
 			if (!CheckIfDirectoryExists())
 				return false;
+			if (!CheckIfDestinationFileExists())
+				return false;
 
 			string folder = Path.GetDirectoryName(options.Destination);
 			if (options.CreateFolder && Directory.Exists(folder))
@@ -100,6 +102,7 @@ namespace RobotPlusPlus.CLI
 					return false;
 				} 
 			}
+
 
 			if (!TryExecAction("Writing compiled code to file", "writing to file",
 				() => File.WriteAllText(destination, compiledCode)))
@@ -207,8 +210,24 @@ namespace RobotPlusPlus.CLI
 		public bool PreCompileWritingChecks()
 		{
 			if (!CheckIfDirectoryExists())
-			{
 				return false;
+
+			if (!CheckIfDestinationFileExists())
+				return false;
+
+			return true;
+		}
+
+		private bool CheckIfDestinationFileExists()
+		{
+			string destination = options.Destination;
+			if (!File.Exists(destination) || !options.OverwriteWithoutPrompt)
+			{
+				if (!Prompt.GetYesNo(
+					$"The destination file \"{Path.GetFileName(destination)}\" already exists, do you wish to override it?", true))
+					return false;
+
+				options.OverwriteWithoutPrompt = true;
 			}
 
 			return true;

@@ -40,7 +40,7 @@ namespace RobotPlusPlus.CLI
 
 		[Option("-o --overwrite",
 			Description = "Will overwrite without prompting the user.")]
-		private bool OptOverwriteWithoutPrompt { get; } = false;
+		private bool OptOverwriteWithoutPrompt { get; set; } = false;
 
 		[Option("-f --folder",
 			Description = "Will create folder if it doesn't already exist.")]
@@ -69,7 +69,12 @@ namespace RobotPlusPlus.CLI
 		public bool PauseAtEnd => !OptDontPauseAtEnd && !OptQuietMode;
 		public bool Verbose => OptVerbose && !OptQuietMode;
 		public bool QuietMode => OptQuietMode;
-		public bool OverwriteWithoutPrompt => OptOverwriteWithoutPrompt || OptQuietMode;
+		public bool OverwriteWithoutPrompt
+		{
+			get => OptOverwriteWithoutPrompt || OptQuietMode;
+			set => OptOverwriteWithoutPrompt = value;
+		}
+
 		public bool CreateFolder => OptCreateFolder;
 
 		public bool DryRun => OptDryRun;
