@@ -11,6 +11,8 @@ namespace RobotPlusPlus.CLI
 	{
 		public static void WriteCodeHighlightError(string sourceCode, ParseException e, int radius, IConsole console)
 		{
+			console.ResetColor();
+
 			string[] lines = sourceCode.Split('\n');
 			if (radius < 0) radius = lines.Length;
 
@@ -102,6 +104,7 @@ namespace RobotPlusPlus.CLI
 				}
 			}
 
+			console.WriteLine();
 			console.ResetColor();
 		}
 

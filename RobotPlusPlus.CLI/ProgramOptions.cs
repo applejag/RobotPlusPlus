@@ -72,27 +72,42 @@ namespace RobotPlusPlus.CLI
 		#endregion
 
 		public static Task<int> ExecuteAsync(string[] args)
-			=> CommandLineApplication.ExecuteAsync<ProgramOptions>(args);
+		{
+			return CommandLineApplication.ExecuteAsync<ProgramOptions>(args);
+		}
 
 		[UsedImplicitly]
 		private async Task OnExecuteAsync()
 		{
 			IConsole console = QuietMode ? NullConsole.Singleton : PhysicalConsole.Singleton;
-			
+
+#if !DEBUG
 			try
 			{
-				var rw = new ReaderWriter(this);
+#endif
+				var rw = new ReaderWriter(this, console);
 
-				await rw.ReadCodeFromFile(console);
-				rw.TokenizeCode(console);
+				await rw.ReadCodeFromFile();
+				rw.TokenizeCode();
+				rw.CompileCode();
 
 				if (!DryRun)
 				{
-					rw.WriteCompiledToDestination(console);
+					rw.WriteCompiledToDestination();
 				}
+#if !DEBUG
+			}
+			catch (Exception e)
+			{
+	#if TRACE
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(e);
+				Console.ResetColor();
+	#endif
 			}
 			finally
 			{
+#endif
 				if (PauseAtEnd)
 				{
 					// Clear buffer & colors
@@ -103,7 +118,9 @@ namespace RobotPlusPlus.CLI
 					Console.ReadKey(true);
 					Console.WriteLine();
 				}
+#if !DEBUG
 			}
+#endif
 		}
 
 		private string EvalSource()
