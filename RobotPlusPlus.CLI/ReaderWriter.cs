@@ -37,10 +37,11 @@ namespace RobotPlusPlus.CLI
 			if (!File.Exists(sourceFile))
 				throw new FileNotFoundException("Script file was not found!", sourceFile);
 
-			string initVerb = $"Reading from file \"{Path.GetFileName(sourceFile)}\"";
+			string encoding = options.Verbose ? $" using encoding {options.InputEncoding.EncodingName}" : string.Empty;
+			string initVerb = $"Reading from \"{Path.GetFileName(sourceFile)}\"{encoding}";
 			const string onErrorVerb = "reading from file";
 
-			if (!TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script), out string content))
+			if (!TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script, options.InputEncoding), out string content))
 				return false;
 
 			sourceCode = ReplaceNewLines(content);
@@ -60,7 +61,7 @@ namespace RobotPlusPlus.CLI
 				throw new InvalidOperationException("Code haven't been read yet!");
 
 			if (!TryExecAction("Tokenizing code", "tokenization", () => Tokenizer.Tokenize(sourceCode),
-				out tokenizedCode)) return false;
+				out tokenizedCode, log: options.Verbose)) return false;
 
 			if (options.Verbose)
 			{
@@ -77,7 +78,7 @@ namespace RobotPlusPlus.CLI
 			if (tokenizedCode == null)
 				throw new InvalidOperationException("Code haven't been tokenized yet!");
 
-			return TryExecAction("Parsing code", "parsing", () => Parser.Parse(tokenizedCode), out parsedCode)
+			return TryExecAction("Parsing code", "parsing", () => Parser.Parse(tokenizedCode), out parsedCode, log: options.Verbose)
 				   && TryExecAction("Compiling code", "compilation", () => Compiler.Compile(parsedCode), out compiledCode);
 		}
 
@@ -96,23 +97,25 @@ namespace RobotPlusPlus.CLI
 			string folder = Path.GetDirectoryName(options.Destination);
 			if (options.CreateFolder && Directory.Exists(folder))
 			{
-				if (!TryExecAction("Creating destination folder", "creating folder", () => Directory.CreateDirectory(folder).Exists, out bool success) || !success) {
+				if (!TryExecAction("Creating destination folder", "creating destination folder",
+					    () => Directory.CreateDirectory(folder).Exists, out bool success, log: options.Verbose) || !success)
+				{
 					LogError("Failed creating destination folder, are you missing permission?");
 					LogError($"\"{folder}\"");
 					return false;
-				} 
+				}
 			}
 
-
-			if (!TryExecAction("Writing compiled code to file", "writing to file",
-				() => File.WriteAllText(destination, compiledCode)))
+			string filename = Path.GetFileName(options.Destination);
+			string encoding = options.Verbose ? $" using encoding {options.OutputEncoding.EncodingName}" : string.Empty;
+			if (!TryExecAction($"Writing file \"{filename}\"{encoding}", "writing to file",
+				() => File.WriteAllText(destination, compiledCode, options.OutputEncoding)))
 				return false;
 
+			console.WriteLine();
 			LogInfo("Success! The compiled code has been saved to:");
 			console.ForegroundColor = ConsoleColor.Green;
-			console.WriteLine();
 			console.WriteLine(options.Destination);
-			console.WriteLine();
 			console.ResetColor();
 
 			return true;
@@ -138,48 +141,59 @@ namespace RobotPlusPlus.CLI
 			console.ResetColor();
 		}
 
-		private bool TryExecAction(string initVerb, string onErrorVerb, Action action)
+		private bool TryExecAction(string initVerb, string onErrorVerb, Action action, bool log = true)
 		{
 			return TryExecAction(initVerb, onErrorVerb, () =>
 			{
 				action();
 				return null;
-			}, out object _);
+			}, out object _, log);
 		}
 
 		private bool TryExecAction<TOut>(string initVerb,
-			string onErrorVerb, Func<TOut> action, out TOut value)
+			string onErrorVerb, Func<TOut> action, out TOut value, bool log = true)
 		{
-			Stopwatch watch = Stopwatch.StartNew();
+			Stopwatch watch = log ? Stopwatch.StartNew() : null;
 
 			void ReportTime(ConsoleColor color, string status)
 			{
 				console.ResetColor();
 				console.ForegroundColor = color;
 				console.Write(status);
-				watch.Stop();
-				console.ForegroundColor = ConsoleColor.DarkGray;
-				console.WriteLine($" (Took {watch.ElapsedMilliseconds}ms)");
-				console.ResetColor();
+
+				if (options.Verbose)
+				{
+					watch.Stop();
+					console.ForegroundColor = ConsoleColor.DarkGray;
+					console.WriteLine($" (Took {watch.ElapsedMilliseconds}ms)");
+					console.ResetColor();
+				}
+				else
+					console.WriteLine();
 			}
 
 			try
 			{
-				console.ResetColor();
-				console.ForegroundColor = ConsoleColor.Cyan;
-				console.Write("[TASK] ");
-				console.ForegroundColor = ConsoleColor.Gray;
-				console.Write($"{initVerb}... ");
-				console.ResetColor();
+				if (log)
+				{
+					console.ResetColor();
+					console.ForegroundColor = ConsoleColor.Cyan;
+					console.Write("[TASK] ");
+					console.ForegroundColor = ConsoleColor.Gray;
+					console.Write($"{initVerb}... ");
+					console.ResetColor();
+				}
 
 				value = action();
 
-				ReportTime(ConsoleColor.Green, "Done.");
+				if (log)
+					ReportTime(ConsoleColor.Green, "Done.");
 				return true;
 			}
 			catch (ParseException e)
 			{
-				ReportTime(ConsoleColor.Red, "Error!");
+				if (log)
+					ReportTime(ConsoleColor.Red, "Error!");
 				LogError($"Error while {onErrorVerb}!");
 
 				console.WriteLine();
@@ -194,14 +208,17 @@ namespace RobotPlusPlus.CLI
 #if !DEBUG
 			catch (Exception e)
 			{
-				ReportTime(ConsoleColor.Red, "Error!");
-				Console.WriteLine();
+				if (log) {
+					ReportTime(ConsoleColor.Red, "Error!");
+					Console.WriteLine();
+				}
 				LogError($"Unexpected error during {onErrorVerb}!");
 				Console.WriteLine();
 				
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(e);
 				Console.ResetColor();
+				value = default;
 				return false;
 			}
 #endif
@@ -221,7 +238,7 @@ namespace RobotPlusPlus.CLI
 		private bool CheckIfDestinationFileExists()
 		{
 			string destination = options.Destination;
-			if (!File.Exists(destination) || !options.OverwriteWithoutPrompt)
+			if (File.Exists(destination) && !options.OverwriteWithoutPrompt)
 			{
 				if (!Prompt.GetYesNo(
 					$"The destination file \"{Path.GetFileName(destination)}\" already exists, do you wish to override it?", true))

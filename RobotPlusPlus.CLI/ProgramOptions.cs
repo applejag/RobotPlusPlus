@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using McMaster.Extensions.CommandLineUtils;
@@ -34,7 +35,7 @@ namespace RobotPlusPlus.CLI
 						  "Default: Same name as <Script> but with `.robot` extension.")]
 		private string OptDestinationFileName { get; } = null;
 
-		[Option("-p --nopause",
+		[Option("-np --nopause",
 			Description = "Disables the pause at the end of the compilation.")]
 		private bool OptDontPauseAtEnd { get; } = false;
 
@@ -58,6 +59,14 @@ namespace RobotPlusPlus.CLI
 		[Option("-t --test",
 			Description = "Only try to compile. Don't write anything to the destination.")]
 		private bool OptDryRun { get; } = false;
+
+		[Option("-oe --outencoding <NAME>",
+			Description = "The encoding to use when writing the output file. Default: Current OS ASNI code page.")]
+		private Encodings? OptOutputEncoding { get; } = null;
+
+		[Option("-ie --inencoding <NAME>",
+			Description = "The encoding to use when reading the source file. Default: Current OS ASNI code page.")]
+		private Encodings? OptInputEncoding { get; } = null;
 		#endregion
 
 		#region Public option fields
@@ -79,6 +88,8 @@ namespace RobotPlusPlus.CLI
 
 		public bool DryRun => OptDryRun;
 
+		public Encoding InputEncoding => OptInputEncoding.HasValue ? Encoding.GetEncoding((int)OptInputEncoding.Value) : Encoding.Default;
+		public Encoding OutputEncoding => OptOutputEncoding.HasValue ? Encoding.GetEncoding((int)OptOutputEncoding.Value) : Encoding.Default;
 		#endregion
 
 		public static int Execute(string[] args)
@@ -155,6 +166,18 @@ namespace RobotPlusPlus.CLI
 				folder = Path.GetDirectoryName(source);
 
 			return Path.Combine(folder, filename);
+		}
+
+		public enum Encodings
+		{
+			UTF7 = 65000,
+			UTF8 = 65001,
+			UTF16 = 1200,
+			Windows1252 = 1252,
+			UTF32 = 12000,
+			UTF32BE = 12001,
+			ASCII = 20127,
+			ISO_8859_1 = 28591,
 		}
 	}
 }

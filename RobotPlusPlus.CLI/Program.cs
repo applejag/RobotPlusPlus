@@ -13,7 +13,7 @@ namespace RobotPlusPlus.CLI
 #else
 			try
 			{
-				return ProgramOptions.ExecuteAsync(args).GetAwaiter().GetResult();
+				return ProgramOptions.Execute(args);
 			}
 			catch (Exception e)
 			{
