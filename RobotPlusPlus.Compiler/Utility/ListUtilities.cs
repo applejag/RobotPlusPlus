@@ -37,6 +37,22 @@ namespace RobotPlusPlus.Utility
 			
 			return range;
 		}
+		
+		public static TList PopRangeAfter<TList>(this TList list, int index, bool includeIndexed = true)
+			where TList : IList, new()
+		{
+			var range = new TList();
+
+			if (!includeIndexed) index++;
+
+			while (index < list.Count)
+			{
+				range.Add(list[index]);
+				list.RemoveAt(index);
+			}
+
+			return range;
+		}
 
 		public static bool TryFirst<TSource>(this IEnumerable<TSource> source, out TSource value)
 		{
