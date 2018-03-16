@@ -17,13 +17,6 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		public Token RHS => Tokens[_RHS];
 		public const int _LHS = 0;
 		public const int _RHS = 1;
-		
-		public bool ContainsValue => Tokens.Any(t =>
-			t is Literal
-			|| t is Identifier
-			|| (t is Punctuator p && p.PunctuatorType == Punctuator.Type.OpeningParentases &&
-			    p.Tokens.Count > 0)
-			|| (t is Operator o && o.ContainsValue));
 
 		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
@@ -99,8 +92,33 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					break;
 
 				default:
-					throw new ParseException($"Unregistered operator type <{sourceCode}>", this);
+					throw new ParseTokenException($"Unregistered operator type <{sourceCode}>", this);
 
+			}
+		}
+
+		public static bool ExpressionHasValue(Token token)
+		{
+			switch (token)
+			{
+				case null:
+					return false;
+
+				case Literal lit:
+				case Identifier id:
+					return true;
+
+				case Operator op:
+					if (op.OperatorType == Type.Unary)
+						return ExpressionHasValue(op.LHS) && op.RHS == null;
+					else
+						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
+
+				case Punctuator pun when pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '(':
+					return pun.Any(ExpressionHasValue);
+
+				default:
+					return false;
 			}
 		}
 
@@ -134,18 +152,12 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				case Type.BitwiseOR:
 				case Type.BooleanAND:
 				case Type.BooleanOR:
-					if (prev is Identifier
-						|| prev is Literal
-						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (prev is Operator op1 && op1.ContainsValue))
+					if (ExpressionHasValue(prev))
 						parser.TakePrevToken(_LHS);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (next is Identifier
-						|| next is Literal
-						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (next is Operator op2 && op2.ContainsValue))
+					if (ExpressionHasValue(next))
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -157,17 +169,14 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (next is Identifier
-						|| next is Literal
-						|| (next is Punctuator tp2 && tp2.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (next is Operator op3 && op3.ContainsValue))
+					if (ExpressionHasValue(next))
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				default:
-					throw new ParseException($"Unexpected operator type <{OperatorType}>.", this);
+					throw new ParseTokenException($"Unexpected operator type <{OperatorType}>.", this);
 			}
 		}
 
