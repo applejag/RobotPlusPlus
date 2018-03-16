@@ -42,6 +42,10 @@ namespace RobotPlusPlus.CLI
 			Description = "Will overwrite without prompting the user.")]
 		private bool OptOverwriteWithoutPrompt { get; } = false;
 
+		[Option("-f --folder",
+			Description = "Will create folder if it doesn't already exist.")]
+		private bool OptCreateFolder { get; } = false;
+
 		[Option("-q --quiet",
 			Description = "Disables all writing to the console.\n" +
 						  "This flag enables --Overwrite and --NoPause, and disables --Verbose.")]
@@ -66,6 +70,7 @@ namespace RobotPlusPlus.CLI
 		public bool Verbose => OptVerbose && !OptQuietMode;
 		public bool QuietMode => OptQuietMode;
 		public bool OverwriteWithoutPrompt => OptOverwriteWithoutPrompt || OptQuietMode;
+		public bool CreateFolder => OptCreateFolder;
 
 		public bool DryRun => OptDryRun;
 
@@ -87,13 +92,17 @@ namespace RobotPlusPlus.CLI
 #endif
 				var rw = new ReaderWriter(this, console);
 
-				rw.ReadCodeFromFile();
-				rw.TokenizeCode();
-				rw.CompileCode();
-
-				if (!DryRun)
+				if (DryRun || rw.PreCompileWritingChecks())
 				{
-					rw.WriteCompiledToDestination();
+
+					bool success = rw.ReadCodeFromFile()
+								   && rw.TokenizeCode()
+								   && rw.CompileCode();
+
+					if (success && !DryRun)
+					{
+						rw.WriteCompiledToDestination();
+					}
 				}
 #if !DEBUG
 			}

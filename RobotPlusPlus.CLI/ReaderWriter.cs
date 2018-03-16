@@ -30,7 +30,7 @@ namespace RobotPlusPlus.CLI
 			this.console = console;
 		}
 
-		public void ReadCodeFromFile()
+		public bool ReadCodeFromFile()
 		{
 			sourceFile = options.Script;
 
@@ -40,8 +40,12 @@ namespace RobotPlusPlus.CLI
 			string initVerb = $"Reading from file \"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}\"";
 			const string onErrorVerb = "reading from file";
 
-			if (TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script), out string content))
-				sourceCode = ReplaceNewLines(content);
+			if (!TryExecAction(initVerb, onErrorVerb, () => File.ReadAllText(options.Script), out string content))
+				return false;
+
+			sourceCode = ReplaceNewLines(content);
+			return true;
+
 		}
 
 		public static string ReplaceNewLines(string multiline)
@@ -50,35 +54,65 @@ namespace RobotPlusPlus.CLI
 		}
 
 		/// <exception cref="ParseException"></exception>
-		public void TokenizeCode()
+		public bool TokenizeCode()
 		{
 			if (sourceCode == null)
 				throw new InvalidOperationException("Code haven't been read yet!");
 
 			if (!TryExecAction("Tokenizing code", "tokenization", () => Tokenizer.Tokenize(sourceCode),
-				out tokenizedCode)) return;
+				out tokenizedCode)) return false;
 
 			if (options.Verbose)
 			{
 				LogInfo("Colorized tokenized code:");
 				PrettyConsoleWriter.WriteCodeToConsole(tokenizedCode, console);
 			}
+
+			return true;
 		}
 
 		/// <exception cref="ParseException"></exception>
-		public void CompileCode()
+		public bool CompileCode()
 		{
 			if (tokenizedCode == null)
 				throw new InvalidOperationException("Code haven't been tokenized yet!");
 
-			if (TryExecAction("Compiling code", "compilation", () => Parser.Parse(tokenizedCode), out parsedCode))
-				TryExecAction("Parsing code", "parsing", () => Compiler.Compile(parsedCode), out compiledCode);
+			return TryExecAction("Parsing code", "parsing", () => Parser.Parse(tokenizedCode), out parsedCode)
+				   && TryExecAction("Compiling code", "compilation", () => Compiler.Compile(parsedCode), out compiledCode);
 		}
 
-		public void WriteCompiledToDestination()
+		public bool WriteCompiledToDestination()
 		{
 			if (compiledCode == null)
 				throw new InvalidOperationException("Code haven't been compiled yet!");
+
+			string destination = options.Destination;
+
+			if (!CheckIfDirectoryExists())
+				return false;
+
+			string folder = Path.GetDirectoryName(options.Destination);
+			if (options.CreateFolder && Directory.Exists(folder))
+			{
+				if (!TryExecAction("Creating destination folder", "creating folder", () => Directory.CreateDirectory(folder).Exists, out bool success) || !success) {
+					LogError("Failed creating destination folder, are you missing permission?");
+					LogError($"\"{folder}\"");
+					return false;
+				} 
+			}
+
+			if (!TryExecAction("Writing compiled code to file", "writing to file",
+				() => File.WriteAllText(destination, compiledCode)))
+				return false;
+
+			LogInfo("Success! The compiled code has been saved to:");
+			console.ForegroundColor = ConsoleColor.Green;
+			console.WriteLine();
+			console.WriteLine(options.Destination);
+			console.WriteLine();
+			console.ResetColor();
+
+			return true;
 		}
 
 		private void LogInfo(string info)
@@ -99,6 +133,15 @@ namespace RobotPlusPlus.CLI
 			console.ForegroundColor = ConsoleColor.White;
 			console.WriteLine(error);
 			console.ResetColor();
+		}
+
+		private bool TryExecAction(string initVerb, string onErrorVerb, Action action)
+		{
+			return TryExecAction(initVerb, onErrorVerb, () =>
+			{
+				action();
+				return null;
+			}, out object _);
 		}
 
 		private bool TryExecAction<TOut>(string initVerb,
@@ -122,7 +165,7 @@ namespace RobotPlusPlus.CLI
 				console.ResetColor();
 				console.ForegroundColor = ConsoleColor.Cyan;
 				console.Write("[TASK] ");
-				console.ResetColor();
+				console.ForegroundColor = ConsoleColor.Gray;
 				console.Write($"{initVerb}... ");
 				console.ResetColor();
 
@@ -134,10 +177,12 @@ namespace RobotPlusPlus.CLI
 			catch (ParseException e)
 			{
 				ReportTime(ConsoleColor.Red, "Error!");
+				LogError($"Error while {onErrorVerb}!");
 
+				console.WriteLine();
 				LogError($"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}:{e.Line}: {e.Message}");
 
-				PrettyConsoleWriter.WriteCodeHighlightError(sourceCode, e, options.Verbose ? -1 : 5, console);
+				PrettyConsoleWriter.WriteCodeHighlightError(sourceCode, e, options.Verbose ? -1 : 12, console);
 
 				console.ResetColor();
 				value = default;
@@ -159,5 +204,28 @@ namespace RobotPlusPlus.CLI
 #endif
 		}
 
+		public bool PreCompileWritingChecks()
+		{
+			if (!CheckIfDirectoryExists())
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool CheckIfDirectoryExists()
+		{
+			string folder = Path.GetDirectoryName(options.Destination);
+			if (!options.CreateFolder && !Directory.Exists(folder))
+			{
+				LogError("Target directory doesn't exist:");
+				LogError($"\"{folder}\"");
+				LogError("Use the --createfolder flag to automatically create the destination folder.");
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
