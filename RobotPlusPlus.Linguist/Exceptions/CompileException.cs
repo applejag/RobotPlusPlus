@@ -1,7 +1,7 @@
 ﻿using System;
-using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Linguist.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Exceptions
+namespace RobotPlusPlus.Linguist.Exceptions
 {
 	public class CompileException : ParseTokenException
 	{

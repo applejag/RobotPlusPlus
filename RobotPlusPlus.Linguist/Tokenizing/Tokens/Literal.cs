@@ -1,4 +1,4 @@
-﻿namespace RobotPlusPlus.Tokenizing.Tokens
+﻿namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 {
 	/// <summary>Numbers, strings, etc. Ex: 10.25, true, "foo"</summary>
 	public abstract class Literal : Token

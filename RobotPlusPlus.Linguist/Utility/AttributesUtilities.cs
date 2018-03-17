@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
-namespace RobotPlusPlus.Utility
+namespace RobotPlusPlus.Linguist.Utility
 {
 	public static class AttributesUtilities
 	{

@@ -1,7 +1,7 @@
-﻿using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Parsing;
+﻿using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Parsing;
 
-namespace RobotPlusPlus.Tokenizing.Tokens
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 {
 	/// <summary>Ignored code. Ex: //line, /*block*/</summary>
 	public class Comment : Token

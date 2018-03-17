@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Exceptions;
-using RobotPlusPlus.Parsing;
-using RobotPlusPlus.Tokenizing;
-using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Exceptions;
+using RobotPlusPlus.Linguist.Parsing;
+using RobotPlusPlus.Linguist.Tokenizing;
+using RobotPlusPlus.Linguist.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.CLI
 {

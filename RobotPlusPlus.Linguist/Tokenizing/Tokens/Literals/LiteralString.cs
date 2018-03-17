@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Parsing;
-using RobotPlusPlus.Utility;
+﻿using System.Text.RegularExpressions;
+using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Parsing;
+using RobotPlusPlus.Linguist.Utility;
 
-namespace RobotPlusPlus.Tokenizing.Tokens.Literals
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals
 {
 	public class LiteralString : Literal
 	{

@@ -1,4 +1,4 @@
-﻿namespace RobotPlusPlus
+﻿namespace RobotPlusPlus.Linguist
 {
 	public enum ValueType
 	{

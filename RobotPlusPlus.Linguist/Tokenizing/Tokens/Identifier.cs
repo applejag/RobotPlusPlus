@@ -1,8 +1,8 @@
-﻿using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Exceptions;
-using RobotPlusPlus.Parsing;
+﻿using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Exceptions;
+using RobotPlusPlus.Linguist.Parsing;
 
-namespace RobotPlusPlus.Tokenizing.Tokens
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 {
 	/// <summary>Variables. Ex: x, myValue, go_johnny_go</summary>
 	public class Identifier : Token

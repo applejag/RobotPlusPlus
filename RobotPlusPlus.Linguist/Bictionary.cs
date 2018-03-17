@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using RobotPlusPlus.Utility;
+using RobotPlusPlus.Linguist.Utility;
 
-namespace RobotPlusPlus
+namespace RobotPlusPlus.Linguist
 {
 	public class Bictionary<T1, T2> : Dictionary<T1, T2>
 	{

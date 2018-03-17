@@ -1,8 +1,8 @@
-﻿using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Exceptions;
-using RobotPlusPlus.Parsing;
+﻿using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Exceptions;
+using RobotPlusPlus.Linguist.Parsing;
 
-namespace RobotPlusPlus.Tokenizing.Tokens.Literals
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals
 {
 	public class LiteralKeyword : Literal
 	{

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using JetBrains.Annotations;
-using RobotPlusPlus.Tokenizing;
-using RobotPlusPlus.Tokenizing.Tokens;
-using RobotPlusPlus.Utility;
+using RobotPlusPlus.Linguist.Tokenizing.Tokens;
+using RobotPlusPlus.Linguist.Utility;
 
-namespace RobotPlusPlus.Parsing
+namespace RobotPlusPlus.Linguist.Parsing
 {
 	public class Parser
 	{

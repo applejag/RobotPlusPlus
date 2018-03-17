@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Parsing;
-using RobotPlusPlus.Utility;
+using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Parsing;
+using RobotPlusPlus.Linguist.Utility;
 
-namespace RobotPlusPlus.Tokenizing.Tokens.Literals
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals
 {
 	public class LiteralNumber : Literal
 	{

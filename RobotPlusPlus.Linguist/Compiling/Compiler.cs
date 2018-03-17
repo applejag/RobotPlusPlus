@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
-using RobotPlusPlus.Exceptions;
-using RobotPlusPlus.Parsing;
-using RobotPlusPlus.Tokenizing;
-using RobotPlusPlus.Tokenizing.Tokens;
-using RobotPlusPlus.Utility;
+using RobotPlusPlus.Linguist.Parsing;
+using RobotPlusPlus.Linguist.Tokenizing;
+using RobotPlusPlus.Linguist.Tokenizing.Tokens;
+using RobotPlusPlus.Linguist.Utility;
 
-namespace RobotPlusPlus.Compiling
+namespace RobotPlusPlus.Linguist.Compiling
 {
 	public class Compiler
 	{

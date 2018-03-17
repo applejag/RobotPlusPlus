@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using RobotPlusPlus.Compiling;
-using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Linguist.Parsing;
 
-namespace RobotPlusPlus.Tokenizing.Tokens
+namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 {
 	public abstract class Token : IList<Token>, IReadOnlyList<Token>
 	{
