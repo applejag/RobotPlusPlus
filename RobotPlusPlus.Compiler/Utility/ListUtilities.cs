@@ -37,6 +37,22 @@ namespace RobotPlusPlus.Utility
 			
 			return range;
 		}
+		
+		public static TList PopRangeAfter<TList>(this TList list, int index, bool includeIndexed = true)
+			where TList : IList, new()
+		{
+			var range = new TList();
+
+			if (!includeIndexed) index++;
+
+			while (index < list.Count)
+			{
+				range.Add(list[index]);
+				list.RemoveAt(index);
+			}
+
+			return range;
+		}
 
 		public static bool TryFirst<TSource>(this IEnumerable<TSource> source, out TSource value)
 		{
@@ -62,6 +78,18 @@ namespace RobotPlusPlus.Utility
 
 			value = default;
 			return false;
+		}
+
+		public static bool AnyRecursive<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.Any(item => predicate(item) || item.AnyRecursive(predicate));
+		}
+
+		public static bool AllRecursive<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.All(item => predicate(item) && item.AnyRecursive(predicate));
 		}
 	}
 }

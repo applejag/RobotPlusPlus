@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 		}
 
 		public abstract void ParseToken(Parser parser);
-		public abstract string CompileToken();
+		public abstract string CompileToken(Compiler compiler);
 
 		public override string ToString()
 		{

@@ -1,0 +1,8 @@
+
+x = "hello dog" + 250
+
+if x == "hello dog250" {
+	y += 10
+}
+
+z = y

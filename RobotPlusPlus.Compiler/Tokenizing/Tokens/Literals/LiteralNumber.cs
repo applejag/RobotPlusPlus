@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using RobotPlusPlus.Compiling;
 using RobotPlusPlus.Parsing;
 using RobotPlusPlus.Utility;
 
@@ -31,7 +32,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens.Literals
 		public override void ParseToken(Parser parser)
 		{ }
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			return IsReal
 				? RealValue.ToString("0.0#############################", CultureInfo.InvariantCulture)

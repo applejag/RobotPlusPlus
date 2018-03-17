@@ -1,7 +1,7 @@
 ﻿using System;
 using RobotPlusPlus.Tokenizing.Tokens;
 
-namespace RobotPlusPlus
+namespace RobotPlusPlus.Exceptions
 {
 	public class ParseException : ApplicationException
 	{
@@ -15,14 +15,6 @@ namespace RobotPlusPlus
 
 		public ParseException(string msg, int line)
 			: this(msg, line, null)
-		{ }
-
-		public ParseException(string msg, Token source)
-			: this(msg, source.SourceLine, null)
-		{ }
-
-		public ParseException(string msg, Token source, Exception innerException)
-			: this(msg, source.SourceLine, innerException)
 		{ }
 	}
 }

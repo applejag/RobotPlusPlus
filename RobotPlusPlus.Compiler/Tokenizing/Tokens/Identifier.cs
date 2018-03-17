@@ -1,4 +1,6 @@
-﻿using RobotPlusPlus.Parsing;
+﻿using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
+using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -6,14 +8,16 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	public class Identifier : Token
 	{
 		public Identifier(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
-		{
-		}
+		{ }
 
 		public override void ParseToken(Parser parser)
 		{ }
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
+			if (!compiler.IsVariableRegistered(this))
+				throw new UnassignedVariableException(this);
+			
 			return $"♥{SourceCode}";
 		}
 	}

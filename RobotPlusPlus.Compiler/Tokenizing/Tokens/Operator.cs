@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
+using RobotPlusPlus.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
 {
@@ -9,17 +13,10 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 	public class Operator : Token
 	{
 		public Type OperatorType { get; }
-		public Token LHS => Tokens[_LHS];
-		public Token RHS => Tokens[_RHS];
+		public Token LHS => this[_LHS];
+		public Token RHS => this[_RHS];
 		public const int _LHS = 0;
 		public const int _RHS = 1;
-
-		public bool ContainsValue => Tokens.Any(t =>
-			t is Literal
-			|| t is Identifier
-			|| (t is Punctuator p && p.PunctuatorType == Punctuator.Type.OpeningParentases &&
-			    p.Tokens.Count > 0)
-			|| (t is Operator o && o.ContainsValue));
 
 		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
 		{
@@ -95,8 +92,33 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					break;
 
 				default:
-					throw new ParseException($"Unregistered operator type <{sourceCode}>", this);
+					throw new ParseTokenException($"Unregistered operator type <{sourceCode}>", this);
 
+			}
+		}
+
+		public static bool ExpressionHasValue(Token token)
+		{
+			switch (token)
+			{
+				case null:
+					return false;
+
+				case Literal lit:
+				case Identifier id:
+					return true;
+
+				case Operator op:
+					if (op.OperatorType == Type.Unary)
+						return ExpressionHasValue(op.LHS) && op.RHS == null;
+					else
+						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
+
+				case Punctuator pun when pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '(':
+					return pun.Any(ExpressionHasValue);
+
+				default:
+					return false;
 			}
 		}
 
@@ -112,7 +134,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					parser.TakePrevToken(_LHS); // LHS
 					break;
 				case Type.Expression:
-					throw new ParseUnexpectedLeadingTokenException(this, prev);
+					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
@@ -130,18 +152,12 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 				case Type.BitwiseOR:
 				case Type.BooleanAND:
 				case Type.BooleanOR:
-					if (prev is Identifier
-						|| prev is Literal
-						|| (prev is Punctuator lp && lp.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (prev is Operator op1 && op1.ContainsValue))
+					if (ExpressionHasValue(prev))
 						parser.TakePrevToken(_LHS);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (next is Identifier
-						|| next is Literal
-						|| (next is Punctuator tp && tp.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (next is Operator op2 && op2.ContainsValue))
+					if (ExpressionHasValue(next))
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -153,34 +169,51 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (next is Identifier
-						|| next is Literal
-						|| (next is Punctuator tp2 && tp2.PunctuatorType == Punctuator.Type.OpeningParentases)
-						|| (next is Operator op3 && op3.ContainsValue))
+					if (ExpressionHasValue(next))
 						parser.TakeNextToken(_RHS);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
+
+					// ex: <<=, +=, %=
+					if (SourceCode != "=")
+					{
+						// Add identifier & operator & old RHS to pool, then take again
+						var id = new Identifier(LHS.SourceCode, LHS.SourceLine);
+						var op = new Operator(SourceCode.Substring(0, SourceCode.Length - 1), SourceLine);
+						Token old_rhs = RHS;
+						this[_RHS] = null;
+
+						parser.AddTokensAfterAndParse(id, op, old_rhs);
+						parser.TakeNextToken(_RHS);
+					}
 					break;
 
 				default:
-					throw new ParseException($"Unexpected operator type <{OperatorType}>.", this);
+					throw new ParseTokenException($"Unexpected operator type <{OperatorType}>.", this);
 			}
 		}
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
 			switch (OperatorType)
 			{
-				case Type.Assignment when SourceCode != "=":
-					string op = SourceCode.Substring(1);
-					//return string.Format("{0}=⊂{0}{1}{2}⊃", LHS.CompileToken(), op, RHS.CompileToken());
-					return string.Format("{0}={0}{1}{2}", LHS.CompileToken(), op, RHS.CompileToken());
-
 				case Type.Assignment:
-					//return string.Format("{0}=⊂{1}⊃", LHS.CompileToken(), RHS.CompileToken());
+					if (this.AnyRecursive(t => t is LiteralNumber)
+					    && this.AnyRecursive(t => t is LiteralString))
+						compiler.assignmentNeedsCSSnipper = true;
+
+					string c_rhs = RHS.CompileToken(compiler);
+					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
+					string c_lhs = LHS.CompileToken(compiler);
+
+					string formatString = compiler.assignmentNeedsCSSnipper
+						? "{0}=⊂{1}⊃"
+						: "{0}={1}";
+
+					return string.Format(formatString, c_lhs, c_rhs);
 
 				default:
-					return string.Format("{0}{1}{2}", LHS?.CompileToken(), SourceCode, RHS?.CompileToken());
+					return string.Format("{0}{1}{2}", LHS?.CompileToken(compiler), SourceCode, RHS?.CompileToken(compiler));
 			}
 		}
 

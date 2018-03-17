@@ -1,31 +1,58 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 using RobotPlusPlus.Tokenizing;
 using RobotPlusPlus.Tokenizing.Tokens;
+using RobotPlusPlus.Utility;
 
 namespace RobotPlusPlus.Compiling
 {
 	public class Compiler
 	{
 		private readonly StringBuilder output = new StringBuilder();
+		private readonly HashSet<string> registeredVariables = new HashSet<string>();
+		
+		public bool assignmentNeedsCSSnipper;
+
+		public void RegisterVariable([NotNull] Identifier identifier)
+		{
+			registeredVariables.Add(identifier.SourceCode);
+		}
+
+		public bool IsVariableRegistered([CanBeNull] Identifier identifier)
+		{
+			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
+		}
 
 		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
 		{
 			if (parsedTokens == null)
 				throw new ArgumentNullException(nameof(parsedTokens));
+			parsedTokens.AnyRecursive(t =>
+			{
+				if (t == null)
+					throw new NullReferenceException("Token is null!");
+				if (!t.IsParsed)
+					throw new ApplicationException($"Unparsed token <{t.SourceCode}> on line {t.SourceLine}!");
+
+				return false;
+			});
 
 			var compiler = new Compiler();
+			var rows = new List<string>(parsedTokens.Length);
 
 			foreach (Token token in parsedTokens)
 			{
-				if (compiler.output.Length > 0)
-					compiler.output.AppendLine();
-
-				compiler.output.Append(token.CompileToken());
+				compiler.assignmentNeedsCSSnipper = false;
+				rows.Add(token.CompileToken(compiler));
 			}
+
+			compiler.output.AppendJoin('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
 
 			return compiler.output.ToString();
 		}

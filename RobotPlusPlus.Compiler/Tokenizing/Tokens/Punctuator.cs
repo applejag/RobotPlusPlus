@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using RobotPlusPlus.Compiling;
+using RobotPlusPlus.Exceptions;
 using RobotPlusPlus.Parsing;
 
 namespace RobotPlusPlus.Tokenizing.Tokens
@@ -47,7 +50,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 					while (true)
 					{
 						if (parser.NextToken == null)
-							throw new ParseException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
+							throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
 
 						Token takenToken = parser.TakeNextToken();
 
@@ -66,7 +69,7 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 
 				case Type.Other when Character == '.' && parser.NextToken is Identifier:
 					if (TrailingWhitespace != null)
-						throw new ParseException(
+						throw new ParseTokenException(
 							$"Unexpected whitespace after punctuator <{Character}> before identifier <{parser.NextToken.SourceCode}>.",
 							this);
 					else
@@ -78,17 +81,40 @@ namespace RobotPlusPlus.Tokenizing.Tokens
 						p.PunctuatorType == Type.OpeningParentases
 						&& p.Character == GetMatchingParentases(Character));
 					if (!someoneLookingForMe)
-						throw new ParseException($"Unexpected ending parentases <{SourceCode}>.", this);
+						throw new ParseTokenException($"Unexpected ending parentases <{SourceCode}>.", this);
 					break;
 
 				default:
-					throw new ParseException($"Unexpected punctuator <{SourceCode}>.", this);
+					throw new ParseTokenException($"Unexpected punctuator <{SourceCode}>.", this);
 			}
 		}
 
-		public override string CompileToken()
+		public override string CompileToken(Compiler compiler)
 		{
-			throw new NotImplementedException();
+			switch (Character)
+			{
+				case '(':
+					return $"({Tokens[0].CompileToken(compiler)})";
+
+				case '{':
+					var rows = new List<string>(Tokens.Count);
+					foreach (Token token in Tokens)
+					{
+						compiler.assignmentNeedsCSSnipper = false;
+
+						rows.Add(token.CompileToken(compiler));
+					}
+
+					return string.Join('\n', rows.Where(s => !string.IsNullOrEmpty(s)));
+
+				case ')':
+				case '}':
+				case ';':
+					return string.Empty;
+
+				default:
+					throw new NotImplementedException();
+			}
 		}
 
 		public static char GetMatchingParentases(char c)

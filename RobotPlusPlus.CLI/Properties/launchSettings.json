@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "RobotPlusPlus.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "\"sample.robotpp\" -v",
+      "workingDirectory": "$(BinariesDirectory)"
+    }
+  }
+}
