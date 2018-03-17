@@ -23,16 +23,24 @@ namespace RobotPlusPlus.CLI
 
 			for (int i = start; i < stop; i++)
 			{
-				if (i + 1 == e.Line)
-					console.BackgroundColor = ConsoleColor.DarkRed;
-				else
-					console.ResetColor();
+				bool errHere = i + 1 == e.Line;
 
-				console.ForegroundColor = ConsoleColor.DarkGray;
+				if (errHere) console.BackgroundColor = ConsoleColor.DarkRed;
+				else console.ResetColor();
+
+				console.ForegroundColor = errHere ? ConsoleColor.Red : ConsoleColor.DarkGray;
 				console.Write((i+1).ToString().PadLeft(totalLinesWidth) + ':');
 
 				console.ForegroundColor = ConsoleColor.Gray;
-				console.WriteLine(lines[i]);
+				console.Write(lines[i].TrimEnd());
+
+				if (errHere)
+				{
+					console.ForegroundColor = ConsoleColor.Red;
+					console.WriteLine(" // {0}", e.Message);
+				}
+				else
+					console.WriteLine();
 			}
 
 			console.ResetColor();
