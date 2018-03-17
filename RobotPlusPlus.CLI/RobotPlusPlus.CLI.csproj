@@ -19,14 +19,14 @@
 	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\RobotPlusPlus.Compiler\RobotPlusPlus.Compiler.csproj" />
-	</ItemGroup>
-
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <None Update="sample.robotpp">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\RobotPlusPlus.Compiler\RobotPlusPlus.Linguist.csproj" />
 	</ItemGroup>
 
 </Project>
