@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
@@ -14,6 +15,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 		private string remainingCode;
 		private readonly List<Token> tokens = new List<Token>();
 
+		public string SourceName { get; }
 		public string SourceCode { get; }
 		public IReadOnlyList<Token> Tokens => tokens;
 		public int CurrentRow { get; private set; } = 1;
@@ -58,15 +60,16 @@ namespace RobotPlusPlus.Core.Tokenizing
 			"<", ">",
 		};
 
-		private Tokenizer(string sourceCode)
+		private Tokenizer(string sourceCode, string sourceName)
 		{
 			SourceCode = sourceCode;
 			remainingCode = sourceCode;
+			SourceName = sourceName;
 		}
 
 		private Token EvaluateNextType()
 		{
-			var source = new TokenSource(string.Empty, "N/A", CurrentRow, CurrentColumn);
+			var source = new TokenSource(string.Empty, SourceName, CurrentRow, CurrentColumn);
 
 			// Block comment
 			if ((source.code = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) != null)
@@ -170,12 +173,15 @@ namespace RobotPlusPlus.Core.Tokenizing
 			}
 		}
 
-		public static Token[] Tokenize(string code)
+		public static Token[] Tokenize(string code, [CallerMemberName] string sourceName = "")
 		{
 			if (string.IsNullOrEmpty(code))
 				return new Token[0];
 
-			var tokenizer = new Tokenizer(code);
+			if (string.IsNullOrWhiteSpace(sourceName))
+				throw new ArgumentException("Source name cannot be null or whitespace!", nameof(sourceName));
+
+			var tokenizer = new Tokenizer(code, sourceName.Trim());
 
 			while (!tokenizer.IsParsingComplete)
 			{

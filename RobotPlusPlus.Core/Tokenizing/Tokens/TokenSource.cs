@@ -1,4 +1,6 @@
-﻿namespace RobotPlusPlus.Core.Tokenizing.Tokens
+﻿using System.Linq;
+
+namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	public struct TokenSource
 	{
@@ -7,7 +9,7 @@
 		public int line;
 		public int column;
 
-		public int newLines;
+		public int NewLines => code.Count(c => c == '\n');
 
 		public TokenSource(string code, string file, int line, int column)
 		{
@@ -15,14 +17,6 @@
 			this.file = file;
 			this.line = line;
 			this.column = column;
-			
-			newLines = 0;
-
-			foreach (char c in code)
-			{
-				if (c == '\n')
-					newLines++;
-			}
 		}
 	}
 }

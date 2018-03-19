@@ -29,5 +29,38 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 				typeof(Whitespace));
 		}
 
+		[TestMethod]
+		public void Tokenize_Newlines()
+		{
+			// Act
+			Token[] result = Tokenizer.Tokenize("\n\n\n");
+
+			// Assert
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Whitespace));
+
+			Assert.That.TokenIsOfType<Whitespace>(result[0], "\n\n\n");
+			Assert.AreEqual(3, result[0].NewLines);
+		}
+
+		[TestMethod]
+		public void Tokenize_NewlinesWithSep()
+		{
+			// Act
+			Token[] result = Tokenizer.Tokenize("\n\n\n;\n\n\n\n");
+
+			// Assert
+			CollectionAssert.That.TokensAreOfTypes(result,
+				typeof(Whitespace),
+				typeof(Punctuator),
+				typeof(Whitespace));
+
+			Assert.That.TokenIsOfType<Whitespace>(result[0], "\n\n\n");
+			Assert.AreEqual(3, result[0].NewLines);
+			Assert.That.TokenIsOfType<Punctuator>(result[1], ";");
+			Assert.That.TokenIsOfType<Whitespace>(result[2], "\n\n\n\n");
+			Assert.AreEqual(4, result[2].NewLines);
+		}
+
 	}
 }

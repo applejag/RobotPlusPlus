@@ -60,7 +60,8 @@ namespace RobotPlusPlus.CLI
 			if (sourceCode == null)
 				throw new InvalidOperationException("Code haven't been read yet!");
 
-			if (!TryExecAction("Tokenizing code", "tokenization", () => Tokenizer.Tokenize(sourceCode),
+			string file = Path.GetFileName(sourceFile);
+			if (!TryExecAction("Tokenizing code", "tokenization", () => Tokenizer.Tokenize(sourceCode, file),
 				out tokenizedCode, log: options.Verbose)) return false;
 
 			if (options.Verbose)

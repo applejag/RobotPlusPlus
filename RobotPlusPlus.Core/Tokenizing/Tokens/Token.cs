@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public string SourceCode => source.code;
 		public int SourceLine => source.line;
 		public int SourceColumn => source.column;
-		public int NewLines => source.newLines;
+		public int NewLines => source.NewLines;
 		public Whitespace LeadingWhitespace { get; set; }
 		public Whitespace TrailingWhitespace { get; set; }
 
