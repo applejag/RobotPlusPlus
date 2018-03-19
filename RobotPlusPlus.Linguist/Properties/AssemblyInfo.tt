@@ -17,7 +17,7 @@
         DateTime buildTime = DateTime.UtcNow;
         
         build = (1000 * (buildTime.Year % 100)) + buildTime.DayOfYear;
-        revision = (100 * buildTime.Hour) + buildTime.Minute + buildTime.Second;
+        revision = (100 * buildTime.Hour) + buildTime.Minute;
         
         version = String.Format("{0}.{1}.{2:00000}.{3:0000}", major, minor, build, revision);
     }
