@@ -16,13 +16,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
+	  <None Remove="sample.robotpp" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <None Update="sample.robotpp">
+	<ItemGroup>
+	  <EmbeddedResource Include="sample.robotpp" Condition="'$(Configuration)'=='Debug'">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
 	</ItemGroup>
 
 	<ItemGroup>
