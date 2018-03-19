@@ -14,8 +14,8 @@ namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 		public const int _Condition = 0;
 		public const int _CodeBlock = 1;
 
-		public Token Condition => Tokens[_Condition];
-		public Token CodeBlock => Tokens[_CodeBlock];
+		public Token Condition => this[_Condition];
+		public Token CodeBlock => this[_CodeBlock];
 		public Type StatementType { get; }
 
 		public Statement(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
