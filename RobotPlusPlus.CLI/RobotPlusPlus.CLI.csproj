@@ -20,13 +20,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="sample.robotpp" />
+		<None Remove="sample.robotpp" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="sample.robotpp" Condition="'$(Configuration)'=='Debug'">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </EmbeddedResource>
+		<EmbeddedResource Include="sample.robotpp" Condition="'$(Configuration)'=='Debug'">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -34,26 +34,26 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\RobotPlusPlus.Linguist\RobotPlusPlus.Linguist.csproj" />
+		<ProjectReference Include="..\RobotPlusPlus.Core\RobotPlusPlus.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Properties\AssemblyInfo.tt">
-	    <Generator>TextTemplatingFileGenerator</Generator>
-	    <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-	  </None>
+		<None Update="Properties\AssemblyInfo.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Properties\AssemblyInfo.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>AssemblyInfo.tt</DependentUpon>
-	  </Compile>
+		<Compile Update="Properties\AssemblyInfo.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AssemblyInfo.tt</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<PropertyGroup>
