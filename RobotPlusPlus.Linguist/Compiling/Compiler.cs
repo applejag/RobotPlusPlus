@@ -14,6 +14,7 @@ namespace RobotPlusPlus.Linguist.Compiling
 	{
 		private readonly StringBuilder output = new StringBuilder();
 		private readonly HashSet<string> registeredVariables = new HashSet<string>();
+		private readonly HashSet<string> registeredLabels = new HashSet<string>();
 		
 		public bool assignmentNeedsCSSnipper;
 
@@ -25,6 +26,26 @@ namespace RobotPlusPlus.Linguist.Compiling
 		public bool IsVariableRegistered([CanBeNull] Identifier identifier)
 		{
 			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
+		}
+
+		public string RegisterLabel([NotNull] string preferredLabelName)
+		{
+			string actualLabelName = preferredLabelName;
+			var iter = 1;
+
+			while (registeredLabels.Contains(actualLabelName))
+			{
+				actualLabelName = preferredLabelName + ++iter;
+			}
+
+			registeredLabels.Add(actualLabelName);
+
+			return actualLabelName;
+		}
+
+		public bool IsLabelRegistered([CanBeNull] string actualLabelName)
+		{
+			return registeredLabels.Contains(actualLabelName);
 		}
 
 		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)

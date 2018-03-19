@@ -19,6 +19,7 @@ namespace RobotPlusPlus.Linguist.Parsing
 		public Token CurrToken => TryPeekToken(0);
 		public Token PrevToken => TryPeekToken(-1);
 		public Parser Root => parent?.Root ?? this;
+		public bool IsRoot => parent == null;
 
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
 		{
@@ -77,11 +78,11 @@ namespace RobotPlusPlus.Linguist.Parsing
 			if (parser == this && parser.currentTokenIndex == index)
 				throw new InvalidOperationException($"Taking the current token is not allowed (offset <{offset}>).");
 
-			// Parse the token
-			parser.ParseTokenAt(index);
-
 			if (index <= parser.currentTokenIndex)
 			{
+				// Parse the token
+				parser.ParseTokenAt(index);
+
 				// Change index to not mess up iterations
 				parser.currentTokenIndex--;
 			}

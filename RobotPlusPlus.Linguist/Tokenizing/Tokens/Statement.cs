@@ -14,8 +14,8 @@ namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 		public const int _Condition = 0;
 		public const int _CodeBlock = 1;
 
-		public Token Condition => Tokens[_Condition];
-		public Token CodeBlock => Tokens[_CodeBlock];
+		public Token Condition => this[_Condition];
+		public Token CodeBlock => this[_CodeBlock];
 		public Type StatementType { get; }
 
 		public Statement(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
@@ -57,7 +57,8 @@ namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 			{
 				case Type.If:
 					if ((next is Punctuator pun && pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '{')
-						|| (next is Operator op && op.OperatorType == Operator.Type.Assignment))
+						|| (next is Operator op && op.OperatorType == Operator.Type.Assignment)
+					    || (next is Statement))
 						parser.TakeNextToken(_CodeBlock);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -67,15 +68,16 @@ namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
 
 		public override string CompileToken(Compiler compiler)
 		{
-
 			var rows = new List<string>();
 
+			string label = compiler.RegisterLabel("noif");
+
 			compiler.assignmentNeedsCSSnipper = true;
-			rows.Add($"jump ➜noif if ⊂!({Condition.CompileToken(compiler)})⊃");
+			rows.Add($"jump ➜{label} if ⊂!({Condition.CompileToken(compiler)})⊃");
 			compiler.assignmentNeedsCSSnipper = false;
 			rows.Add(CodeBlock.CompileToken(compiler));
 
-			rows.Add("➜noif");
+			rows.Add($"➜{label}");
 
 			return string.Join('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
 		}
