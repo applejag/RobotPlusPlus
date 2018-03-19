@@ -17,9 +17,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public const int _LHS = 0;
 		public const int _RHS = 1;
 
-		public Operator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public Operator(TokenSource source) : base(source)
 		{
-			switch (sourceCode)
+			switch (SourceCode)
 			{
 				case "++":
 				case "--":
@@ -91,7 +91,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					break;
 
 				default:
-					throw new ParseTokenException($"Unregistered operator type <{sourceCode}>", this);
+					throw new ParseTokenException($"Unregistered operator type <{SourceCode}>", this);
 
 			}
 		}
@@ -177,8 +177,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					if (SourceCode != "=")
 					{
 						// Add identifier & operator & old RHS to pool, then take again
-						var id = new Identifier(LHS.SourceCode, LHS.SourceLine);
-						var op = new Operator(SourceCode.Substring(0, SourceCode.Length - 1), SourceLine);
+						var id = new Identifier(LHS.source);
+						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line, source.column));
 						Token old_rhs = RHS;
 						this[_RHS] = null;
 

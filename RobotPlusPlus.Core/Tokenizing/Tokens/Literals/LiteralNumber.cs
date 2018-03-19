@@ -19,14 +19,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 
 		public object Value { get; }
 
-		public LiteralNumber(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public LiteralNumber(TokenSource source) : base(source)
 		{
-			if (sourceCode.EndsWith('f', ignoreCase: true))
-				Value = double.Parse(sourceCode.Substring(0, sourceCode.Length - 1), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-			else if (sourceCode.IndexOf('.') == -1)
-				Value = int.Parse(sourceCode, NumberStyles.None, CultureInfo.InvariantCulture);
+			if (SourceCode.EndsWith('f', ignoreCase: true))
+				Value = double.Parse(SourceCode.Substring(0, SourceCode.Length - 1), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+			else if (SourceCode.IndexOf('.') == -1)
+				Value = int.Parse(SourceCode, NumberStyles.None, CultureInfo.InvariantCulture);
 			else
-				Value = double.Parse(sourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+				Value = double.Parse(SourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 		}
 
 		public override void ParseToken(Parser parser)

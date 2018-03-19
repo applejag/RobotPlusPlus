@@ -25,10 +25,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public char Character { get; }
 		public Type PunctuatorType { get; }
 
-		public Punctuator(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public Punctuator(TokenSource source) : base(source)
 		{
 			
-			Character = sourceCode[0];
+			Character = SourceCode[0];
 
 			if (parentasesPairs.ContainsKey(Character))
 				PunctuatorType = Type.OpeningParentases;

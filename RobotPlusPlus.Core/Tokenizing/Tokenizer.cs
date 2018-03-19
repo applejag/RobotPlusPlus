@@ -17,6 +17,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 		public string SourceCode { get; }
 		public IReadOnlyList<Token> Tokens => tokens;
 		public int CurrentRow { get; private set; } = 1;
+		public int CurrentColumn { get; private set; } = 1;
 		public bool IsParsingComplete => remainingCode.Length == 0;
 		public bool IsParsingSuccessful => ParseException == null;
 		public ParseException ParseException { get; private set; } = null;
@@ -65,42 +66,42 @@ namespace RobotPlusPlus.Core.Tokenizing
 
 		private Token EvaluateNextType()
 		{
-			string segment;
+			var source = new TokenSource(string.Empty, "N/A", CurrentRow, CurrentColumn);
 
 			// Block comment
-			if ((segment = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) != null)
-				return new Comment(segment, CurrentRow, isBlock: true);
+			if ((source.code = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) != null)
+				return new Comment(source, isBlock: true);
 
 			// Incomplete block comment
 			if (MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\z") != null)
 				throw new ParseException("Nonterminated block comment.", CurrentRow);
 			
 			// Singleline comment
-			if ((segment = MatchingRegex(@"\/\/.*")) != null)
-				return new Comment(segment, CurrentRow, isBlock: false);
+			if ((source.code = MatchingRegex(@"\/\/.*")) != null)
+				return new Comment(source, isBlock: false);
 
 			// Whitespace
-			if ((segment = MatchingRegex(@"\s+")) != null)
-				return new Whitespace(segment, CurrentRow);
+			if ((source.code = MatchingRegex(@"\s+")) != null)
+				return new Whitespace(source);
 
 			// Literal keywords
-			if ((segment = MatchingWordsInList(literalKeywords, ignoreCase: false)) != null)
-				return new LiteralKeyword(segment, CurrentRow);
+			if ((source.code = MatchingWordsInList(literalKeywords, ignoreCase: false)) != null)
+				return new LiteralKeyword(source);
 
 			// Statements
-			if ((segment = MatchingWordsInList(statements, ignoreCase: false)) != null)
-				return new Statement(segment, CurrentRow);
+			if ((source.code = MatchingWordsInList(statements, ignoreCase: false)) != null)
+				return new Statement(source);
 
 			// Identifiers
-			if ((segment = MatchingRegex(@"[\p{L}_][\p{L}_\p{N}]*")) != null)
-				return new Identifier(segment, CurrentRow);
+			if ((source.code = MatchingRegex(@"[\p{L}_][\p{L}_\p{N}]*")) != null)
+				return new Identifier(source);
 
 			// Strings
 			foreach (char s in strings)
 			{
 				// Full string
-				if ((segment = MatchingRegex($@"{s}([^{s}\\]|\\.)*{s}")) != null)
-					return new LiteralString(segment, CurrentRow);
+				if ((source.code = MatchingRegex($@"{s}([^{s}\\]|\\.)*{s}")) != null)
+					return new LiteralString(source);
 				
 				// Incomplete '' strings
 				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") != null)
@@ -108,22 +109,25 @@ namespace RobotPlusPlus.Core.Tokenizing
 			}
 
 			// Numbers
-			if ((segment = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[fF]?")) != null)
+			if ((source.code = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[fF]?")) != null)
 			{
 				// Ending with invalid char?
-				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]*") != segment)
+				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]*") != source.code)
 					throw new ParseException("Unexpected character after number.", CurrentRow);
 
-				return new LiteralNumber(segment, CurrentRow);
+				return new LiteralNumber(source);
 			}
 
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
-				return new Punctuator(remainingCode.Substring(0, 1), CurrentRow);
+			{
+				source.code = remainingCode.Substring(0, 1);
+				return new Punctuator(source);
+			}
 
 			// Operators
-			if ((segment = MatchingStringInList(operators)) != null)
-				return new Operator(segment, CurrentRow);
+			if ((source.code = MatchingStringInList(operators)) != null)
+				return new Operator(source);
 
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);
@@ -146,7 +150,12 @@ namespace RobotPlusPlus.Core.Tokenizing
 				foreach (char c in token.SourceCode)
 				{
 					if (c == '\n')
+					{
 						CurrentRow++;
+						CurrentColumn = 1;
+					}
+					else
+						CurrentColumn++;
 				}
 			}
 			catch (ParseException e)

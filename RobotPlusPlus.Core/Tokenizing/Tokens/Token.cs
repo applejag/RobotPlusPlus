@@ -8,28 +8,20 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	public abstract class Token : IList<Token>, IReadOnlyList<Token>
 	{
-		public string SourceCode { get; }
-		public int SourceLine { get; }
-		public int NewLines { get; }
+		protected internal readonly TokenSource source;
+		public string SourceCode => source.code;
+		public int SourceLine => source.line;
+		public int SourceColumn => source.column;
+		public int NewLines => source.newLines;
 		public Whitespace LeadingWhitespace { get; set; }
 		public Whitespace TrailingWhitespace { get; set; }
 
 		public List<Token> Tokens { get; } = new List<Token>();
 		public bool IsParsed { get; internal set; }
 
-		protected Token(string sourceCode, int sourceLine)
+		protected Token(TokenSource source)
 		{
-			SourceCode = sourceCode;
-			SourceLine = sourceLine;
-
-			var newLines = 0;
-			foreach (char c in sourceCode)
-			{
-				if (c == '\n')
-					newLines++;
-			}
-
-			NewLines = newLines;
+			this.source = source;
 		}
 
 		public abstract void ParseToken(Parser parser);

@@ -18,9 +18,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public Token CodeBlock => this[_CodeBlock];
 		public Type StatementType { get; }
 
-		public Statement(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public Statement(TokenSource source) : base(source)
 		{
-			if (Enum.TryParse(sourceCode, true, out Type statementType))
+			if (Enum.TryParse(SourceCode, true, out Type statementType))
 				StatementType = statementType;
 			else
 				throw new ParseUnexpectedTokenException(this);

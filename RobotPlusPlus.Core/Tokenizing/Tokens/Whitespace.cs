@@ -6,7 +6,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	/// <summary>Spaces and newlines. Ex: \n, \t, \r</summary>
 	public class Whitespace : Token
 	{
-		public Whitespace(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public Whitespace(TokenSource source) : base(source)
 		{}
 
 		public override void ParseToken(Parser parser)

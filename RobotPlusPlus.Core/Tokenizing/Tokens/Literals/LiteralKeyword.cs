@@ -10,9 +10,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 		public bool IsNull => Value is null;
 		public object Value { get; }
 
-		public LiteralKeyword(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public LiteralKeyword(TokenSource source) : base(source)
 		{
-			switch (sourceCode)
+			switch (SourceCode)
 			{
 				case "true":
 					Value = true;
@@ -27,7 +27,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 					break;
 
 				default:
-					throw new ParseException($"Unkown literal keyword <{sourceCode}>!", sourceLine);
+					throw new ParseException($"Unkown literal keyword <{SourceCode}>!", SourceLine);
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	{
 		public bool IsBlockComment { get; }
 		
-		public Comment(string sourceCode, int sourceLine, bool isBlock) : base(sourceCode, sourceLine)
+		public Comment(TokenSource source, bool isBlock) : base(source)
 		{
 			IsBlockComment = isBlock;
 		}

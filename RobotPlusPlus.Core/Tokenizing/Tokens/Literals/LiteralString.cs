@@ -9,9 +9,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 	{
 		public string Value { get; }
 
-		public LiteralString(string sourceCode, int sourceLine) : base(sourceCode, sourceLine)
+		public LiteralString(TokenSource source) : base(source)
 		{
-			Value = Regex.Unescape(sourceCode.Substring(1, sourceCode.Length - 2));
+			Value = Regex.Unescape(SourceCode.Substring(1, SourceCode.Length - 2));
 		}
 
 		public override void ParseToken(Parser parser)
