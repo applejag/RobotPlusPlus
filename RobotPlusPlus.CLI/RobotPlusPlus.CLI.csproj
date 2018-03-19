@@ -8,11 +8,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <LangVersion>latest</LangVersion>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <LangVersion>latest</LangVersion>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,11 +30,45 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
+		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\RobotPlusPlus.Linguist\RobotPlusPlus.Linguist.csproj" />
+		<ProjectReference Include="..\RobotPlusPlus.Linguist\RobotPlusPlus.Linguist.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\AssemblyInfo.tt">
+	    <Generator>TextTemplatingFileGenerator</Generator>
+	    <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\AssemblyInfo.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>AssemblyInfo.tt</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<!-- 15.0 is for VS2017, adjust if necessary -->
+		<VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+		<VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+		<!-- This is what will cause the templates to be transformed when the project is built (default is false) -->
+		<TransformOnBuild>true</TransformOnBuild>
+		<!-- Set to true to force overwriting of read-only output files, e.g. if they're not checked out (default is false) -->
+		<OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
+		<!-- Set to false to transform files even if the output appears to be up-to-date (default is true)  -->
+		<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+	</PropertyGroup>
+
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets" />
 
 </Project>
