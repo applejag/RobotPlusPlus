@@ -102,5 +102,59 @@ namespace RobotPlusPlus.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual(expected, compiled);
 		}
+
+		[TestMethod]
+		public void Compile_IfNestedBlocks()
+		{
+			// Arrange
+			const string code = "if true { if false { a = 0 } }";
+			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			                        "♥a=0\n" +
+			                        "➜noif2\n" +
+			                        "➜noif";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfNestedFirstHasBlock()
+		{
+			// Arrange
+			const string code = "if true { if false a = 0 }";
+			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			                        "♥a=0\n" +
+			                        "➜noif2\n" +
+			                        "➜noif";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfNestedSecondHasBlock()
+		{
+			// Arrange
+			const string code = "if true if false { a = 0 }";
+			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			                        "♥a=0\n" +
+			                        "➜noif2\n" +
+			                        "➜noif";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
 	}
 }
