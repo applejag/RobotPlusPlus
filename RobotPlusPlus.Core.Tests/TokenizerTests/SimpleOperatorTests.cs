@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tests.TokenizerTests
+namespace RobotPlusPlus.Core.Tests.TokenizerTests
 {
 	[TestClass]
 	public class SimpleOperatorTests

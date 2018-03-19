@@ -2,7 +2,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
 
-namespace RobotPlusPlus.Tests.CompilerTests
+namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
     [TestClass]
     public class SimpleTests

@@ -8,7 +8,7 @@ using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Core.Tests
 {
 	public static class Utility
 	{

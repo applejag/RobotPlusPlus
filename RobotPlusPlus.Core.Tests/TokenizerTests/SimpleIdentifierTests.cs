@@ -1,10 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tests.TokenizerTests
+namespace RobotPlusPlus.Core.Tests.TokenizerTests
 {
 	[TestClass]
 	public class SimpleIdentifierTests

@@ -2,7 +2,7 @@
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 
-namespace RobotPlusPlus.Tests.CompilerTests
+namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
 	[TestClass]
 	public class IntermediateAssignmentTests

@@ -3,7 +3,7 @@ using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
-namespace RobotPlusPlus.Tests.TokenizerTests
+namespace RobotPlusPlus.Core.Tests.TokenizerTests
 {
 	[TestClass]
 	public class SimpleLiteralKeywordTests

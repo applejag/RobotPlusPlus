@@ -3,7 +3,7 @@ using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tests.ParserTests
+namespace RobotPlusPlus.Core.Tests.ParserTests
 {
 	[TestClass]
 	public class SimpleAssignmentTests

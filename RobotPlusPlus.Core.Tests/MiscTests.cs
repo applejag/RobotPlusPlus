@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Tests
+namespace RobotPlusPlus.Core.Tests
 {
 	[TestClass]
 	public class MiscTests

@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 
-namespace RobotPlusPlus.Tests.CompilerTests
+namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
 	[TestClass]
 	public class SimpleIfStatements

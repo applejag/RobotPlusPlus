@@ -2,7 +2,7 @@
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Tests.TokenizerTests
+namespace RobotPlusPlus.Core.Tests.TokenizerTests
 {
 	[TestClass]
 	public class SimpleTests
