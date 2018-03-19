@@ -4,6 +4,7 @@ using System.Linq;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
@@ -50,7 +51,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					{
 						if (parser.NextToken == null)
 							throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
-
+						
 						Token takenToken = parser.TakeNextToken();
 
 						// Stop when found matching pair
@@ -60,6 +61,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						{
 							break;
 						}
+					}
+
+					if (Character == '(')
+					{
+						// Remove closing parentases
+						Tokens.RemoveAt(Tokens.Count - 1);
+						// Replace self
+						parser.ReplaceCurrentWith(Tokens);
 					}
 					break;
 
@@ -81,8 +90,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						&& p.Character == GetMatchingParentases(Character));
 					if (!someoneLookingForMe)
 						throw new ParseTokenException($"Unexpected ending parentases <{SourceCode}>.", this);
-					break;
 
+					parser.MoveToParent();
+					break;
 				default:
 					throw new ParseTokenException($"Unexpected punctuator <{SourceCode}>.", this);
 			}

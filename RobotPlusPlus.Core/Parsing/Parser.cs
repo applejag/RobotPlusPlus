@@ -107,6 +107,23 @@ namespace RobotPlusPlus.Core.Parsing
 			ParseAllFollowingTokens();
 		}
 
+		public void ReplaceCurrentWith(IEnumerable<Token> enumTokens)
+		{
+			tokens.RemoveAt(currentTokenIndex);
+			tokens.InsertRange(currentTokenIndex, enumTokens);
+			ParseAllFollowingTokens();
+		}
+
+		public void ReplaceCurrentWith(params Token[] paramsTokens)
+		{
+			ReplaceCurrentWith(enumTokens: paramsTokens);
+		}
+
+		public void MoveToParent()
+		{
+			parent?.tokens.AddRange(tokens);
+		}
+
 		protected void ParseAllFollowingTokens()
 		{
 			var parser = new Parser(this, tokens.PopRangeAfter(currentTokenIndex, false));

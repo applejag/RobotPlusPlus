@@ -74,10 +74,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsOperator(div, Operator.Type.Multiplicative, "/");
 			Assert.That.TokenIsLiteralInteger(div[0], 15);
 
-			Token par = div[1];
-			Assert.That.TokenIsParentases(par, '(', 1);
-
-			Token plus = par.Tokens[0];
+			Token plus = div.Tokens[0];
 			Assert.That.TokenIsOperator(plus, Operator.Type.Additive, "+");
 			Assert.That.TokenIsLiteralInteger(plus[0], 2);
 			Assert.That.TokenIsLiteralInteger(plus[1], 5);
