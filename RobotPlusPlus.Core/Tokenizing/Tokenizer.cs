@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
-namespace RobotPlusPlus.Linguist.Tokenizing
+namespace RobotPlusPlus.Core.Tokenizing
 {
 	public class Tokenizer
 	{

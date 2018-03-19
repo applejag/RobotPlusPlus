@@ -1,7 +1,7 @@
-﻿using RobotPlusPlus.Linguist.Compiling;
-using RobotPlusPlus.Linguist.Parsing;
+﻿using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Parsing;
 
-namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
+namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Spaces and newlines. Ex: \n, \t, \r</summary>
 	public class Whitespace : Token

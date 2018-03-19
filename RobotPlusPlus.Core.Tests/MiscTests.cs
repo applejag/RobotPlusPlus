@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Utility;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Tests
 {

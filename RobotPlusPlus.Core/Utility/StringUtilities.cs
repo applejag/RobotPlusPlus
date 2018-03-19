@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using JetBrains.Annotations;
 
-namespace RobotPlusPlus.Linguist.Utility
+namespace RobotPlusPlus.Core.Utility
 {
 	public static class StringUtilities
 	{

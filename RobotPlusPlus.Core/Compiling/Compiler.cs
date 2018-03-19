@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
-using RobotPlusPlus.Linguist.Parsing;
-using RobotPlusPlus.Linguist.Tokenizing;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Utility;
+using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Tokenizing;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Linguist.Compiling
+namespace RobotPlusPlus.Core.Compiling
 {
 	public class Compiler
 	{

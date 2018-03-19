@@ -1,6 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Compiling;
+using RobotPlusPlus.Core.Compiling;
 
 namespace RobotPlusPlus.Tests.CompilerTests
 {

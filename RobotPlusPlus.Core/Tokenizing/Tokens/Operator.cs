@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using RobotPlusPlus.Linguist.Compiling;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Parsing;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals;
-using RobotPlusPlus.Linguist.Utility;
+using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
+namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Assignment and comparisson. Ex: =, >, +</summary>
 	public class Operator : Token

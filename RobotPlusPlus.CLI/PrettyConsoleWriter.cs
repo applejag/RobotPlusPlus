@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
 namespace RobotPlusPlus.CLI
 {

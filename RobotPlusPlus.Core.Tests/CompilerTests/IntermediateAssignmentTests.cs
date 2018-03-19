@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Compiling;
-using RobotPlusPlus.Linguist.Exceptions;
+using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Exceptions;
 
 namespace RobotPlusPlus.Tests.CompilerTests
 {

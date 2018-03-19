@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Parsing;
-using RobotPlusPlus.Linguist.Tokenizing;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Tokenizing;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.ParserTests
 {

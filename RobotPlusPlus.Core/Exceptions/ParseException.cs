@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RobotPlusPlus.Linguist.Exceptions
+namespace RobotPlusPlus.Core.Exceptions
 {
 	public class ParseException : ApplicationException
 	{

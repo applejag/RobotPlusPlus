@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Utility;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Linguist.Parsing
+namespace RobotPlusPlus.Core.Parsing
 {
 	public class Parser
 	{

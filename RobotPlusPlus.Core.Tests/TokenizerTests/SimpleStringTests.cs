@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Tokenizing;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Tokenizing;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Tests.TokenizerTests
 {

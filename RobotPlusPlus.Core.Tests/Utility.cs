@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Tokenizing;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Tokenizing;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
 namespace RobotPlusPlus.Tests
 {

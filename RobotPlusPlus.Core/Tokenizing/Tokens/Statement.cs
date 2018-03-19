@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RobotPlusPlus.Linguist.Compiling;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Parsing;
-using RobotPlusPlus.Linguist.Utility;
+using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
+namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Reserved words. Ex: if, while, try</summary>
 	public class Statement : Token

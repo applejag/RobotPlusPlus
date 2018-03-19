@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace RobotPlusPlus.Linguist.Utility
+namespace RobotPlusPlus.Core.Utility
 {
 	public static class ListUtilities
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
-using RobotPlusPlus.Linguist.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 
-namespace RobotPlusPlus.Linguist.Exceptions
+namespace RobotPlusPlus.Core.Exceptions
 {
 	public class UnassignedVariableException : CompileException
 	{

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RobotPlusPlus.Linguist.Compiling;
-using RobotPlusPlus.Linguist.Exceptions;
-using RobotPlusPlus.Linguist.Parsing;
+using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Parsing;
 
-namespace RobotPlusPlus.Linguist.Tokenizing.Tokens
+namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Separators and pairing characters. Ex: }, (, ;</summary>
 	public class Punctuator : Token
