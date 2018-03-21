@@ -9,170 +9,34 @@ namespace RobotPlusPlus.Core.Parsing
 {
 	public class Parser
 	{
-		private readonly List<Token> tokens;
-		private int currentTokenIndex = 0;
-		private readonly HashSet<Token> currentlyParsing;
-
-		private readonly Parser parent;
-
-		public Token NextToken => TryPeekToken(1);
-		public Token CurrToken => TryPeekToken(0);
-		public Token PrevToken => TryPeekToken(-1);
-		public Parser Root => parent?.Root ?? this;
-		public bool IsRoot => parent == null;
+		private List<Token> Tokens { get; }
 
 		private Parser([NotNull, ItemNotNull] IEnumerable<Token> tokens)
 		{
-			this.tokens = tokens.ToList();
-			currentlyParsing = new HashSet<Token>();
-		}
-
-		private Parser([NotNull] Parser parent, [NotNull, ItemNotNull] IEnumerable<Token> tokens)
-		{
-			this.parent = parent;
-			this.tokens = tokens.ToList();
-			currentlyParsing = parent.currentlyParsing;
+			Tokens = tokens.ToList();
 		}
 
 		public override string ToString()
 		{
-			return $"parser{{{string.Join(", ", tokens)}}} list[{currentTokenIndex}]: {CurrToken?.ToString() ?? "null"}";
-		}
-
-		public (Parser parent, int index) TryAddressToken(int offset)
-		{
-			int i = currentTokenIndex + offset;
-
-			// Peek mine
-			if (i >= 0 && i < tokens.Count)
-				return (this, i);
-
-			// Peek parents next
-			if (i >= tokens.Count && parent != null)
-				return parent.TryAddressToken(parent.currentTokenIndex + i - tokens.Count + 1);
-
-			// Peek parents prev
-			if (i < 0 && parent != null)
-				return parent.TryAddressToken(parent.currentTokenIndex + i + 1);
-
-			return (null, default);
-		}
-
-		public Token TryPeekToken(int offset)
-		{
-			(Parser parser, int index) = TryAddressToken(offset);
-			return parser?.tokens[index];
-		}
-
-		private Token TakeToken(int offset, int insertionIndex)
-		{
-			(Parser parser, int index) = TryAddressToken(offset);
-			Token current = CurrToken;
-
-			if (parser == null)
-				throw new IndexOutOfRangeException($"Token at offset <{offset}> does not exist!");
-
-			if (parser.tokens[index] == null)
-				throw new NullReferenceException($"Parsers token is null!");
-
-			if (parser == this && parser.currentTokenIndex == index)
-				throw new InvalidOperationException($"Taking the current token is not allowed (offset <{offset}>).");
-
-			if (index <= parser.currentTokenIndex)
-			{
-				// Parse the token
-				parser.ParseTokenAt(index);
-
-				// Change index to not mess up iterations
-				parser.currentTokenIndex--;
-			}
-
-			if (offset > 0)
-			{
-				// Parse the following before proceeding
-				ParseAllFollowingTokens();
-			}
-
-			// Transfer
-			Token target = parser.tokens[index];
-			current.Insert(insertionIndex, target);
-			parser.tokens.RemoveAt(index);
-
-			return target;
-		}
-
-		public void AddTokensAfterAndParse(params Token[] unparsedTokens)
-		{
-			tokens.InsertRange(currentTokenIndex + 1, unparsedTokens);
-			ParseAllFollowingTokens();
-		}
-
-		protected void ParseAllFollowingTokens()
-		{
-			var parser = new Parser(this, tokens.PopRangeAfter(currentTokenIndex, false));
-			parser.ParseAllTokenTypes();
-			tokens.AddRange(parser.tokens);
-		}
-
-		public void ParseTokenAt(int index)
-		{
-			new Parser(this, new[] {tokens[index] }).ParseAllTokenTypes();
-		}
-
-		public Token TakePrevToken(int insertionIndex)
-		{
-			return TakeToken(-1, insertionIndex);
-		}
-
-		public Token TakePrevToken()
-		{
-			return TakePrevToken(CurrToken.Count);
-		}
-
-		public Token TakeNextToken(int insertionIndex)
-		{
-			return TakeToken(+1, insertionIndex);
-		}
-
-		public Token TakeNextToken()
-		{
-			return TakeNextToken(CurrToken.Count);
-		}
-
-		public bool IsTokenParsing(Token token)
-		{
-			return currentlyParsing.Contains(token);
-		}
-
-		public bool IsTokenParsing(Func<Token, bool> predicate)
-		{
-			return currentlyParsing.Any(predicate);
-		}
-
-		public bool IsTokenParsing<T>(Func<T, bool> predicate) where T : Token
-		{
-			return currentlyParsing.OfType<T>().Any(predicate);
-		}
-
-		protected void ParseCurrentToken(Predicate<Token> filter = null)
-		{
-			Token current = CurrToken;
-			if (current.IsParsed || IsTokenParsing(current))
-				return;
-
-			if (filter?.Invoke(current) == false) return;
-
-			current.IsParsed = true;
-			currentlyParsing.Add(current);
-			current.ParseToken(this);
-			currentlyParsing.Remove(current);
+			return $"parser{{{string.Join(", ", Tokens)}}}";
 		}
 
 		protected void ParseTokens(Predicate<Token> filter = null)
 		{
-			for (currentTokenIndex = 0; currentTokenIndex < tokens.Count; currentTokenIndex++)
+			ParseTokens(Tokens, filter);
+		}
+
+		protected void ParseTokens(IList<Token> tokens, Predicate<Token> filter)
+		{
+			for (var i = 0; i < tokens.Count; i++)
 			{
-				ParseCurrentToken(filter);		
+				Token token = tokens[i];
+				if (token == null) continue;
+
+				ParseTokens(token, filter);
+				if (!filter(token)) continue;
+
+				tokens.ParseTokenAt(i);
 			}
 		}
 
@@ -190,23 +54,24 @@ namespace RobotPlusPlus.Core.Parsing
 
 		protected void KillComments()
 		{
-			tokens.RemoveAll(t => t is Comment);
+			Tokens.RemoveAll(t => t is Comment);
 		}
 
 		protected void KillWhitespaces()
 		{
-			for (currentTokenIndex = 0; currentTokenIndex < tokens.Count; currentTokenIndex++)
+			for (var i= 0; i < Tokens.Count; i++)
 			{
+				Token CurrToken = Tokens[i];
 				if (CurrToken is Whitespace) continue;
 
-				if (PrevToken is Whitespace leading)
+				if (Tokens.TryGet(i-1) is Whitespace leading)
 					CurrToken.TrailingWhitespace = leading;
 
-				if (NextToken is Whitespace trailing)
+				if (Tokens.TryGet(i+1) is Whitespace trailing)
 					CurrToken.TrailingWhitespace = trailing;
 			}
 
-			tokens.RemoveAll(t => t is Whitespace);
+			Tokens.RemoveAll(t => t is Whitespace);
 		}
 
 		public static Token[] Parse([ItemNotNull] Token[] tokens)
@@ -222,7 +87,7 @@ namespace RobotPlusPlus.Core.Parsing
 			parser.ParseAllTokenTypes();
 
 			// Kdone
-			return parser.tokens.ToArray();
+			return parser.Tokens.ToArray();
 		}
 
 	}

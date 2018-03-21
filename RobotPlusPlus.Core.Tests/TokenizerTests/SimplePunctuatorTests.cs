@@ -42,7 +42,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 		public void Tokenize_PunctuatorsBundle()
 		{
 			// Arrange
-			const string input = "(;:,:.{)}]}:;[[.";
+			const string input = "(;,.{)}]};[[.";
 
 			// Act
 			Token[] result = Tokenizer.Tokenize(input);

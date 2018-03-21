@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Utility;
@@ -29,7 +30,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 				Value = double.Parse(SourceCode, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

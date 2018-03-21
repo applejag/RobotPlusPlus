@@ -1,4 +1,5 @@
-﻿using RobotPlusPlus.Core.Compiling;
+﻿using System.Collections.Generic;
+using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
 
@@ -10,7 +11,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public Identifier(TokenSource source) : base(source)
 		{ }
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

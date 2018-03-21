@@ -1,4 +1,5 @@
-﻿using RobotPlusPlus.Core.Compiling;
+﻿using System.Collections.Generic;
+using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Parsing;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
@@ -13,7 +14,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			IsBlockComment = isBlock;
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

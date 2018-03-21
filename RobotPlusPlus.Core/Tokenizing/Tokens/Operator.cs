@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
@@ -12,10 +13,17 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	public class Operator : Token
 	{
 		public Type OperatorType { get; }
-		public Token LHS => this[_LHS];
-		public Token RHS => this[_RHS];
-		public const int _LHS = 0;
-		public const int _RHS = 1;
+		public Token LHS
+		{
+			get => this[0];
+			set => this[0] = value;
+		}
+
+		public Token RHS
+		{
+			get => this[1];
+			set => this[1] = value;
+		}
 
 		public Operator(TokenSource source) : base(source)
 		{
@@ -121,23 +129,25 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{
-			Token prev = parser.PrevToken;
-			Token next = parser.NextToken;
+			int prevIndex = myIndex - 1;
+			int nextIndex = myIndex + 1;
+			Token prev = parent.TryGet(prevIndex);
+			Token next = parent.TryGet(nextIndex);
 
 			switch (OperatorType)
 			{
 				// Expression
 				case Type.Expression when prev is Identifier:
-					parser.TakePrevToken(_LHS); // LHS
+					LHS = parent.Pop(prevIndex);
 					break;
 				case Type.Expression:
 					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
-					parser.TakeNextToken(_RHS);
+					RHS = parent.Pop(nextIndex);
 					break;
 
 				// Two sided expressions
@@ -152,43 +162,46 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.BooleanAND:
 				case Type.BooleanOR:
 					if (ExpressionHasValue(prev))
-						parser.TakePrevToken(_LHS);
+						LHS = parent.Pop(prevIndex);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 					if (ExpressionHasValue(next))
-						parser.TakeNextToken(_RHS);
+						RHS = parent.Pop(nextIndex);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				case Type.Assignment:
 					if (prev is Identifier)
-						parser.TakePrevToken(_LHS);
+						LHS = parent.Pop(prevIndex);
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (ExpressionHasValue(next))
-						parser.TakeNextToken(_RHS);
-					else
-						throw new ParseUnexpectedTrailingTokenException(this, next);
-
 					// ex: <<=, +=, %=
+					// Add identifier & operator to pool
 					if (SourceCode != "=")
 					{
-						// Add identifier & operator & old RHS to pool, then take again
+						// Duplicate identifier & create operand from my source
 						var id = new Identifier(LHS.source);
 						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line, source.column));
-						Token old_rhs = RHS;
-						this[_RHS] = null;
 
-						parser.AddTokensAfterAndParse(id, op, old_rhs);
-						parser.TakeNextToken(_RHS);
+						// Add to parent
+						parent.Insert(nextIndex + 0, id);
+						parent.Insert(nextIndex + 1, op);
+
+						// Parse
+						parent.ParseTokenAt(nextIndex + 1);
 					}
+
+					if (ExpressionHasValue(next))
+						RHS = parent.Pop(nextIndex);
+					else
+						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				default:
-					throw new ParseTokenException($"Unexpected operator type <{OperatorType}>.", this);
+					throw new ParseUnexpectedTokenException(this);
 			}
 		}
 

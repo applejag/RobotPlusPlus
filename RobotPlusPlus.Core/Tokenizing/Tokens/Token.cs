@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public Whitespace LeadingWhitespace { get; set; }
 		public Whitespace TrailingWhitespace { get; set; }
 
-		public List<Token> Tokens { get; } = new List<Token>();
+		private List<Token> Tokens { get; } = new List<Token>();
 		public bool IsParsed { get; internal set; }
 
 		protected Token(TokenSource source)
@@ -24,7 +24,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			this.source = source;
 		}
 
-		public abstract void ParseToken(Parser parser);
+		public abstract void ParseToken(IList<Token> parent, int myIndex);
 		public abstract string CompileToken(Compiler compiler);
 
 		public override string ToString()

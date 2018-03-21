@@ -4,6 +4,7 @@ using System.Linq;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
@@ -19,7 +20,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		private static readonly IReadOnlyCollection<char> separators = new []
 		{
-			';', ',', ':'
+			';', ',',
 		};
 
 		public char Character { get; }
@@ -37,54 +38,53 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			else if (separators.Contains(Character))
 				PunctuatorType = Type.Separator;
 			else
-				PunctuatorType = Type.Other;
+				throw new ParseUnexpectedTokenException(this);
 		}
+		
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{
 			switch (PunctuatorType)
 			{
 				case Type.OpeningParentases:
-					// Collect all until group found
-					while (true)
-					{
-						if (parser.NextToken == null)
-							throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", parser.CurrToken);
-
-						Token takenToken = parser.TakeNextToken();
-
-						// Stop when found matching pair
-						if (takenToken is Punctuator punc
-						    && punc.PunctuatorType == Type.ClosingParentases
-						    && punc.Character == GetMatchingParentases(Character))
-						{
-							break;
-						}
-					}
+					CollectUntilClosingParentases(parent, myIndex);
 					break;
 
 				case Type.Separator:
 					break;
-
-				case Type.Other when Character == '.' && parser.NextToken is Identifier:
-					if (TrailingWhitespace != null)
-						throw new ParseTokenException(
-							$"Unexpected whitespace after punctuator <{Character}> before identifier <{parser.NextToken.SourceCode}>.",
-							this);
-					else
-						parser.TakeNextToken();
-					break;
-
-				case Type.ClosingParentases:
-					bool someoneLookingForMe = parser.IsTokenParsing<Punctuator>(p =>
-						p.PunctuatorType == Type.OpeningParentases
-						&& p.Character == GetMatchingParentases(Character));
-					if (!someoneLookingForMe)
-						throw new ParseTokenException($"Unexpected ending parentases <{SourceCode}>.", this);
-					break;
-
+					
+				// Closing parentases should be caught by the opening ones, otherwise they're stray
 				default:
-					throw new ParseTokenException($"Unexpected punctuator <{SourceCode}>.", this);
+					throw new ParseUnexpectedTokenException(this);
+			}
+		}
+
+		private void CollectUntilClosingParentases(IList<Token> parent, int myIndex)
+		{
+			// Collect all until group found
+			int nextIndex = myIndex + 1;
+			while (true)
+			{
+				Token next = parent.TryGet(nextIndex);
+				switch (next)
+				{
+					case null:
+						throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", this);
+
+					case Punctuator open when open.PunctuatorType == Type.OpeningParentases:
+						parent.ParseTokenAt(nextIndex);
+						goto default;
+
+					case Punctuator close when close.PunctuatorType == Type.ClosingParentases
+						&& close.Character == GetMatchingParentases(Character):
+						parent.RemoveAt(nextIndex);
+						return; // stops
+
+					default:
+						parent.RemoveAt(nextIndex);
+						this.Add(next);
+						break;
+				}
 			}
 		}
 
@@ -93,11 +93,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (Character)
 			{
 				case '(':
-					return $"({Tokens[0].CompileToken(compiler)})";
+				case ')':
+				case '}':
+				case ']':
+					throw new ParseUnexpectedTokenException(this);
 
 				case '{':
-					var rows = new List<string>(Tokens.Count);
-					foreach (Token token in Tokens)
+					var rows = new List<string>(this.Count);
+					foreach (Token token in this)
 					{
 						compiler.assignmentNeedsCSSnipper = false;
 
@@ -105,9 +108,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					}
 
 					return string.Join('\n', rows.Where(s => !string.IsNullOrEmpty(s)));
-
-				case ')':
-				case '}':
+					
 				case ';':
 					return string.Empty;
 
@@ -126,7 +127,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			OpeningParentases,
 			ClosingParentases,
 			Separator,
-			Other,
 		}
 	}
 }

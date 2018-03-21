@@ -11,11 +11,18 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	/// <summary>Reserved words. Ex: if, while, try</summary>
 	public class Statement : Token
 	{
-		public const int _Condition = 0;
-		public const int _CodeBlock = 1;
+		public Token Condition
+		{
+			get => this[0];
+			set => this[0] = value;
+		}
 
-		public Token Condition => this[_Condition];
-		public Token CodeBlock => this[_CodeBlock];
+		public Token CodeBlock
+		{
+			get => this[1];
+			set => this[1] = value;
+		}
+
 		public Type StatementType { get; }
 
 		public Statement(TokenSource source) : base(source)
@@ -26,15 +33,17 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				throw new ParseUnexpectedTokenException(this);
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IList<Token> parent, int myIndex)
 		{
-			ParseTokenCondition(parser);
-			ParseTokenCodeBlock(parser);
+			ParseTokenCondition(parent, myIndex);
+			ParseTokenCodeBlock(parent, myIndex);
 		}
 
-		private void ParseTokenCondition(Parser parser)
+		private void ParseTokenCondition(IList<Token> parent, int myIndex)
 		{
-			Token next = parser.NextToken;
+			int nextIndex = myIndex + 1;
+			Token next = parent.TryGet(nextIndex);
+
 			switch (StatementType)
 			{
 				case Type.If:
@@ -42,7 +51,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					{
 						if (next.AnyRecursive(t => t is Operator op && op.OperatorType == Operator.Type.Assignment))
 							throw new ParseTokenException($"Unexpected assignment in statement condition <{SourceCode}>.", this);
-						parser.TakeNextToken(_Condition);
+
+						Condition = parent.Pop(nextIndex);
 					}
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -50,16 +60,18 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		private void ParseTokenCodeBlock(Parser parser)
+		private void ParseTokenCodeBlock(IList<Token> parent, int myIndex)
 		{
-			Token next = parser.NextToken;
+			int nextIndex = myIndex + 1;
+			Token next = parent.TryGet(nextIndex);
+
 			switch (StatementType)
 			{
 				case Type.If:
 					if ((next is Punctuator pun && pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '{')
 						|| (next is Operator op && op.OperatorType == Operator.Type.Assignment)
 					    || (next is Statement))
-						parser.TakeNextToken(_CodeBlock);
+						CodeBlock = parent.Pop(nextIndex);
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;

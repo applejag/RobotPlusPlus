@@ -91,5 +91,33 @@ namespace RobotPlusPlus.Core.Utility
 		{
 			return source.All(item => predicate(item) && item.AnyRecursive(predicate));
 		}
+
+		public static TSource TryGet<TSource>(this IList<TSource> source, int index)
+		{
+			if (index >= 0 && index < source.Count)
+				return source[index];
+			return default;
+		}
+
+		public static bool TryGet<TSource>(this IList<TSource> source, int index, out TSource value)
+		{
+			if (index >= 0 && index < source.Count)
+			{
+				value = source[index];
+				return true;
+			}
+			value = default;
+			return false;
+		}
+		
+		public static TSource Pop<TSource>(this IList<TSource> source, int index)
+		{
+			if (index < 0 || index >= source.Count)
+				throw new IndexOutOfRangeException();
+
+			TSource value = source[index];
+			source.RemoveAt(index);
+			return value;
+		}
 	}
 }
