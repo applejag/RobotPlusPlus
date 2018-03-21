@@ -68,6 +68,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (StatementType)
 			{
 				case Type.If:
+					if (next is Statement)
+						parent.ParseTokenAt(nextIndex);
+
 					if ((next is Punctuator pun && pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '{')
 						|| (next is Operator op && op.OperatorType == Operator.Type.Assignment)
 					    || (next is Statement))

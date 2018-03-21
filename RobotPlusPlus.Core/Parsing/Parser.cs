@@ -26,17 +26,24 @@ namespace RobotPlusPlus.Core.Parsing
 			ParseTokens(Tokens, filter);
 		}
 
-		protected void ParseTokens(IList<Token> tokens, Predicate<Token> filter)
+		protected static void ParseTokens(IList<Token> tokens, Predicate<Token> filter)
 		{
-			for (var i = 0; i < tokens.Count; i++)
+			while (true)
 			{
-				Token token = tokens[i];
-				if (token == null) continue;
+				var any = false;
 
-				ParseTokens(token, filter);
-				if (filter?.Invoke(token) == false) continue;
+				for (var i = 0; i < tokens.Count; i++)
+				{
+					Token token = tokens[i];
+					if (token == null) continue;
 
-				tokens.ParseTokenAt(i);
+					ParseTokens(token, filter);
+					if (filter != null && !filter.Invoke(token)) continue;
+
+					any |= tokens.ParseTokenAt(i);
+				}
+
+				if (!any) return;
 			}
 		}
 

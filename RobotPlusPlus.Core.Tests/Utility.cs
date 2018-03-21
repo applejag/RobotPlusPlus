@@ -69,11 +69,11 @@ namespace RobotPlusPlus.Core.Tests
 			Assert.AreEqual(((Punctuator)token).PunctuatorType, Punctuator.Type.OpeningParentases, "First token in group isn't marked as parentases group opening.");
 			Assert.AreEqual(((Punctuator)token).Character, expectedOpeningChar, "Parentases group doesn't start with expected parentases.");
 
-			Token last = token.LastOrDefault();
-			Assert.IsNotNull(last, "Parentases group doesn't contain any tokens.");
-			Assert.IsInstanceOfType(last, typeof(Punctuator), "Parentases group doesn't end with punctuator.");
-			Assert.AreEqual(((Punctuator)last).PunctuatorType, Punctuator.Type.ClosingParentases, "Parentases group doesn't end with a closing punctuator.");
-			Assert.AreEqual(((Punctuator)last).Character, Punctuator.GetMatchingParentases(expectedOpeningChar), "Parentases group doesn't end with a closing punctuator of correct type.");
+			//Token last = token.LastOrDefault();
+			//Assert.IsNotNull(last, "Parentases group doesn't contain any tokens.");
+			//Assert.IsInstanceOfType(last, typeof(Punctuator), "Parentases group doesn't end with punctuator.");
+			//Assert.AreEqual(((Punctuator)last).PunctuatorType, Punctuator.Type.ClosingParentases, "Parentases group doesn't end with a closing punctuator.");
+			//Assert.AreEqual(((Punctuator)last).Character, Punctuator.GetMatchingParentases(expectedOpeningChar), "Parentases group doesn't end with a closing punctuator of correct type.");
 		}
 
 		[AssertionMethod]
@@ -82,7 +82,7 @@ namespace RobotPlusPlus.Core.Tests
 		{
 			Assert.That.TokenIsParentases(token, expectedOpeningChar);
 			// -1 to exclude the closing parentases
-			Assert.AreEqual(((Punctuator)token).Count - 1, expectedContainedTokens);
+			Assert.AreEqual(((Punctuator)token).Count, expectedContainedTokens, "Wrong number of direct children for parentases group.");
 		}
 
 		[AssertionMethod]

@@ -13,6 +13,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	public class Operator : Token
 	{
 		public Type OperatorType { get; }
+
 		public Token LHS
 		{
 			get => this[0];
@@ -100,7 +101,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 				default:
 					throw new ParseTokenException($"Unregistered operator type <{SourceCode}>", this);
-
 			}
 		}
 
@@ -136,18 +136,30 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			Token prev = parent.TryGet(prevIndex);
 			Token next = parent.TryGet(nextIndex);
 
+			void TakePrevForLHS()
+			{
+				LHS = parent.Pop(prevIndex);
+				nextIndex--;
+				myIndex--;
+			}
+
+			void TakeNextForRHS()
+			{
+				RHS = parent.Pop(nextIndex);
+			}
+
 			switch (OperatorType)
 			{
 				// Expression
 				case Type.Expression when prev is Identifier:
-					LHS = parent.Pop(prevIndex);
+					TakePrevForLHS();
 					break;
 				case Type.Expression:
 					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
-					RHS = parent.Pop(nextIndex);
+					TakeNextForRHS();
 					break;
 
 				// Two sided expressions
@@ -162,19 +174,19 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.BooleanAND:
 				case Type.BooleanOR:
 					if (ExpressionHasValue(prev))
-						LHS = parent.Pop(prevIndex);
+						TakePrevForLHS();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 					if (ExpressionHasValue(next))
-						RHS = parent.Pop(nextIndex);
+						TakeNextForRHS();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				case Type.Assignment:
 					if (prev is Identifier)
-						LHS = parent.Pop(prevIndex);
+						TakePrevForLHS();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
@@ -184,7 +196,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					{
 						// Duplicate identifier & create operand from my source
 						var id = new Identifier(LHS.source);
-						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line, source.column));
+						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line,
+							source.column));
 
 						// Add to parent
 						parent.Insert(nextIndex + 0, id);
@@ -195,7 +208,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					}
 
 					if (ExpressionHasValue(next))
-						RHS = parent.Pop(nextIndex);
+						TakeNextForRHS();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
@@ -215,7 +228,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						compiler.assignmentNeedsCSSnipper = true;
 
 					string c_rhs = RHS.CompileToken(compiler);
-					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
+					compiler.RegisterVariable(LHS as Identifier ??
+					                          throw new CompileException("Missing identifier for assignment.", this));
 					string c_lhs = LHS.CompileToken(compiler);
 
 					string formatString = compiler.assignmentNeedsCSSnipper
@@ -233,28 +247,40 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		{
 			///<summary>++, --</summary>
 			Expression,
+
 			///<summary>-x, !x, ~x</summary>
 			Unary,
+
 			///<summary>x*y, x/y, x%y</summary>
 			Multiplicative,
+
 			///<summary>x+y, x-y</summary>
 			Additive,
+
 			///<summary>x&lt;&lt;y, x&gt;&gt;y</summary>
 			BitwiseShift,
+
 			///<summary>x&lt;y, x&gt;y, x&lt;=y, x&gt;=y</summary>
 			Relational,
+
 			///<summary>x==y, x!=y</summary>
 			Equality,
+
 			///<summary>x&amp;y</summary>
 			BitwiseAND,
+
 			///<summary>x^y</summary>
 			BitwiseXOR,
+
 			///<summary>x|y</summary>
 			BitwiseOR,
+
 			///<summary>x&amp;&amp;y</summary>
 			BooleanAND,
+
 			///<summary>x||y</summary>
 			BooleanOR,
+
 			/////<summary>x?true:false</summary>
 			//Conditional,
 			///<summary>x=y, x+=y, x-=y, x*=y, x/=y, etc.</summary>
