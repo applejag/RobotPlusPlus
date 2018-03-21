@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Parsing
 				if (token == null) continue;
 
 				ParseTokens(token, filter);
-				if (!filter(token)) continue;
+				if (filter?.Invoke(token) == false) continue;
 
 				tokens.ParseTokenAt(i);
 			}
