@@ -1,23 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Assignment and comparisson. Ex: =, >, +</summary>
-	public class Operator : Token
+	public class OperatorToken : Token
 	{
 		public Type OperatorType { get; }
-		public Token LHS => this[_LHS];
-		public Token RHS => this[_RHS];
-		public const int _LHS = 0;
-		public const int _RHS = 1;
 
-		public Operator(TokenSource source) : base(source)
+		public Token LHS
+		{
+			get => this[0];
+			set => this[0] = value;
+		}
+
+		public Token RHS
+		{
+			get => this[1];
+			set => this[1] = value;
+		}
+
+		public OperatorToken(TokenSource source) : base(source)
 		{
 			switch (SourceCode)
 			{
@@ -92,7 +102,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 				default:
 					throw new ParseTokenException($"Unregistered operator type <{SourceCode}>", this);
-
 			}
 		}
 
@@ -103,17 +112,17 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case null:
 					return false;
 
-				case Literal lit:
-				case Identifier id:
+				case LiteralToken lit:
+				case IdentifierToken id:
 					return true;
 
-				case Operator op:
+				case OperatorToken op:
 					if (op.OperatorType == Type.Unary)
 						return ExpressionHasValue(op.LHS) && op.RHS == null;
 					else
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
 
-				case Punctuator pun when pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '(':
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '(':
 					return pun.Any(ExpressionHasValue);
 
 				default:
@@ -121,23 +130,23 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IteratedList<Token> parent)
 		{
-			Token prev = parser.PrevToken;
-			Token next = parser.NextToken;
+			Token prev = parent.Previous;
+			Token next = parent.Next;
 
 			switch (OperatorType)
 			{
 				// Expression
-				case Type.Expression when prev is Identifier:
-					parser.TakePrevToken(_LHS); // LHS
+				case Type.Expression when prev is IdentifierToken:
+					LHS = parent.PopPrevious();
 					break;
 				case Type.Expression:
 					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
-					parser.TakeNextToken(_RHS);
+					RHS = parent.PopNext();
 					break;
 
 				// Two sided expressions
@@ -152,43 +161,46 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.BooleanAND:
 				case Type.BooleanOR:
 					if (ExpressionHasValue(prev))
-						parser.TakePrevToken(_LHS);
+						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 					if (ExpressionHasValue(next))
-						parser.TakeNextToken(_RHS);
+						RHS = parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				case Type.Assignment:
-					if (prev is Identifier)
-						parser.TakePrevToken(_LHS);
+					if (prev is IdentifierToken)
+						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
-					if (ExpressionHasValue(next))
-						parser.TakeNextToken(_RHS);
-					else
-						throw new ParseUnexpectedTrailingTokenException(this, next);
-
 					// ex: <<=, +=, %=
+					// Add identifier & operator to pool
 					if (SourceCode != "=")
 					{
-						// Add identifier & operator & old RHS to pool, then take again
-						var id = new Identifier(LHS.source);
-						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line, source.column));
-						Token old_rhs = RHS;
-						this[_RHS] = null;
+						// Duplicate identifier & create operand from my source
+						var id = new IdentifierToken(LHS.source);
+						var op = new OperatorToken(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line,
+							source.column));
 
-						parser.AddTokensAfterAndParse(id, op, old_rhs);
-						parser.TakeNextToken(_RHS);
+						// Add to parent
+						parent.PushRangeNext(id, op);
+
+						// Parse operator
+						parent.ParseTokenAt(parent.Index + 2);
 					}
+
+					if (ExpressionHasValue(next))
+						RHS = parent.PopNext();
+					else
+						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				default:
-					throw new ParseTokenException($"Unexpected operator type <{OperatorType}>.", this);
+					throw new ParseUnexpectedTokenException(this);
 			}
 		}
 
@@ -197,12 +209,13 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (OperatorType)
 			{
 				case Type.Assignment:
-					if (this.AnyRecursive(t => t is LiteralNumber)
-					    && this.AnyRecursive(t => t is LiteralString))
+					if (this.AnyRecursive(t => t is LiteralNumberToken)
+					    && this.AnyRecursive(t => t is LiteralStringToken))
 						compiler.assignmentNeedsCSSnipper = true;
 
 					string c_rhs = RHS.CompileToken(compiler);
-					compiler.RegisterVariable(LHS as Identifier ?? throw new CompileException("Missing identifier for assignment.", this));
+					compiler.RegisterVariable(LHS as IdentifierToken ??
+					                          throw new CompileException("Missing identifier for assignment.", this));
 					string c_lhs = LHS.CompileToken(compiler);
 
 					string formatString = compiler.assignmentNeedsCSSnipper
@@ -220,28 +233,40 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		{
 			///<summary>++, --</summary>
 			Expression,
+
 			///<summary>-x, !x, ~x</summary>
 			Unary,
+
 			///<summary>x*y, x/y, x%y</summary>
 			Multiplicative,
+
 			///<summary>x+y, x-y</summary>
 			Additive,
+
 			///<summary>x&lt;&lt;y, x&gt;&gt;y</summary>
 			BitwiseShift,
+
 			///<summary>x&lt;y, x&gt;y, x&lt;=y, x&gt;=y</summary>
 			Relational,
+
 			///<summary>x==y, x!=y</summary>
 			Equality,
+
 			///<summary>x&amp;y</summary>
 			BitwiseAND,
+
 			///<summary>x^y</summary>
 			BitwiseXOR,
+
 			///<summary>x|y</summary>
 			BitwiseOR,
+
 			///<summary>x&amp;&amp;y</summary>
 			BooleanAND,
+
 			///<summary>x||y</summary>
 			BooleanOR,
+
 			/////<summary>x?true:false</summary>
 			//Conditional,
 			///<summary>x=y, x+=y, x-=y, x*=y, x/=y, etc.</summary>

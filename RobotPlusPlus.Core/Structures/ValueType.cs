@@ -1,4 +1,4 @@
-﻿namespace RobotPlusPlus.Core
+﻿namespace RobotPlusPlus.Core.Structures
 {
 	public enum ValueType
 	{

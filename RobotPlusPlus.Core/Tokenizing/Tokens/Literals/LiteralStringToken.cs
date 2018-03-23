@@ -1,20 +1,22 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
-	public class LiteralString : Literal
+	public class LiteralStringToken : LiteralToken
 	{
 		public string Value { get; }
 
-		public LiteralString(TokenSource source) : base(source)
+		public LiteralStringToken(TokenSource source) : base(source)
 		{
 			Value = Regex.Unescape(SourceCode.Substring(1, SourceCode.Length - 2));
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

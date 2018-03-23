@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
@@ -73,7 +74,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 
 			// Block comment
 			if ((source.code = MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\*\/")) != null)
-				return new Comment(source, isBlock: true);
+				return new CommentToken(source, isBlock: true);
 
 			// Incomplete block comment
 			if (MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\z") != null)
@@ -81,30 +82,30 @@ namespace RobotPlusPlus.Core.Tokenizing
 			
 			// Singleline comment
 			if ((source.code = MatchingRegex(@"\/\/.*")) != null)
-				return new Comment(source, isBlock: false);
+				return new CommentToken(source, isBlock: false);
 
 			// Whitespace
 			if ((source.code = MatchingRegex(@"\s+")) != null)
-				return new Whitespace(source);
+				return new WhitespaceToken(source);
 
 			// Literal keywords
 			if ((source.code = MatchingWordsInList(literalKeywords, ignoreCase: false)) != null)
-				return new LiteralKeyword(source);
+				return new LiteralKeywordToken(source);
 
 			// Statements
 			if ((source.code = MatchingWordsInList(statements, ignoreCase: false)) != null)
-				return new Statement(source);
+				return new StatementToken(source);
 
 			// Identifiers
 			if ((source.code = MatchingRegex(@"[\p{L}_][\p{L}_\p{N}]*")) != null)
-				return new Identifier(source);
+				return new IdentifierToken(source);
 
 			// Strings
 			foreach (char s in strings)
 			{
 				// Full string
 				if ((source.code = MatchingRegex($@"{s}([^{s}\\]|\\.)*{s}")) != null)
-					return new LiteralString(source);
+					return new LiteralStringToken(source);
 				
 				// Incomplete '' strings
 				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") != null)
@@ -118,19 +119,19 @@ namespace RobotPlusPlus.Core.Tokenizing
 				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]*") != source.code)
 					throw new ParseException("Unexpected character after number.", CurrentRow);
 
-				return new LiteralNumber(source);
+				return new LiteralNumberToken(source);
 			}
 
 			// Punctuators
 			if (punctuators.Contains(remainingCode[0]))
 			{
 				source.code = remainingCode.Substring(0, 1);
-				return new Punctuator(source);
+				return new PunctuatorToken(source);
 			}
 
 			// Operators
 			if ((source.code = MatchingStringInList(operators)) != null)
-				return new Operator(source);
+				return new OperatorToken(source);
 
 			// Unknown
 			throw new ParseException("Unable to parse next token.", CurrentRow);

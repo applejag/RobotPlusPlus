@@ -26,7 +26,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Whitespace));
+				typeof(WhitespaceToken));
 		}
 
 		[TestMethod]
@@ -37,9 +37,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Whitespace));
+				typeof(WhitespaceToken));
 
-			Assert.That.TokenIsOfType<Whitespace>(result[0], "\n\n\n");
+			Assert.That.TokenIsOfType<WhitespaceToken>(result[0], "\n\n\n");
 			Assert.AreEqual(3, result[0].NewLines);
 		}
 
@@ -51,14 +51,14 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Whitespace),
-				typeof(Punctuator),
-				typeof(Whitespace));
+				typeof(WhitespaceToken),
+				typeof(PunctuatorToken),
+				typeof(WhitespaceToken));
 
-			Assert.That.TokenIsOfType<Whitespace>(result[0], "\n\n\n");
+			Assert.That.TokenIsOfType<WhitespaceToken>(result[0], "\n\n\n");
 			Assert.AreEqual(3, result[0].NewLines);
-			Assert.That.TokenIsOfType<Punctuator>(result[1], ";");
-			Assert.That.TokenIsOfType<Whitespace>(result[2], "\n\n\n\n");
+			Assert.That.TokenIsOfType<PunctuatorToken>(result[1], ";");
+			Assert.That.TokenIsOfType<WhitespaceToken>(result[2], "\n\n\n\n");
 			Assert.AreEqual(4, result[2].NewLines);
 		}
 

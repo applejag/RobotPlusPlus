@@ -14,7 +14,7 @@ namespace RobotPlusPlus.Core.Tests
 			char[] input = { '(', '[', '{' };
 			char[] expected = { ')', ']', '}' };
 
-			char[] actual = input.Select(Punctuator.GetMatchingParentases).ToArray();
+			char[] actual = input.Select(PunctuatorToken.GetMatchingParentases).ToArray();
 
 			CollectionAssert.AreEqual(expected, actual);
 		}

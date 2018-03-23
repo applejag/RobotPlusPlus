@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace RobotPlusPlus.Core.Tokenizing.Tokens
+namespace RobotPlusPlus.Core.Structures
 {
 	public struct TokenSource
 	{

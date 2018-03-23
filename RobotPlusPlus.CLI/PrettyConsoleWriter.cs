@@ -55,24 +55,24 @@ namespace RobotPlusPlus.CLI
 
 				switch (token)
 				{
-					case LiteralNumber num:
+					case LiteralNumberToken num:
 						color = ConsoleColor.Yellow;
 						output = token.SourceCode;
 						break;
 
-					case LiteralString str:
+					case LiteralStringToken str:
 						color = ConsoleColor.Green;
 						output = token.SourceCode;
 						break;
 
-					case Statement st:
-					case LiteralKeyword kw:
-					case Operator op:
+					case StatementToken st:
+					case LiteralKeywordToken kw:
+					case OperatorToken op:
 						color = ConsoleColor.Magenta;
 						output = token.SourceCode;
 						break;
 
-					case Comment com:
+					case CommentToken com:
 						color = ConsoleColor.DarkGreen;
 						output = token.SourceCode;
 						break;

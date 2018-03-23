@@ -20,7 +20,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Identifier));
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Identifier));
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -48,9 +48,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Whitespace),
-				typeof(Identifier),
-				typeof(Whitespace));
+				typeof(WhitespaceToken),
+				typeof(IdentifierToken),
+				typeof(WhitespaceToken));
 		}
 
 		[TestMethod]
@@ -77,11 +77,11 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Identifier),
-				typeof(Whitespace),
-				typeof(Identifier),
-				typeof(Whitespace),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(WhitespaceToken),
+				typeof(IdentifierToken),
+				typeof(WhitespaceToken),
+				typeof(IdentifierToken));
 		}
 	}
 }

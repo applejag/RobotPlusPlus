@@ -1,16 +1,18 @@
-﻿using RobotPlusPlus.Core.Compiling;
+﻿using System.Collections.Generic;
+using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
-	public class LiteralKeyword : Literal
+	public class LiteralKeywordToken : LiteralToken
 	{
 		public bool IsBool => Value is bool;
 		public bool IsNull => Value is null;
 		public object Value { get; }
 
-		public LiteralKeyword(TokenSource source) : base(source)
+		public LiteralKeywordToken(TokenSource source) : base(source)
 		{
 			switch (SourceCode)
 			{
@@ -31,7 +33,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 			}
 		}
 
-		public override void ParseToken(Parser parser)
+		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

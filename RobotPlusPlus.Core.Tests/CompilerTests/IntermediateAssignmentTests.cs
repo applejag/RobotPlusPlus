@@ -100,5 +100,37 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥y=42\n♥x=♥y", output);
 		}
+
+		[TestMethod]
+		public void Compile_NestedAssignment()
+		{
+			// Act
+			string output = Compiler.Compile("y = x = 10");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥y=♥x", output);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileException))]
+		public void Compile_NestedInvalidAssignment()
+		{
+			// Act
+			// Should compile to y = ((5 + x) = 10), which is invalid
+			// You can't set (5 + x) = 10, need solo variable
+			string output = Compiler.Compile("y = 5 + x = 10");
+
+			// Assert
+		}
+
+		[TestMethod]
+		public void Compile_NestedAlteredAssignment()
+		{
+			// Act
+			string output = Compiler.Compile("y = 5 + (x = 10)");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥y=5+♥x", output);
+		}
 	}
 }
