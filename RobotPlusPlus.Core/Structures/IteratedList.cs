@@ -23,12 +23,18 @@ namespace RobotPlusPlus.Core.Structures
 		public T Next => List.TryGet(Index + 1);
 
 		public int Index { get; private set; }
+		public bool Reversed { get; }
 
 		public IList<T> List { get; }
 
-		public IteratedList(IList<T> list, int index = 0)
+		public IteratedList(IList<T> list, bool reversed = false)
+			: this(list, reversed ? list.Count - 1 : 0, reversed)
+		{ }
+
+		public IteratedList(IList<T> list, int index, bool reversed = false)
 		{
 			List = list;
+			Reversed = reversed;
 			Index = index;
 		}
 
@@ -72,7 +78,7 @@ namespace RobotPlusPlus.Core.Structures
 
 		public IteratedList<T> Copy()
 		{
-			return new IteratedList<T>(List, Index);
+			return new IteratedList<T>(List, Reversed);
 		}
 
 		public IEnumerator<T> GetEnumerator()
@@ -101,12 +107,14 @@ namespace RobotPlusPlus.Core.Structures
 
 			public bool MoveNext()
 			{
+				if (parent.Reversed)
+					return (--parent.Index) >= 0;
 				return (++parent.Index) < parent.Count;
 			}
 
 			public void Reset()
 			{
-				parent.Index = -1;
+				parent.Index = parent.Reversed ? parent.Count : -1;
 			}
 
 			public T Current => parent.Current;

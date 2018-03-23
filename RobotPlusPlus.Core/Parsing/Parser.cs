@@ -22,13 +22,14 @@ namespace RobotPlusPlus.Core.Parsing
 			return $"parser{{{string.Join(", ", Tokens)}}}";
 		}
 
-		protected void ParseTokens(Predicate<Token> filter = null)
+		protected void ParseTokens(Predicate<Token> filter = null, bool reversed = false)
 		{
-			ParseTokens(new IteratedList<Token>(Tokens), filter);
+			ParseTokens(Tokens, filter, reversed);
 		}
 
-		protected static void ParseTokens(IteratedList<Token> parent, Predicate<Token> filter)
+		private static void ParseTokens(IList<Token> tokens, Predicate<Token> filter, bool reversed)
 		{
+			var parent = new IteratedList<Token>(tokens, reversed);
 			while (true)
 			{
 				var any = false;
@@ -37,7 +38,7 @@ namespace RobotPlusPlus.Core.Parsing
 				{
 					if (parent.Current == null) continue;
 					
-					ParseTokens(new IteratedList<Token>(parent.Current), filter);
+					ParseTokens(parent.Current, filter, parent.Reversed);
 					if (filter != null && !filter.Invoke(token)) continue;
 
 					any |= parent.ParseTokenAt(parent.Index);
@@ -53,7 +54,8 @@ namespace RobotPlusPlus.Core.Parsing
 
 			foreach (OperatorToken.Type type in Enum.GetValues(typeof(OperatorToken.Type)))
 			{
-				ParseTokens(token => token is OperatorToken o && o.OperatorType == type);
+				ParseTokens(token => token is OperatorToken o && o.OperatorType == type,
+					reversed: type == OperatorToken.Type.Assignment);
 			}
 
 			ParseTokens();
