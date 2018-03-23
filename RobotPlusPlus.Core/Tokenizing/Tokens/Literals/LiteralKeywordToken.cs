@@ -5,13 +5,13 @@ using RobotPlusPlus.Core.Parsing;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
-	public class LiteralKeyword : Literal
+	public class LiteralKeywordToken : LiteralToken
 	{
 		public bool IsBool => Value is bool;
 		public bool IsNull => Value is null;
 		public object Value { get; }
 
-		public LiteralKeyword(TokenSource source) : base(source)
+		public LiteralKeywordToken(TokenSource source) : base(source)
 		{
 			switch (SourceCode)
 			{

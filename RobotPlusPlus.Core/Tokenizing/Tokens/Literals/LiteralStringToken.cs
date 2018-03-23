@@ -6,11 +6,11 @@ using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
-	public class LiteralString : Literal
+	public class LiteralStringToken : LiteralToken
 	{
 		public string Value { get; }
 
-		public LiteralString(TokenSource source) : base(source)
+		public LiteralStringToken(TokenSource source) : base(source)
 		{
 			Value = Regex.Unescape(SourceCode.Substring(1, SourceCode.Length - 2));
 		}

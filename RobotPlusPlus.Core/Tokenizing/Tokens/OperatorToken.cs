@@ -10,7 +10,7 @@ using RobotPlusPlus.Core.Utility;
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Assignment and comparisson. Ex: =, >, +</summary>
-	public class Operator : Token
+	public class OperatorToken : Token
 	{
 		public Type OperatorType { get; }
 
@@ -26,7 +26,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			set => this[1] = value;
 		}
 
-		public Operator(TokenSource source) : base(source)
+		public OperatorToken(TokenSource source) : base(source)
 		{
 			switch (SourceCode)
 			{
@@ -111,17 +111,17 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case null:
 					return false;
 
-				case Literal lit:
-				case Identifier id:
+				case LiteralToken lit:
+				case IdentifierToken id:
 					return true;
 
-				case Operator op:
+				case OperatorToken op:
 					if (op.OperatorType == Type.Unary)
 						return ExpressionHasValue(op.LHS) && op.RHS == null;
 					else
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
 
-				case Punctuator pun when pun.PunctuatorType == Punctuator.Type.OpeningParentases && pun.Character == '(':
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '(':
 					return pun.Any(ExpressionHasValue);
 
 				default:
@@ -151,7 +151,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (OperatorType)
 			{
 				// Expression
-				case Type.Expression when prev is Identifier:
+				case Type.Expression when prev is IdentifierToken:
 					TakePrevForLHS();
 					break;
 				case Type.Expression:
@@ -185,7 +185,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					break;
 
 				case Type.Assignment:
-					if (prev is Identifier)
+					if (prev is IdentifierToken)
 						TakePrevForLHS();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
@@ -195,8 +195,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					if (SourceCode != "=")
 					{
 						// Duplicate identifier & create operand from my source
-						var id = new Identifier(LHS.source);
-						var op = new Operator(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line,
+						var id = new IdentifierToken(LHS.source);
+						var op = new OperatorToken(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line,
 							source.column));
 
 						// Add to parent
@@ -223,12 +223,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (OperatorType)
 			{
 				case Type.Assignment:
-					if (this.AnyRecursive(t => t is LiteralNumber)
-					    && this.AnyRecursive(t => t is LiteralString))
+					if (this.AnyRecursive(t => t is LiteralNumberToken)
+					    && this.AnyRecursive(t => t is LiteralStringToken))
 						compiler.assignmentNeedsCSSnipper = true;
 
 					string c_rhs = RHS.CompileToken(compiler);
-					compiler.RegisterVariable(LHS as Identifier ??
+					compiler.RegisterVariable(LHS as IdentifierToken ??
 					                          throw new CompileException("Missing identifier for assignment.", this));
 					string c_lhs = LHS.CompileToken(compiler);
 

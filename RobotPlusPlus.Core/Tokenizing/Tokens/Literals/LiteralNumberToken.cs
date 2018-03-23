@@ -6,7 +6,7 @@ using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
-	public class LiteralNumber : Literal
+	public class LiteralNumberToken : LiteralToken
 	{
 		/// <summary><see cref="Value"/> is <seealso cref="double"/></summary>
 		public bool IsReal => Value is double;
@@ -20,7 +20,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 
 		public object Value { get; }
 
-		public LiteralNumber(TokenSource source) : base(source)
+		public LiteralNumberToken(TokenSource source) : base(source)
 		{
 			if (SourceCode.EndsWith('f', ignoreCase: true))
 				Value = double.Parse(SourceCode.Substring(0, SourceCode.Length - 1), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);

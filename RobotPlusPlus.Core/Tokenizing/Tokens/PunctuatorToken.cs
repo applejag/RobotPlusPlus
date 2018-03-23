@@ -10,7 +10,7 @@ using RobotPlusPlus.Core.Utility;
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Separators and pairing characters. Ex: }, (, ;</summary>
-	public class Punctuator : Token
+	public class PunctuatorToken : Token
 	{
 		private static readonly Bictionary<char, char> parentasesPairs = new Bictionary<char, char>
 		{
@@ -27,7 +27,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public char Character { get; }
 		public Type PunctuatorType { get; }
 
-		public Punctuator(TokenSource source) : base(source)
+		public PunctuatorToken(TokenSource source) : base(source)
 		{
 			
 			Character = SourceCode[0];
@@ -72,11 +72,11 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					case null:
 						throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", this);
 
-					case Punctuator open when open.PunctuatorType == Type.OpeningParentases:
+					case PunctuatorToken open when open.PunctuatorType == Type.OpeningParentases:
 						parent.ParseTokenAt(nextIndex);
 						goto default;
 
-					case Punctuator close when close.PunctuatorType == Type.ClosingParentases
+					case PunctuatorToken close when close.PunctuatorType == Type.ClosingParentases
 						&& close.Character == GetMatchingParentases(Character):
 						parent.RemoveAt(nextIndex);
 						return; // stops

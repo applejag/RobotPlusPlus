@@ -14,8 +14,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public int SourceLine => source.line;
 		public int SourceColumn => source.column;
 		public int NewLines => source.NewLines;
-		public Whitespace LeadingWhitespace { get; set; }
-		public Whitespace TrailingWhitespace { get; set; }
+		public WhitespaceToken LeadingWhitespaceToken { get; set; }
+		public WhitespaceToken TrailingWhitespaceToken { get; set; }
 		public bool IsParsed { get; internal set; }
 
 		protected Token(TokenSource source)

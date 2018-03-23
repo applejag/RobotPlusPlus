@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal));
+				typeof(LiteralToken));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal));
+				typeof(LiteralToken));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -74,7 +74,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal));
+				typeof(LiteralToken));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -89,7 +89,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal));
+				typeof(LiteralToken));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -105,7 +105,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal));
+				typeof(LiteralToken));
 
 			Assert.AreEqual(input, result[0].SourceCode);
 		}
@@ -123,9 +123,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Literal),
-				typeof(Whitespace),
-				typeof(Literal));
+				typeof(LiteralToken),
+				typeof(WhitespaceToken),
+				typeof(LiteralToken));
 
 			Assert.AreEqual(str1, result[0].SourceCode);
 			Assert.AreEqual(str2, result[2].SourceCode);

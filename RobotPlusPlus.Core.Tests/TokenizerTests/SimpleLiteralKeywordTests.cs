@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(LiteralKeyword));
+				typeof(LiteralKeywordToken));
 		}
 
 		[TestMethod]
@@ -27,7 +27,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(LiteralKeyword));
+				typeof(LiteralKeywordToken));
 		}
 
 		[TestMethod]
@@ -38,7 +38,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(LiteralKeyword));
+				typeof(LiteralKeywordToken));
 		}
 		
 		[TestMethod]
@@ -50,7 +50,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 			// Assert
 			Assert.IsNotNull(result, "Tokens list is null.");
 			Assert.IsNotNull(result[0], "tokens[0] is null.");
-			Assert.IsNotInstanceOfType(result[0], typeof(LiteralKeyword));
+			Assert.IsNotInstanceOfType(result[0], typeof(LiteralKeywordToken));
 		}
 	}
 }

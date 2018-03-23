@@ -49,11 +49,11 @@ namespace RobotPlusPlus.Core.Parsing
 
 		protected void ParseAllTokenTypes()
 		{
-			ParseTokens(token => token is Punctuator);
+			ParseTokens(token => token is PunctuatorToken);
 
-			foreach (Operator.Type type in Enum.GetValues(typeof(Operator.Type)))
+			foreach (OperatorToken.Type type in Enum.GetValues(typeof(OperatorToken.Type)))
 			{
-				ParseTokens(token => token is Operator o && o.OperatorType == type);
+				ParseTokens(token => token is OperatorToken o && o.OperatorType == type);
 			}
 
 			ParseTokens();
@@ -61,7 +61,7 @@ namespace RobotPlusPlus.Core.Parsing
 
 		protected void KillComments()
 		{
-			Tokens.RemoveAll(t => t is Comment);
+			Tokens.RemoveAll(t => t is CommentToken);
 		}
 
 		protected void KillWhitespaces()
@@ -69,16 +69,16 @@ namespace RobotPlusPlus.Core.Parsing
 			for (var i= 0; i < Tokens.Count; i++)
 			{
 				Token CurrToken = Tokens[i];
-				if (CurrToken is Whitespace) continue;
+				if (CurrToken is WhitespaceToken) continue;
 
-				if (Tokens.TryGet(i-1) is Whitespace leading)
-					CurrToken.TrailingWhitespace = leading;
+				if (Tokens.TryGet(i-1) is WhitespaceToken leading)
+					CurrToken.TrailingWhitespaceToken = leading;
 
-				if (Tokens.TryGet(i+1) is Whitespace trailing)
-					CurrToken.TrailingWhitespace = trailing;
+				if (Tokens.TryGet(i+1) is WhitespaceToken trailing)
+					CurrToken.TrailingWhitespaceToken = trailing;
 			}
 
-			Tokens.RemoveAll(t => t is Whitespace);
+			Tokens.RemoveAll(t => t is WhitespaceToken);
 		}
 
 		public static Token[] Parse([ItemNotNull] Token[] tokens)

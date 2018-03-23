@@ -19,7 +19,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Punctuator));
+				typeof(PunctuatorToken));
 		}
 
 		[TestMethod]
@@ -33,8 +33,8 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Punctuator),
-				typeof(Punctuator));
+				typeof(PunctuatorToken),
+				typeof(PunctuatorToken));
 		}
 
 
@@ -48,7 +48,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 			Token[] result = Tokenizer.Tokenize(input);
 
 			// Assert
-			CollectionAssert.That.TokensAreSameType(result, typeof(Punctuator));
+			CollectionAssert.That.TokensAreSameType(result, typeof(PunctuatorToken));
 			Assert.AreEqual(input.Length, result.Length, "Wrong token count in result.");
 		}
 	}

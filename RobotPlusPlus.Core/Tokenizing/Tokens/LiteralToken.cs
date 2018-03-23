@@ -1,9 +1,9 @@
 ﻿namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
 	/// <summary>Numbers, strings, etc. Ex: 10.25, true, "foo"</summary>
-	public abstract class Literal : Token
+	public abstract class LiteralToken : Token
 	{
-		protected Literal(TokenSource source) : base(source)
+		protected LiteralToken(TokenSource source) : base(source)
 		{ }
 	}
 }

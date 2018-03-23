@@ -18,12 +18,12 @@ namespace RobotPlusPlus.Core.Compiling
 		
 		public bool assignmentNeedsCSSnipper;
 
-		public void RegisterVariable([NotNull] Identifier identifier)
+		public void RegisterVariable([NotNull] IdentifierToken identifier)
 		{
 			registeredVariables.Add(identifier.SourceCode);
 		}
 
-		public bool IsVariableRegistered([CanBeNull] Identifier identifier)
+		public bool IsVariableRegistered([CanBeNull] IdentifierToken identifier)
 		{
 			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
 		}

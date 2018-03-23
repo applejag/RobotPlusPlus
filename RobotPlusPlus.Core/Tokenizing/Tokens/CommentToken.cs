@@ -4,11 +4,15 @@ using RobotPlusPlus.Core.Parsing;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
-	/// <summary>Spaces and newlines. Ex: \n, \t, \r</summary>
-	public class Whitespace : Token
+	/// <summary>Ignored code. Ex: //line, /*block*/</summary>
+	public class CommentToken : Token
 	{
-		public Whitespace(TokenSource source) : base(source)
-		{}
+		public bool IsBlockComment { get; }
+		
+		public CommentToken(TokenSource source, bool isBlock) : base(source)
+		{
+			IsBlockComment = isBlock;
+		}
 
 		public override void ParseToken(IList<Token> parent, int myIndex)
 		{ }

@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Operator));
+				typeof(OperatorToken));
 		}
 
 		[TestMethod]
@@ -32,8 +32,8 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Assert
 			CollectionAssert.That.TokensAreOfTypes(result,
-				typeof(Operator),
-				typeof(Operator));
+				typeof(OperatorToken),
+				typeof(OperatorToken));
 		}
 
 		[TestMethod]
@@ -46,8 +46,8 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -61,9 +61,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Identifier),
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 
@@ -78,9 +78,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Identifier),
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -93,9 +93,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Identifier),
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -109,9 +109,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Identifier),
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 		[TestMethod]
@@ -129,9 +129,9 @@ namespace RobotPlusPlus.Core.Tests.TokenizerTests
 
 			// Act & assert
 			Utility.TokenizeAndAssert(samples,
-				typeof(Identifier),
-				typeof(Operator),
-				typeof(Identifier));
+				typeof(IdentifierToken),
+				typeof(OperatorToken),
+				typeof(IdentifierToken));
 		}
 
 

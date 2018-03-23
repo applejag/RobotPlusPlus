@@ -14,21 +14,21 @@ namespace RobotPlusPlus.Core.Tests
 	{
 		[AssertionMethod]
 		public static void TokenIsOperator(this Assert assert,
-			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, Operator.Type type)
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, OperatorToken.Type type)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(Operator));
-			Assert.AreEqual(((Operator)token).OperatorType, type);
+			Assert.IsInstanceOfType(token, typeof(OperatorToken));
+			Assert.AreEqual(((OperatorToken)token).OperatorType, type);
 		}
 
 		[AssertionMethod]
 		public static void TokenIsOperator(this Assert assert,
-			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, Operator.Type type, string expectedSource)
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, OperatorToken.Type type, string expectedSource)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(Operator));
-			Assert.AreEqual(((Operator)token).OperatorType, type);
-			Assert.AreEqual(((Operator)token).SourceCode, expectedSource);
+			Assert.IsInstanceOfType(token, typeof(OperatorToken));
+			Assert.AreEqual(((OperatorToken)token).OperatorType, type);
+			Assert.AreEqual(((OperatorToken)token).SourceCode, expectedSource);
 		}
 
 		[AssertionMethod]
@@ -36,9 +36,9 @@ namespace RobotPlusPlus.Core.Tests
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, int value)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(LiteralNumber));
-			Assert.IsTrue(((LiteralNumber)token).IsInteger);
-			Assert.AreEqual(((LiteralNumber)token).Value, value);
+			Assert.IsInstanceOfType(token, typeof(LiteralNumberToken));
+			Assert.IsTrue(((LiteralNumberToken)token).IsInteger);
+			Assert.AreEqual(((LiteralNumberToken)token).Value, value);
 		}
 
 		[AssertionMethod]
@@ -46,9 +46,9 @@ namespace RobotPlusPlus.Core.Tests
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, double value)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(LiteralNumber));
-			Assert.IsTrue(((LiteralNumber)token).IsReal);
-			Assert.AreEqual(((LiteralNumber)token).Value, value);
+			Assert.IsInstanceOfType(token, typeof(LiteralNumberToken));
+			Assert.IsTrue(((LiteralNumberToken)token).IsReal);
+			Assert.AreEqual(((LiteralNumberToken)token).Value, value);
 		}
 
 		[AssertionMethod]
@@ -56,8 +56,8 @@ namespace RobotPlusPlus.Core.Tests
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, string value)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(LiteralString));
-			Assert.AreEqual(((LiteralString)token).Value, value);
+			Assert.IsInstanceOfType(token, typeof(LiteralStringToken));
+			Assert.AreEqual(((LiteralStringToken)token).Value, value);
 		}
 
 		[AssertionMethod]
@@ -65,9 +65,9 @@ namespace RobotPlusPlus.Core.Tests
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, char expectedOpeningChar)
 		{
 			Assert.IsNotNull(token);
-			Assert.IsInstanceOfType(token, typeof(Punctuator));
-			Assert.AreEqual(((Punctuator)token).PunctuatorType, Punctuator.Type.OpeningParentases, "First token in group isn't marked as parentases group opening.");
-			Assert.AreEqual(((Punctuator)token).Character, expectedOpeningChar, "Parentases group doesn't start with expected parentases.");
+			Assert.IsInstanceOfType(token, typeof(PunctuatorToken));
+			Assert.AreEqual(((PunctuatorToken)token).PunctuatorType, PunctuatorToken.Type.OpeningParentases, "First token in group isn't marked as parentases group opening.");
+			Assert.AreEqual(((PunctuatorToken)token).Character, expectedOpeningChar, "Parentases group doesn't start with expected parentases.");
 
 			//Token last = token.LastOrDefault();
 			//Assert.IsNotNull(last, "Parentases group doesn't contain any tokens.");
@@ -82,7 +82,7 @@ namespace RobotPlusPlus.Core.Tests
 		{
 			Assert.That.TokenIsParentases(token, expectedOpeningChar);
 			// -1 to exclude the closing parentases
-			Assert.AreEqual(((Punctuator)token).Count, expectedContainedTokens, "Wrong number of direct children for parentases group.");
+			Assert.AreEqual(((PunctuatorToken)token).Count, expectedContainedTokens, "Wrong number of direct children for parentases group.");
 		}
 
 		[AssertionMethod]
