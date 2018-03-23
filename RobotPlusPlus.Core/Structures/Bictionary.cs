@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Core
+namespace RobotPlusPlus.Core.Structures
 {
 	public class Bictionary<T1, T2> : Dictionary<T1, T2>
 	{

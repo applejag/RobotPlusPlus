@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Structures;
 
 namespace RobotPlusPlus.Core.Utility
 {

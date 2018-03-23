@@ -4,6 +4,7 @@ using System.Linq;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
