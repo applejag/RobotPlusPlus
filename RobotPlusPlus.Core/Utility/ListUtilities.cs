@@ -80,16 +80,40 @@ namespace RobotPlusPlus.Core.Utility
 			return false;
 		}
 
-		public static bool AnyRecursive<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
+		public static bool AnyRecursive<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
 			return source.Any(item => predicate(item) || item.AnyRecursive(predicate));
 		}
 
-		public static bool AllRecursive<TSource>(this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
+		public static bool AllRecursive<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
 			return source.All(item => predicate(item) && item.AnyRecursive(predicate));
+		}
+
+		public static int CountRecursive<TSource>([NotNull] this IEnumerable<TSource> source)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.Sum(item => 1 + item?.CountRecursive() ?? 0);
+		}
+
+		public static int CountRecursive<TSource>([NotNull] this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.Sum(item => predicate(item) ? 1 + item?.CountRecursive(predicate) ?? 0 : 0);
+		}
+
+		public static bool ContainsRecursive<TSource>([NotNull] this IEnumerable<TSource> source, TSource value)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.Any(t => EqualityComparer<TSource>.Default.Equals(t, value) || t.ContainsRecursive(value));
+		}
+
+		public static bool ContainsRecursive<TSource>([NotNull] this IEnumerable<TSource> source, TSource value, [NotNull] IEqualityComparer<TSource> comparer)
+			where TSource : IEnumerable<TSource>
+		{
+			return source.Any(t => comparer.Equals(t, value) || t.ContainsRecursive(value, comparer));
 		}
 
 		public static TSource TryGet<TSource>(this IList<TSource> source, int index)

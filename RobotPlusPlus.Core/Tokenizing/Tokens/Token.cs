@@ -7,7 +7,7 @@ using RobotPlusPlus.Core.Structures;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {
-	public abstract class Token : TokenContainer
+	public abstract class Token : FlexibleList<Token>
 	{
 		protected internal readonly TokenSource source;
 		public string SourceCode => source.code;
