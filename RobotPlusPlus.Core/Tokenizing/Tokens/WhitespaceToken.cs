@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens
 {

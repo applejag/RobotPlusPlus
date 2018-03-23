@@ -2,6 +2,7 @@
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 
 namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 {
