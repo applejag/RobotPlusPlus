@@ -34,16 +34,15 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				throw new ParseUnexpectedTokenException(this);
 		}
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{
-			ParseTokenCondition(parent, myIndex);
-			ParseTokenCodeBlock(parent, myIndex);
+			ParseTokenCondition(parent);
+			ParseTokenCodeBlock(parent);
 		}
 
-		private void ParseTokenCondition(IList<Token> parent, int myIndex)
+		private void ParseTokenCondition(IteratedList<Token> parent)
 		{
-			int nextIndex = myIndex + 1;
-			Token next = parent.TryGet(nextIndex);
+			Token next = parent.Next;
 
 			switch (StatementType)
 			{
@@ -53,7 +52,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						if (next.AnyRecursive(t => t is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment))
 							throw new ParseTokenException($"Unexpected assignment in statement condition <{SourceCode}>.", this);
 
-						Condition = parent.Pop(nextIndex);
+						Condition = parent.PopNext();
 					}
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -61,21 +60,20 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		private void ParseTokenCodeBlock(IList<Token> parent, int myIndex)
+		private void ParseTokenCodeBlock(IteratedList<Token> parent)
 		{
-			int nextIndex = myIndex + 1;
-			Token next = parent.TryGet(nextIndex);
+			Token next = parent.Next;
 
 			switch (StatementType)
 			{
 				case Type.If:
 					if (next is StatementToken)
-						parent.ParseTokenAt(nextIndex);
+						parent.ParseNextToken();
 
 					if ((next is PunctuatorToken pun && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '{')
 						|| (next is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
 					    || (next is StatementToken))
-						CodeBlock = parent.Pop(nextIndex);
+						CodeBlock = parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;

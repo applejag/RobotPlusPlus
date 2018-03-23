@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 			Value = Regex.Unescape(SourceCode.Substring(1, SourceCode.Length - 2));
 		}
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

@@ -116,6 +116,10 @@ namespace RobotPlusPlus.Core.Utility
 			return source.Any(t => comparer.Equals(t, value) || t.ContainsRecursive(value, comparer));
 		}
 
+		/// <summary>
+		/// Will return the value at <paramref name="source"/>[<paramref name="index"/>].
+		/// If index is out of bounds, will return default(<typeparamref name="TSource"/>)
+		/// </summary>
 		public static TSource TryGet<TSource>(this IList<TSource> source, int index)
 		{
 			if (index >= 0 && index < source.Count)
@@ -123,6 +127,10 @@ namespace RobotPlusPlus.Core.Utility
 			return default;
 		}
 
+		/// <summary>
+		/// Tries to set out parameter <paramref name="value"/> to the value at <paramref name="source"/>[<paramref name="index"/>].
+		/// If index is out of bounds, will return false. Else will return true.
+		/// </summary>
 		public static bool TryGet<TSource>(this IList<TSource> source, int index, out TSource value)
 		{
 			if (index >= 0 && index < source.Count)

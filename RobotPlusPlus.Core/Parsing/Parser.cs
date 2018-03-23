@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
@@ -23,24 +24,23 @@ namespace RobotPlusPlus.Core.Parsing
 
 		protected void ParseTokens(Predicate<Token> filter = null)
 		{
-			ParseTokens(Tokens, filter);
+			ParseTokens(new IteratedList<Token>(Tokens), filter);
 		}
 
-		protected static void ParseTokens(IList<Token> tokens, Predicate<Token> filter)
+		protected static void ParseTokens(IteratedList<Token> parent, Predicate<Token> filter)
 		{
 			while (true)
 			{
 				var any = false;
-
-				for (var i = 0; i < tokens.Count; i++)
+				
+				foreach (Token token in parent)
 				{
-					Token token = tokens[i];
-					if (token == null) continue;
-
-					ParseTokens(token, filter);
+					if (parent.Current == null) continue;
+					
+					ParseTokens(new IteratedList<Token>(parent.Current), filter);
 					if (filter != null && !filter.Invoke(token)) continue;
 
-					any |= tokens.ParseTokenAt(i);
+					any |= parent.ParseTokenAt(parent.Index);
 				}
 
 				if (!any) return;

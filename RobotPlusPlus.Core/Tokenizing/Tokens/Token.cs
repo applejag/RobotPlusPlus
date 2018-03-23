@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			this.source = source;
 		}
 
-		public abstract void ParseToken(IList<Token> parent, int myIndex);
+		public abstract void ParseToken(IteratedList<Token> parent);
 		public abstract string CompileToken(Compiler compiler);
 
 		public override string ToString()

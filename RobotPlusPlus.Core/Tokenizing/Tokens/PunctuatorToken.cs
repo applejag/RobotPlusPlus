@@ -43,12 +43,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		}
 		
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{
 			switch (PunctuatorType)
 			{
 				case Type.OpeningParentases:
-					CollectUntilClosingParentases(parent, myIndex);
+					CollectUntilClosingParentases(parent);
 					break;
 
 				case Type.Separator:
@@ -60,30 +60,28 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		private void CollectUntilClosingParentases(IList<Token> parent, int myIndex)
+		private void CollectUntilClosingParentases(IteratedList<Token> parent)
 		{
 			// Collect all until group found
-			int nextIndex = myIndex + 1;
 			while (true)
 			{
-				Token next = parent.TryGet(nextIndex);
+				Token next = parent.Next;
 				switch (next)
 				{
 					case null:
 						throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", this);
 
 					case PunctuatorToken open when open.PunctuatorType == Type.OpeningParentases:
-						parent.ParseTokenAt(nextIndex);
+						parent.ParseNextToken();
 						goto default;
 
 					case PunctuatorToken close when close.PunctuatorType == Type.ClosingParentases
 						&& close.Character == GetMatchingParentases(Character):
-						parent.RemoveAt(nextIndex);
+						parent.PopNext();
 						return; // stops
 
 					default:
-						parent.RemoveAt(nextIndex);
-						this.Add(next);
+						this.Add(parent.PopNext());
 						break;
 				}
 			}

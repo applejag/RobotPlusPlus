@@ -11,7 +11,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public WhitespaceToken(TokenSource source) : base(source)
 		{}
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
 		public override string CompileToken(Compiler compiler)

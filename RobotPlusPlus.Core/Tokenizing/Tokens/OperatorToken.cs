@@ -130,37 +130,23 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{
-			int prevIndex = myIndex - 1;
-			int nextIndex = myIndex + 1;
-			Token prev = parent.TryGet(prevIndex);
-			Token next = parent.TryGet(nextIndex);
-
-			void TakePrevForLHS()
-			{
-				LHS = parent.Pop(prevIndex);
-				nextIndex--;
-				myIndex--;
-			}
-
-			void TakeNextForRHS()
-			{
-				RHS = parent.Pop(nextIndex);
-			}
+			Token prev = parent.Previous;
+			Token next = parent.Next;
 
 			switch (OperatorType)
 			{
 				// Expression
 				case Type.Expression when prev is IdentifierToken:
-					TakePrevForLHS();
+					LHS = parent.PopPrevious();
 					break;
 				case Type.Expression:
 					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
 
 				// Unary
 				case Type.Unary:
-					TakeNextForRHS();
+					RHS = parent.PopNext();
 					break;
 
 				// Two sided expressions
@@ -175,19 +161,19 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.BooleanAND:
 				case Type.BooleanOR:
 					if (ExpressionHasValue(prev))
-						TakePrevForLHS();
+						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
 					if (ExpressionHasValue(next))
-						TakeNextForRHS();
+						RHS = parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;
 
 				case Type.Assignment:
 					if (prev is IdentifierToken)
-						TakePrevForLHS();
+						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, prev);
 
@@ -201,15 +187,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 							source.column));
 
 						// Add to parent
-						parent.Insert(nextIndex + 0, id);
-						parent.Insert(nextIndex + 1, op);
+						parent.PushRangeNext(id, op);
 
-						// Parse
-						parent.ParseTokenAt(nextIndex + 1);
+						// Parse operator
+						parent.ParseTokenAt(parent.Index + 2);
 					}
 
 					if (ExpressionHasValue(next))
-						TakeNextForRHS();
+						RHS = parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
 					break;

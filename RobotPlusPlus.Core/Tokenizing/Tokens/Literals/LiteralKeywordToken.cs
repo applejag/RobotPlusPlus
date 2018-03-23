@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 			}
 		}
 
-		public override void ParseToken(IList<Token> parent, int myIndex)
+		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
 		public override string CompileToken(Compiler compiler)
