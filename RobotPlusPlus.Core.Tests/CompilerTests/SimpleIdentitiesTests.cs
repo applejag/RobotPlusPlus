@@ -15,5 +15,35 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			Assert.AreEqual("♥a=1\n♥a2=2", output);
 		}
+
+		[TestMethod]
+		public void Compile_VariableReuseInBlock()
+		{
+			// Act
+			string output = Compiler.Compile("x = 10 { x = 15 }");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥x=15", output);
+		}
+
+		[TestMethod]
+		public void Compile_VariableOutsideBlock()
+		{
+			// Act
+			string output = Compiler.Compile("{ x = 10 } x = 15");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥x2=15", output);
+		}
+
+		[TestMethod]
+		public void Compile_VariableSeperateBlocks()
+		{
+			// Act
+			string output = Compiler.Compile("{ x = 10 } { x = 15 }");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥x2=15", output);
+		}
 	}
 }
