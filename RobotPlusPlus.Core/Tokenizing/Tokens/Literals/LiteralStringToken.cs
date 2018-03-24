@@ -19,14 +19,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 		public override void ParseToken(IteratedList<Token> parent)
 		{ }
 
-		public override string CompileToken(Compiler compiler)
-		{
-			string escaped = Value.EscapeString();
-			if (escaped == Value && !compiler.assignmentNeedsCSSnipper)
-				return $"‴{Value}‴";
+		//public string AssembleIntoString()
+		//{
+		//	string escaped = Value.EscapeString();
+		//	if (escaped == Value && !compiler.assignmentNeedsCSSnipper)
+		//		return $"‴{Value}‴";
 
-			compiler.assignmentNeedsCSSnipper = true;
-			return $"\"{escaped}\"";
-		}
+		//	compiler.assignmentNeedsCSSnipper = true;
+		//	return $"\"{escaped}\"";
+		//}
 	}
 }

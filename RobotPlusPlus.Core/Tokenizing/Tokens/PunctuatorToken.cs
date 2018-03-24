@@ -87,35 +87,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		public override string CompileToken(Compiler compiler)
-		{
-			switch (Character)
-			{
-				case '(':
-				case ')':
-				case '}':
-				case ']':
-					throw new ParseUnexpectedTokenException(this);
-
-				case '{':
-					var rows = new List<string>(this.Count);
-					foreach (Token token in this)
-					{
-						compiler.assignmentNeedsCSSnipper = false;
-
-						rows.Add(token.CompileToken(compiler));
-					}
-
-					return string.Join('\n', rows.Where(s => !string.IsNullOrEmpty(s)));
-					
-				case ';':
-					return string.Empty;
-
-				default:
-					throw new NotImplementedException();
-			}
-		}
-
 		public static char GetMatchingParentases(char c)
 		{
 			return parentasesPairs[c];

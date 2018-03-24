@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public CodeUnit Parent { get; }
 		public CodeUnit Root => Parent?.Root ?? this;
-		public bool IsRoot => Root == this;
+		public bool IsRoot => Parent == null;
 
 		protected CodeUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 		{
@@ -26,6 +26,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PostUnits = parent?.PostUnits ?? new FlexibleList<CodeUnit>();
 		}
 
+		public virtual void PreCompile(Compiler compiler) { }
+		public virtual void PostCompile(Compiler compiler) { }
 		public abstract void Compile(Compiler compiler);
 		public abstract string AssembleIntoString();
 
@@ -38,6 +40,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				case PunctuatorToken pun when pun.Character == ';':
 					return null;
+
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
+					&& pun.Character == '{':
+					return new CodeBlockUnit(token);
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

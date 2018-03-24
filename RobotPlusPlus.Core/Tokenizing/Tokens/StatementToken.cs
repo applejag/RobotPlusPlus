@@ -80,21 +80,21 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
-		public override string CompileToken(Compiler compiler)
-		{
-			var rows = new List<string>();
+		//public override string CompileToken(Compiler compiler)
+		//{
+		//	var rows = new List<string>();
 
-			string label = compiler.RegisterLabel("noif");
+		//	string label = compiler.RegisterLabel("noif");
 
-			compiler.assignmentNeedsCSSnipper = true;
-			rows.Add($"jump ➜{label} if ⊂!({Condition.CompileToken(compiler)})⊃");
-			compiler.assignmentNeedsCSSnipper = false;
-			rows.Add(CodeBlock.CompileToken(compiler));
+		//	compiler.assignmentNeedsCSSnipper = true;
+		//	rows.Add($"jump ➜{label} if ⊂!({Condition.CompileToken(compiler)})⊃");
+		//	compiler.assignmentNeedsCSSnipper = false;
+		//	rows.Add(CodeBlock.CompileToken(compiler));
 
-			rows.Add($"➜{label}");
+		//	rows.Add($"➜{label}");
 
-			return string.Join('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
-		}
+		//	return string.Join('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
+		//}
 
 		public enum Type
 		{

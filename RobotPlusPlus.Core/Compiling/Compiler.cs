@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
@@ -15,6 +15,9 @@ namespace RobotPlusPlus.Core.Compiling
 	public class Compiler
 	{
 		private readonly List<CodeUnit> codeUnits;
+
+		public NameContext VariableContext { get; private set; }
+		public NameContext LabelContext { get; private set; }
 
 		public Compiler()
 		{
@@ -45,38 +48,56 @@ namespace RobotPlusPlus.Core.Compiling
 
 		public void Compile()
 		{
+			// Reset contexts
+			VariableContext = new NameContext();
+			LabelContext = new NameContext();
+
+			// Compile
+			CompileUnits(codeUnits, this);
+		}
+
+		public static void CompileUnits(List<CodeUnit> codeUnits, Compiler compiler)
+		{
 			foreach (CodeUnit unit in codeUnits)
 			{
-				foreach (CodeUnit pre in unit.PreUnits)
-					pre.Compile(this);
-
-				unit.Compile(this);
-
-				foreach (CodeUnit post in unit.PostUnits)
-					post.Compile(this);
+				ExecuteUnit(unit, u => u.PreCompile(compiler));
+				ExecuteUnit(unit, u => u.Compile(compiler));
+				ExecuteUnit(unit, u => u.PostCompile(compiler));
 			}
+		}
+
+		private static void ExecuteUnit(CodeUnit unit, Action<CodeUnit> callback)
+		{
+			foreach (CodeUnit pre in unit.PreUnits)
+				callback(pre);
+
+			callback(unit);
+
+			foreach (CodeUnit post in unit.PostUnits)
+				callback(post);
 		}
 
 		public string AssembleIntoString()
 		{
+			return AssembleUnitsIntoString(codeUnits) ?? string.Empty;
+		}
+
+		public static string AssembleUnitsIntoString(List<CodeUnit> codeUnits)
+		{
 			if (codeUnits == null)
-				return string.Empty;
+				return null;
+			if (codeUnits.Count == 0)
+				return null;
 
 			// Assemble into code rows
 			var rows = new List<string>();
 
 			foreach (CodeUnit unit in codeUnits)
 			{
-				foreach (CodeUnit pre in unit.PreUnits)
-					rows.Add(pre.AssembleIntoString());
-
-				rows.Add(unit.AssembleIntoString());
-
-				foreach (CodeUnit post in unit.PostUnits)
-					rows.Add(post.AssembleIntoString());
+				ExecuteUnit(unit, u => rows.Add(u.AssembleIntoString()));
 			}
 
-			return string.Join('\n', rows);
+			return string.Join('\n', rows.Where(r => r != null));
 		}
 
 		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)

@@ -183,7 +183,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					{
 						// Duplicate identifier & create operand from my source
 						var id = new IdentifierToken(LHS.source);
-						var op = new OperatorToken(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file, source.line,
+						var op = new OperatorToken(new TokenSource(source.code.Substring(0, SourceCode.Length - 1), source.file,
+							source.line,
 							source.column));
 
 						// Add to parent
@@ -201,31 +202,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 				default:
 					throw new ParseUnexpectedTokenException(this);
-			}
-		}
-
-		public override string CompileToken(Compiler compiler)
-		{
-			switch (OperatorType)
-			{
-				case Type.Assignment:
-					if (this.AnyRecursive(t => t is LiteralNumberToken)
-					    && this.AnyRecursive(t => t is LiteralStringToken))
-						compiler.assignmentNeedsCSSnipper = true;
-
-					string c_rhs = RHS.CompileToken(compiler);
-					compiler.RegisterVariable(LHS as IdentifierToken ??
-					                          throw new CompileException("Missing identifier for assignment.", this));
-					string c_lhs = LHS.CompileToken(compiler);
-
-					string formatString = compiler.assignmentNeedsCSSnipper
-						? "{0}=⊂{1}⊃"
-						: "{0}={1}";
-
-					return string.Format(formatString, c_lhs, c_rhs);
-
-				default:
-					return string.Format("{0}{1}{2}", LHS?.CompileToken(compiler), SourceCode, RHS?.CompileToken(compiler));
 			}
 		}
 

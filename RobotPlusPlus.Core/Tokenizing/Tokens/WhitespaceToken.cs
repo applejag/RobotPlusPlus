@@ -13,10 +13,5 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override void ParseToken(IteratedList<Token> parent)
 		{ }
-
-		public override string CompileToken(Compiler compiler)
-		{
-			return string.Empty;
-		}
 	}
 }
