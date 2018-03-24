@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -12,46 +14,18 @@ namespace RobotPlusPlus.Core.Compiling
 {
 	public class Compiler
 	{
-		private readonly StringBuilder output = new StringBuilder();
-		private readonly HashSet<string> registeredVariables = new HashSet<string>();
-		private readonly HashSet<string> registeredLabels = new HashSet<string>();
-		
-		public bool assignmentNeedsCSSnipper;
+		private readonly List<CodeUnit> codeUnits;
 
-		public void RegisterVariable([NotNull] IdentifierToken identifier)
+		public Compiler()
 		{
-			registeredVariables.Add(identifier.SourceCode);
+			codeUnits = new List<CodeUnit>();
 		}
 
-		public bool IsVariableRegistered([CanBeNull] IdentifierToken identifier)
-		{
-			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
-		}
-
-		public string RegisterLabel([NotNull] string preferredLabelName)
-		{
-			string actualLabelName = preferredLabelName;
-			var iter = 1;
-
-			while (registeredLabels.Contains(actualLabelName))
-			{
-				actualLabelName = preferredLabelName + ++iter;
-			}
-
-			registeredLabels.Add(actualLabelName);
-
-			return actualLabelName;
-		}
-
-		public bool IsLabelRegistered([CanBeNull] string actualLabelName)
-		{
-			return registeredLabels.Contains(actualLabelName);
-		}
-
-		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
+		public void AddTokens([ItemNotNull, NotNull] Token[] parsedTokens)
 		{
 			if (parsedTokens == null)
 				throw new ArgumentNullException(nameof(parsedTokens));
+
 			parsedTokens.AnyRecursive(t =>
 			{
 				if (t == null)
@@ -62,26 +36,65 @@ namespace RobotPlusPlus.Core.Compiling
 				return false;
 			});
 
-			var compiler = new Compiler();
-			var rows = new List<string>(parsedTokens.Length);
-
-			foreach (Token token in parsedTokens)
-			{
-				compiler.assignmentNeedsCSSnipper = false;
-				rows.Add(token.CompileToken(compiler));
-			}
-
-			compiler.output.AppendJoin('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
-
-			return compiler.output.ToString();
+			// Convert to code units
+			codeUnits.AddRange(parsedTokens
+				.Select(CodeUnit.CompileParsedToken)
+				.Where(unit => unit != null)
+			);
 		}
 
-		public static string Compile([NotNull] string code)
+		public void Compile()
+		{
+			foreach (CodeUnit unit in codeUnits)
+			{
+				foreach (CodeUnit pre in unit.PreUnits)
+					pre.Compile(this);
+
+				unit.Compile(this);
+
+				foreach (CodeUnit post in unit.PostUnits)
+					post.Compile(this);
+			}
+		}
+
+		public string AssembleIntoString()
+		{
+			if (codeUnits == null)
+				return string.Empty;
+
+			// Assemble into code rows
+			var rows = new List<string>();
+
+			foreach (CodeUnit unit in codeUnits)
+			{
+				foreach (CodeUnit pre in unit.PreUnits)
+					rows.Add(pre.AssembleIntoString());
+
+				rows.Add(unit.AssembleIntoString());
+
+				foreach (CodeUnit post in unit.PostUnits)
+					rows.Add(post.AssembleIntoString());
+			}
+
+			return string.Join('\n', rows);
+		}
+
+		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
+		{
+			var compiler = new Compiler();
+
+			compiler.AddTokens(parsedTokens);
+			compiler.Compile();
+
+			return compiler.AssembleIntoString();
+		}
+
+		public static string Compile([NotNull] string code, [CallerMemberName] string sourceName = "")
 		{
 			if (code == null)
 				throw new ArgumentNullException(nameof(code));
 
-			return Compile(Parser.Parse(Tokenizer.Tokenize(code)));
+			return Compile(Parser.Parse(Tokenizer.Tokenize(code, sourceName)));
 		}
 	}
 }

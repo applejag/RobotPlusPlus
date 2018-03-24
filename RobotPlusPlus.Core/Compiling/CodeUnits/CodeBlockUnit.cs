@@ -2,12 +2,7 @@
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
-	public class CodeBlockUnit : CodeUnit
+	public class CodeBlockUnit 
 	{
-		public CodeBlockUnit(CodeUnit parent, Token source)
-			: base(parent, source)
-		{
-
-		}
 	}
 }
