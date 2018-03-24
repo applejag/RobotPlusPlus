@@ -82,7 +82,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					throw new CompileUnexpectedTokenException(token);
 
 				case OperatorToken op when op.LHS != null && op.RHS != null:
-					return $"{StringifyToken(op.LHS)}{op.SourceCode}{StringifyToken(op.RHS)}";
+					return $"{StringifyOperatorChildToken(op, op.LHS)}{op.SourceCode}{StringifyOperatorChildToken(op, op.RHS)}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
 					return $"{op.SourceCode}{StringifyToken(op.RHS)}";
@@ -90,6 +90,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				default:
 					throw new CompileUnexpectedTokenException(token);
 			}
+		}
+
+		private string StringifyOperatorChildToken(OperatorToken parent, Token child)
+		{
+			if (child is OperatorToken op && op.OperatorType > parent.OperatorType)
+				return $"({StringifyToken(child)})";
+
+			return StringifyToken(child);
 		}
 
 		#endregion

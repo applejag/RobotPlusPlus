@@ -54,7 +54,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		[TestMethod]
 		public void Compile_ParentasesPriorityNotNeeded()
 		{
-			// Arrange
+			// Act
 			string output = Compiler.Compile("x=(1*5)+5");
 
 			// Assert
@@ -64,7 +64,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		[TestMethod]
 		public void Compile_ParentasesPriorityNeeded()
 		{
-			// Arrange
+			// Act
 			string output = Compiler.Compile("x=1*(5+5)");
 
 			// Assert
