@@ -34,6 +34,33 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
+		[ExpectedException(typeof(ParseUnexpectedLeadingTokenException))]
+		public void Parse_NestedAssignmentParentasesInvalid()
+		{
+			// Arrange
+			const string code = "y = (x) = 10";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParseUnexpectedLeadingTokenException))]
+		public void Parse_NestedAssignmentPriorityInvalid()
+		{
+			// Arrange
+			// Should compile into (y = ((5 + x) = 10)), which is invalid
+			const string code = "y = 5 + x = 10";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+		}
+
+		[TestMethod]
 		public void Parse_NestedAlteredAssignment()
 		{
 			// Arrange

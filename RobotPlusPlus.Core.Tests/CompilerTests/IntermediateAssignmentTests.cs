@@ -118,7 +118,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Act
 			// Should compile to y = ((5 + x) = 10), which is invalid
 			// You can't set (5 + x) = 10, need solo variable
-			string output = Compiler.Compile("y = 5 + x = 10");
+			Compiler.Compile("y = 5 + x = 10");
 
 			// Assert
 		}
@@ -132,5 +132,16 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥x=10\n♥y=5+♥x", output);
 		}
+		
+		[TestMethod]
+		public void Compile_NestedMultipleAssignment()
+		{
+			// Act
+			string output = Compiler.Compile("y = x = z = 10");
+
+			// Assert
+			Assert.AreEqual("♥z=10\n♥x=♥z\n♥y=♥x", output);
+		}
+
 	}
 }
