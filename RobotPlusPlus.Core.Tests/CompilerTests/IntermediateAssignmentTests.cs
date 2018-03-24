@@ -112,7 +112,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileException))]
+		[ExpectedException(typeof(ParseUnexpectedLeadingTokenException))]
 		public void Compile_NestedInvalidAssignment()
 		{
 			// Act

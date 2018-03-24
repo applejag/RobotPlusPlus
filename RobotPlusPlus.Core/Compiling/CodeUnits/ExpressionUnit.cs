@@ -1,5 +1,5 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -12,6 +12,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 	{
 		public bool NeedsCSSnippet { get; set; }
 
+		private Dictionary<IdentifierToken, string> variableLookup = null;
+
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
 		{
@@ -21,21 +23,76 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void Compile(Compiler compiler)
 		{
-			// Check variables for registration
-			if (Token.TryFirstRecursive(t => t is IdentifierToken
-				&& !compiler.VariableContext.PrefferedExists(t.SourceCode), out Token var, true))
-				throw new UnassignedVariableException(var);
-
-			// Check contains mix of string n number
+			// Check contains string and operator
 			if (Token.AnyRecursive(t => t is LiteralStringToken, true)
-			    && Token.AnyRecursive(t => t is LiteralNumberToken, true))
+				&& Token.AnyRecursive(t => t is OperatorToken, true))
 				NeedsCSSnippet = true;
+
+			// Check string needing escape chars
+			if (Token.AnyRecursive(t => t is LiteralStringToken str
+				&& str.Value.EscapeString() != str.Value, true))
+				NeedsCSSnippet = true;
+
+			variableLookup = new Dictionary<IdentifierToken, string>();
+
+			// Loop variables
+			Token.ForEachRecursive(t =>
+			{
+				if (!(t is IdentifierToken id)) return;
+
+				variableLookup[id] = compiler.VariableContext.GetGenerated(id.SourceCode);
+
+				// Check variables for registration
+				if (!compiler.VariableContext.PrefferedExists(id.SourceCode))
+					throw new UnassignedVariableException(id);
+			}, includeTop: true);
 		}
 
 		public override string AssembleIntoString()
 		{
-			throw new NotImplementedException();
+			return NeedsCSSnippet
+				? $"⊂{StringifyToken(Token)}⊃"
+				: StringifyToken(Token);
 		}
+
+		#region Stringify expression tokens
+
+		private string StringifyToken(Token token)
+		{
+			switch (token)
+			{
+				case LiteralStringToken str:
+					return NeedsCSSnippet
+						? $"\"{str.Value.EscapeString()}\""
+						: $"‴{str.Value}‴";
+
+				case LiteralNumberToken num:
+					return num.AssembleIntoString();
+
+				case LiteralKeywordToken kw:
+					return token.SourceCode;
+
+				case IdentifierToken id:
+					return $"♥{variableLookup[id]}";
+
+				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment
+					|| op.SourceCode == "++"
+					|| op.SourceCode == "--":
+					// Should've been extracted
+					throw new CompileUnexpectedTokenException(token);
+
+				case OperatorToken op when op.LHS != null && op.RHS != null:
+					return $"{StringifyToken(op.LHS)}{op.SourceCode}{StringifyToken(op.RHS)}";
+
+				case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
+					return $"{op.SourceCode}{StringifyToken(op.RHS)}";
+
+				default:
+					throw new CompileUnexpectedTokenException(token);
+			}
+		}
+
+		#endregion
 
 		#region Construction alterations
 
@@ -43,7 +100,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			// TODO: Add support for x++, x--, ++x, --x, ?:
 			if (token is OperatorToken op
-			    && op.OperatorType == OperatorToken.Type.Assignment)
+				&& op.OperatorType == OperatorToken.Type.Assignment)
 			{
 				PreUnits.Add(new AssignmentUnit(op, this));
 				token = op.LHS;
@@ -59,7 +116,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public static Token RemoveParentases(Token token)
 		{
-		Repeat:
+			Repeat:
 
 			if (token is PunctuatorToken pun
 				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases

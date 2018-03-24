@@ -143,7 +143,7 @@ namespace RobotPlusPlus.Core.Utility
 			return source.Sum(item => 1 + item?.CountRecursive() ?? 0);
 		}
 
-		public static int CountRecursive<TSource>([NotNull] this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+		public static int CountRecursive<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
 			return source.Sum(item => predicate(item) ? 1 + item?.CountRecursive(predicate) ?? 0 : 0);
@@ -161,14 +161,14 @@ namespace RobotPlusPlus.Core.Utility
 			return source.Any(t => comparer.Equals(t, value) || t.ContainsRecursive(value, comparer));
 		}
 
-		public static TSource FirstOrDefaultRecursive<TSource>([NotNull] this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+		public static TSource FirstOrDefaultRecursive<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
 			TryFirstRecursive(source, predicate, out TSource value);
 			return value;
 		}
 
-		public static TSource FirstOrDefaultRecursive<TSource>([NotNull] this TSource source, Func<TSource, bool> predicate,
+		public static TSource FirstOrDefaultRecursive<TSource>([NotNull] this TSource source, [NotNull] Func<TSource, bool> predicate,
 			bool includeTop)
 			where TSource : IEnumerable<TSource>
 		{
@@ -176,7 +176,7 @@ namespace RobotPlusPlus.Core.Utility
 			return source;
 		}
 
-		public static TSource FirstRecursive<TSource>([NotNull] this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+		public static TSource FirstRecursive<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
 			if (!TryFirstRecursive(source, predicate, out TSource value))
@@ -184,13 +184,34 @@ namespace RobotPlusPlus.Core.Utility
 			return value;
 		}
 
-		public static TSource FirstRecursive<TSource>([NotNull] this TSource source, Func<TSource, bool> predicate,
+		public static TSource FirstRecursive<TSource>([NotNull] this TSource source, [NotNull] Func<TSource, bool> predicate,
 			bool includeTop)
 			where TSource : IEnumerable<TSource>
 		{
 			if (!TryFirstRecursive(source, predicate, out source, includeTop))
 				throw new InvalidOperationException("First found no match.");
 			return source;
+		}
+
+		public static void ForEachRecursive<TSource>([NotNull] this IEnumerable<TSource> source,
+			[NotNull] Action<TSource> callback)
+			where TSource : IEnumerable<TSource>
+		{
+			foreach (TSource item in source)
+			{
+				callback(item);
+				item?.ForEachRecursive(callback);
+			}
+		}
+
+		public static void ForEachRecursive<TSource>([NotNull] this TSource source,
+			[NotNull] Action<TSource> callback, bool includeTop)
+			where TSource : IEnumerable<TSource>
+		{
+			if (includeTop)
+				callback(source);
+
+			source.ForEachRecursive(callback);
 		}
 
 		/// <summary>

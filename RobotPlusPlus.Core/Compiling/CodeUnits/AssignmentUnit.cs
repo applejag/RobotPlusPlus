@@ -36,7 +36,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override string AssembleIntoString()
 		{
-			return string.Format("{0}={1}", VariableGeneratedName, Expression.AssembleIntoString());
+			return string.Format("♥{0}={1}", VariableGeneratedName, Expression.AssembleIntoString());
 		}
 	}
 }
