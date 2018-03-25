@@ -6,7 +6,7 @@ using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures
 {
-	public abstract class FlexibleList<T> : IList<T>, IReadOnlyList<T>
+	public class FlexibleList<T> : IList<T>, IReadOnlyList<T>
 	{
 		private readonly List<T> items = new List<T>();
 
@@ -26,10 +26,10 @@ namespace RobotPlusPlus.Core.Structures
 				items.AddRange(new T[index - items.Count + 1]);
 
 			items[index] = item;
-			TrimTokens();
+			TrimNullsAtEnd();
 		}
 
-		private void TrimTokens()
+		private void TrimNullsAtEnd()
 		{
 			while (items.Count > 0 && items[items.Count - 1] == null)
 				items.RemoveAt(items.Count - 1);
@@ -51,11 +51,12 @@ namespace RobotPlusPlus.Core.Structures
 		public void RemoveAt(int index)
 		{
 			items.RemoveAt(index);
-			TrimTokens();
+			TrimNullsAtEnd();
 		}
 
 		public void Add(T item)
 		{
+			TrimNullsAtEnd();
 			items.Add(item);
 		}
 

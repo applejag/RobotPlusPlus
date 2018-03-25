@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Parsing;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
@@ -12,46 +14,21 @@ namespace RobotPlusPlus.Core.Compiling
 {
 	public class Compiler
 	{
-		private readonly StringBuilder output = new StringBuilder();
-		private readonly HashSet<string> registeredVariables = new HashSet<string>();
-		private readonly HashSet<string> registeredLabels = new HashSet<string>();
-		
-		public bool assignmentNeedsCSSnipper;
+		private readonly List<CodeUnit> codeUnits;
 
-		public void RegisterVariable([NotNull] IdentifierToken identifier)
+		public NameContext VariableContext { get; private set; }
+		public NameContext LabelContext { get; private set; }
+
+		public Compiler()
 		{
-			registeredVariables.Add(identifier.SourceCode);
+			codeUnits = new List<CodeUnit>();
 		}
 
-		public bool IsVariableRegistered([CanBeNull] IdentifierToken identifier)
-		{
-			return identifier != null && registeredVariables.Contains(identifier.SourceCode);
-		}
-
-		public string RegisterLabel([NotNull] string preferredLabelName)
-		{
-			string actualLabelName = preferredLabelName;
-			var iter = 1;
-
-			while (registeredLabels.Contains(actualLabelName))
-			{
-				actualLabelName = preferredLabelName + ++iter;
-			}
-
-			registeredLabels.Add(actualLabelName);
-
-			return actualLabelName;
-		}
-
-		public bool IsLabelRegistered([CanBeNull] string actualLabelName)
-		{
-			return registeredLabels.Contains(actualLabelName);
-		}
-
-		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
+		public void AddTokens([ItemNotNull, NotNull] Token[] parsedTokens)
 		{
 			if (parsedTokens == null)
 				throw new ArgumentNullException(nameof(parsedTokens));
+
 			parsedTokens.AnyRecursive(t =>
 			{
 				if (t == null)
@@ -62,26 +39,72 @@ namespace RobotPlusPlus.Core.Compiling
 				return false;
 			});
 
-			var compiler = new Compiler();
-			var rows = new List<string>(parsedTokens.Length);
-
-			foreach (Token token in parsedTokens)
-			{
-				compiler.assignmentNeedsCSSnipper = false;
-				rows.Add(token.CompileToken(compiler));
-			}
-
-			compiler.output.AppendJoin('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
-
-			return compiler.output.ToString();
+			// Convert to code units
+			codeUnits.AddRange(parsedTokens
+				.Select(CodeUnit.CompileParsedToken)
+				.Where(unit => unit != null)
+			);
 		}
 
-		public static string Compile([NotNull] string code)
+		public void Compile()
+		{
+			// Reset contexts
+			VariableContext = new NameContext();
+			LabelContext = new NameContext();
+
+			// Compile
+			CompileUnits(codeUnits, this);
+		}
+
+		public static void CompileUnits(List<CodeUnit> codeUnits, Compiler compiler)
+		{
+			foreach (CodeUnit unit in codeUnits)
+			{
+				unit.PreCompile(compiler);
+				unit.Compile(compiler);
+				unit.PostCompile(compiler);
+			}
+		}
+
+		public string AssembleIntoString()
+		{
+			return AssembleUnitsIntoString(codeUnits) ?? string.Empty;
+		}
+
+		public static string AssembleUnitsIntoString(List<CodeUnit> codeUnits)
+		{
+			if (codeUnits == null)
+				return null;
+			if (codeUnits.Count == 0)
+				return null;
+
+			// Assemble into code rows
+			var rows = new RowBuilder();
+
+			foreach (CodeUnit unit in codeUnits)
+			{
+				rows.AppendLine(unit.AssembleIntoString());
+			}
+
+			return rows.ToString();
+		}
+
+		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)
+		{
+			var compiler = new Compiler();
+
+			compiler.AddTokens(parsedTokens);
+			compiler.Compile();
+
+			return compiler.AssembleIntoString();
+		}
+
+		public static string Compile([NotNull] string code, [CallerMemberName] string sourceName = "")
 		{
 			if (code == null)
 				throw new ArgumentNullException(nameof(code));
 
-			return Compile(Parser.Parse(Tokenizer.Tokenize(code)));
+			return Compile(Parser.Parse(Tokenizer.Tokenize(code, sourceName)));
 		}
 	}
 }

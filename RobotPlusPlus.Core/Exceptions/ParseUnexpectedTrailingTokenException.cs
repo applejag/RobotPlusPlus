@@ -3,7 +3,7 @@ using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Exceptions
 {
-	public class ParseUnexpectedTrailingTokenException : ParseTokenException
+	public class ParseUnexpectedTrailingTokenException : ParseTokenOtherException
 	{
 		public ParseUnexpectedTrailingTokenException(Token source, Token trailing)
 			: this(source, trailing, null)
@@ -11,7 +11,7 @@ namespace RobotPlusPlus.Core.Exceptions
 
 		public ParseUnexpectedTrailingTokenException(Token source, Token trailing, Exception innerException)
 			: base($"Unexpected trailing token <{(trailing == null ? "null" : trailing.GetType().Name + ", " + trailing.SourceCode)}> after <{source.SourceCode}>.",
-				trailing ?? source, innerException)
+				source, trailing, innerException)
 		{ }
 	}
 }

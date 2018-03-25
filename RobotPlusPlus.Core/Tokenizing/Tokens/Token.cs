@@ -24,7 +24,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		}
 
 		public abstract void ParseToken(IteratedList<Token> parent);
-		public abstract string CompileToken(Compiler compiler);
 
 		public override string ToString()
 		{

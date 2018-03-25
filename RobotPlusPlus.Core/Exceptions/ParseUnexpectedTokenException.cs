@@ -9,7 +9,7 @@ namespace RobotPlusPlus.Core.Exceptions
 		{ }
 
 		public ParseUnexpectedTokenException(Token source, Exception innerException)
-			: base($"Unexpected token value <{source.GetType().Name + ", " + source.SourceCode}>.", source, innerException)
+			: base($"Unexpected {source.GetType().Name} token while parsing, value <{source.SourceCode}>.", source, innerException)
 		{ }
 	}
 }

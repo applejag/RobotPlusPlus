@@ -3,7 +3,7 @@ using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Exceptions
 {
-	public class ParseUnexpectedLeadingTokenException : ParseTokenException
+	public class ParseUnexpectedLeadingTokenException : ParseTokenOtherException
 	{
 		public ParseUnexpectedLeadingTokenException(Token source, Token leading)
 			: this(source, leading, null)
@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Exceptions
 		public ParseUnexpectedLeadingTokenException(Token source, Token leading, Exception innerException)
 			: base(
 				$"Unexpected leading token <{(leading == null ? "null" : leading.GetType().Name + ", " + leading.SourceCode)}> before <{source.SourceCode}>.",
-				leading ?? source, innerException)
+				source, leading, innerException)
 		{ }
 	}
 }
