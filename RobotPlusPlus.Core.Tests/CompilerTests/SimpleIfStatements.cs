@@ -16,9 +16,17 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			// Act
 			Compiler.Compile(code);
+		}
 
-			// Assert
-			Assert.Fail();
+		[TestMethod]
+		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
+		public void Compile_IfNoBlock()
+		{
+			// Arrange
+			const string code = "if 1 > 0";
+
+			// Act
+			Compiler.Compile(code);
 		}
 
 		[TestMethod]
@@ -144,9 +152,26 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if true if false { a = 0 }";
 			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			                        "jump ➜noif2 if ⊂!(false)⊃\n" +
 			                        "♥a=0\n" +
 			                        "➜noif2\n" +
+			                        "➜noif";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+
+		[TestMethod]
+		public void Compile_IfEmbeddedAssignment()
+		{
+			// Arrange
+			const string code = "if (x = 2) > 1 { }";
+			const string expected = "♥x=2\n" +
+			                        "jump ➜noif if ⊂!(♥x>1)⊃\n" +
 			                        "➜noif";
 
 			// Act

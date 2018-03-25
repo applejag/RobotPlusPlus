@@ -31,8 +31,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		public void Compile_ParentasesInIfStatement()
 		{
 			// Arrange
-			string output = Compiler.Compile("if (x > 0)");
-			const string expected = "jump ➜noif if ⊂!(x>0)⊃\n" +
+			string output = Compiler.Compile("if (1 > 0) {}");
+			const string expected = "jump ➜noif if ⊂!(1>0)⊃\n" +
 			                        "➜noif";
 
 			// Assert
@@ -43,8 +43,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		public void Compile_DoubleParentasesInIfStatement()
 		{
 			// Arrange
-			string output = Compiler.Compile("if ((x > 0))");
-			const string expected = "jump ➜noif if ⊂!(x>0)⊃\n" +
+			string output = Compiler.Compile("if ((1 > 0)) {}");
+			const string expected = "jump ➜noif if ⊂!(1>0)⊃\n" +
 			                        "➜noif";
 
 			// Assert

@@ -45,5 +45,15 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥x=10\n♥x2=15", output);
 		}
+
+		[TestMethod]
+		public void Compile_VariableOutsideNestedBlock()
+		{
+			// Act
+			string output = Compiler.Compile("{ { x = 10 y = 2 } x = 15 } y = 8");
+
+			// Assert
+			Assert.AreEqual("♥x=10\n♥y=2\n♥x2=15\n♥y2=8", output);
+		}
 	}
 }
