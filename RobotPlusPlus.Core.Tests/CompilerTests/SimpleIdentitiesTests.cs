@@ -13,7 +13,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			string output = Compiler.Compile(code);
 
-			Assert.AreEqual("♥a=1\n♥a2=2", output);
+			Assert.AreEqual("♥a=1\n♥A2=2", output);
 		}
 
 		[TestMethod]

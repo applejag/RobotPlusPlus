@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures
 {
@@ -12,21 +13,24 @@ namespace RobotPlusPlus.Core.Structures
 
 		public int Layers => occupied.Count;
 
-		public readonly IEqualityComparer<string> comparer;
+		public readonly IEqualityComparer<string> generatedComparer;
+		public readonly IEqualityComparer<string> prefferedComparer;
 
-		public NameContext(IEqualityComparer<string> comparer)
+		public NameContext(IEqualityComparer<string> prefferedComparer,
+			IEqualityComparer<string> generatedComparer)
 		{
-			this.comparer = comparer;
-			occupied.Push(new Dictionary<string, string>(comparer));
+			this.prefferedComparer = prefferedComparer;
+			this.generatedComparer = generatedComparer;
+			occupied.Push(new Dictionary<string, string>());
 		}
 
 		public NameContext()
-			: this (StringComparer.OrdinalIgnoreCase)
+			: this (StringComparer.InvariantCulture, StringComparer.CurrentCultureIgnoreCase)
 		{}
 
 		public void PushLayer()
 		{
-			occupied.Push(new Dictionary<string, string>(comparer));
+			occupied.Push(new Dictionary<string, string>());
 		}
 
 		public void PopLayer()
@@ -39,17 +43,24 @@ namespace RobotPlusPlus.Core.Structures
 
 		public bool PrefferedExists([NotNull] string preffered)
 		{
-			return occupied.Any(layer => layer.ContainsKey(preffered));
+			return occupied.Any(layer => layer.Keys.Contains(preffered, prefferedComparer));
 		}
 
 		public bool GeneratedExists([NotNull] string generated)
 		{
-			return oldGenerated.Contains(generated) || occupied.Any(layer => layer.ContainsValue(generated));
+			return oldGenerated.Contains(generated, generatedComparer)
+			       || occupied.Any(layer => layer.Values.Contains(generated, generatedComparer));
 		}
 
 		public string GetGenerated([NotNull] string preffered)
 		{
-			return occupied.FirstOrDefault(d => d.ContainsKey(preffered))?[preffered];
+			foreach (Dictionary<string, string> layer in occupied)
+			{
+				if (layer.Keys.TryFirst(k => prefferedComparer.Equals(k, preffered), out string key))
+					return layer[key];
+			}
+
+			return null;
 		}
 
 		public string GetOrGenerateName([NotNull] string preffered)
