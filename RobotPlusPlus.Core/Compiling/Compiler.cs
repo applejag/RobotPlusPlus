@@ -60,21 +60,10 @@ namespace RobotPlusPlus.Core.Compiling
 		{
 			foreach (CodeUnit unit in codeUnits)
 			{
-				ExecuteUnit(unit, u => u.PreCompile(compiler));
-				ExecuteUnit(unit, u => u.Compile(compiler));
-				ExecuteUnit(unit, u => u.PostCompile(compiler));
+				unit.PreCompile(compiler);
+				unit.Compile(compiler);
+				unit.PostCompile(compiler);
 			}
-		}
-
-		private static void ExecuteUnit(CodeUnit unit, Action<CodeUnit> callback)
-		{
-			foreach (CodeUnit pre in unit.PreUnits)
-				callback(pre);
-
-			callback(unit);
-
-			foreach (CodeUnit post in unit.PostUnits)
-				callback(post);
 		}
 
 		public string AssembleIntoString()
@@ -90,14 +79,14 @@ namespace RobotPlusPlus.Core.Compiling
 				return null;
 
 			// Assemble into code rows
-			var rows = new List<string>();
+			var rows = new RowBuilder();
 
 			foreach (CodeUnit unit in codeUnits)
 			{
-				ExecuteUnit(unit, u => rows.Add(u.AssembleIntoString()));
+				rows.AppendLine(unit.AssembleIntoString());
 			}
 
-			return string.Join('\n', rows.Where(r => r != null));
+			return rows.ToString();
 		}
 
 		public static string Compile([ItemNotNull, NotNull] Token[] parsedTokens)

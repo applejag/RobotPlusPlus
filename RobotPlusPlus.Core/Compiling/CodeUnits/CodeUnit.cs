@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -9,9 +10,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public abstract class CodeUnit
 	{
-		public FlexibleList<CodeUnit> PreUnits { get; }
-		public FlexibleList<CodeUnit> PostUnits { get; }
-
 		public Token Token { get; protected set; }
 
 		public CodeUnit Parent { get; }
@@ -22,8 +20,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			Parent = parent;
 			Token = token;
-			PreUnits = parent?.PreUnits ?? new FlexibleList<CodeUnit>();
-			PostUnits = parent?.PostUnits ?? new FlexibleList<CodeUnit>();
 		}
 
 		public virtual void PreCompile(Compiler compiler) { }
@@ -44,6 +40,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
 					&& pun.Character == '{':
 					return new CodeBlockUnit(token);
+
+				case StatementToken st when st.StatementType == StatementToken.Type.If:
+					return new IfUnit(st);
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

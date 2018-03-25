@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 using RobotPlusPlus.Core.Utility;
@@ -10,6 +11,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class ExpressionUnit : CodeUnit
 	{
+		public FlexibleList<CodeUnit> PreUnits { get; }
+		public FlexibleList<CodeUnit> PostUnits { get; }
+
 		public bool NeedsCSSnippet { get; set; }
 
 		private Dictionary<IdentifierToken, string> variableLookup = null;
@@ -17,12 +21,34 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
 		{
+			PreUnits = new FlexibleList<CodeUnit>();
+			PostUnits = new FlexibleList<CodeUnit>();
+
 			Token = RemoveParentases(token);
 			Token = ExtractInnerAssignments(Token);
 		}
 
+		public override void PreCompile(Compiler compiler)
+		{
+			foreach (CodeUnit pre in PreUnits)
+				pre.PreCompile(compiler);
+			foreach (CodeUnit post in PostUnits)
+				post.PreCompile(compiler);
+		}
+
+		public override void PostCompile(Compiler compiler)
+		{
+			foreach (CodeUnit pre in PreUnits)
+				pre.PostCompile(compiler);
+			foreach (CodeUnit post in PostUnits)
+				post.PostCompile(compiler);
+		}
+
 		public override void Compile(Compiler compiler)
 		{
+			foreach (CodeUnit pre in PreUnits)
+				pre.Compile(compiler);
+
 			// Check contains string and operator
 			if (Token.AnyRecursive(t => t is LiteralStringToken, true)
 				&& Token.AnyRecursive(t => t is OperatorToken, true))
@@ -46,6 +72,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				if (!compiler.VariableContext.PrefferedExists(id.SourceCode))
 					throw new UnassignedVariableException(id);
 			}, includeTop: true);
+			
+			foreach (CodeUnit post in PostUnits)
+				post.Compile(compiler);
 		}
 
 		public override string AssembleIntoString()

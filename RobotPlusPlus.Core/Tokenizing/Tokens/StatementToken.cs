@@ -49,9 +49,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.If:
 					if (OperatorToken.ExpressionHasValue(next))
 					{
-						if (next.AnyRecursive(t => t is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment))
-							throw new ParseTokenException($"Unexpected assignment in statement condition <{SourceCode}>.", this);
-
 						Condition = parent.PopNext();
 					}
 					else
