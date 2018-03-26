@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<G1ANT
+	xmlns="my://g1ant">
+
+	<Commands>
+
+		<GlobalArguments>
+			<Argument Name="errorjump" Type="label"/>
+			<Argument Name="errormessage" Type="string"/>
+			<Argument Name="if" Type="boolean"/>
+		</GlobalArguments>
+
+		<Command Name="color">
+			<Argument Name="position" Type="point" Required="true"/>
+			<Argument Name="result" Type="variable"/>
+			<Argument Name="relative" Type="boolean"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="color">
+			<Command Name="expected">
+				<Argument Name="position" Type="point" Required="true"/>
+				<Argument Name="color" Type="string" Required="true"/>
+				<Argument Name="relative" Type="boolean"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+
+			<Command Name="find">
+				<Argument Name="color" Type="string" Required="true"/>
+				<Argument Name="position" Type="point" Required="true"/>
+				<Argument Name="direction" Type="string"/>
+				<Argument Name="relative" Type="boolean"/>
+				<Argument Name="result" Type="variable" VariableType="point"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="database">
+			<Argument Name="connection" Type="string" Required="true"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="debug">
+			<Command Name="trace">
+				<Argument Name="variablename" Type="variablename" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="delay">
+			<Argument Name="seconds" Type="integer"/>
+			<Argument Name="milliseconds" Type="integer"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<Command Name="dialog">
+			<Argument Name="message" Type="string"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="dialog">
+			<Command Name="ask">
+				<Argument Name="result" Type="variable" VariableType="string" />
+				<Argument Name="message" Type="string"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="directory">
+			<Argument Name="path" Type="string" Required="true"/>
+			<Argument Name="pattern" Type="string"/>
+			<Argument Name="result" Type="variable" VariableType="list"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="directory">
+			<Command Name="filescount">
+				<Argument Name="path" Type="string" Required="true"/>
+				<Argument Name="pattern" Type="string"/>
+				<Argument Name="result" Type="variable" VariableType="integer"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="chrome">
+			<Argument Name="url" Type="string" Required="true"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="is">
+			<Command Name="accessible">
+				<Argument Name="hostname" Type="string" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+			</Command>
+		</CommandFamily>
+
+		<CommandFamily Name="mail">
+			<Command Name="smtp">
+				<Argument Name="login" Type="string" Required="true"/>
+				<Argument Name="password" Type="string" Required="true"/>
+				<Argument Name="port" Type="integer"/>
+				<Argument Name="host" Type="string"/>
+				<Argument Name="from" Type="string" Required="true"/>
+				<Argument Name="to" Type="string" Required="true"/>
+				<Argument Name="subject" Type="string"/>
+				<Argument Name="body" Type="string"/>
+				<Argument Name="attachments" Type="list"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+
+		<CommandFamily Name="ocroffline">
+			<Command Name="fromscreen">
+				<Argument Name="area" Type="rectangle" Required="true"/>
+				<Argument Name="relative" Type="boolean"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="language" Type="string"/>
+			</Command>
+			<Command Name="find">
+				<Argument Name="search" Type="string" Required="true"/>
+				<Argument Name="area" Type="rectangle"/>
+				<Argument Name="relative" Type="boolean"/>
+				<Argument Name="result" Type="variable" VariableType="rectangle"/>
+				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="language" Type="string"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="pause">
+			<Argument Name="key" Type="string"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<Command Name="ping">
+			<Argument Name="ip" Type="string"/>
+			<Argument Name="repeats" Type="integer"/>
+			<Argument Name="timeout" Type="integer"/>
+			<Argument Name="result" Type="variable" VariableType="integer"/>
+		</Command>
+
+		<Command Name="program">
+			<Argument Name="name" Type="string" Required="true"/>
+			<Argument Name="arguments" Type="string"/>
+			<Argument Name="timeout" Type="integer"/>
+			<Argument Name="wait" Type="boolean"/>
+		</Command>
+
+		<CommandFamily Name="random">
+			<Command Name="string">
+				<Argument Name="length" Type="integer" Required="true"/>
+				<Argument Name="useletters" Type="boolean"/>
+				<Argument Name="usenumbers" Type="boolean"/>
+				<Argument Name="usechars" Type="boolean"/>
+				<Argument Name="casesensitivity" Type="boolean"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+
+		<Command Name="rest">
+			<Argument Name="method" Type="string" Required="true"/>
+			<Argument Name="url" Type="string" Required="true"/>
+			<Argument Name="timeout" Type="integer"/>
+			<Argument Name="headers" Type="list"/>
+			<Argument Name="parameters" Type="list"/>
+			<Argument Name="result" Type="variable" VariableType="string"/>
+			<Argument Name="status" Type="variable" VariableType="integer"/>
+		</Command>
+
+		<Command Name="stop">
+			<Argument Name="silentmode" Type="boolean"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<Command Name="test">
+			<Argument Name="condition" Type="boolean" Required="true"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<Command Name="window">
+			<Argument Name="title" Type="string"/>
+			<Argument Name="style" Type="string"/>
+			<Argument Name="timeout" Type="integer"/>
+		</Command>
+
+		<CommandFamily Name="vnc">
+			<Command Name="connect">
+				<Argument Name="host" Type="string" Required="true"/>
+				<Argument Name="port" Type="string" Required="true"/>
+				<Argument Name="password" Type="string"/>
+				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="result" Type="variable" VariableType="boolean"/>
+			</Command>
+		</CommandFamily>
+
+		<CommandFamily Name="as400">
+			<Command Name="open">
+				<Argument Name="host" Type="string" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
+	</Commands>
+</G1ANT>

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="G1ANT"
+	targetNamespace="my://g1ant"
+	xmlns="my://g1ant"
+	xmlns:g1ant="my://g1ant"
+	attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+	<xs:element name="G1ANT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Commands">
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="Command" type="Command" minOccurs="0" maxOccurs="unbounded">
+								<xs:unique name="UniqueNameInCommand">
+									<xs:selector xpath="g1ant:Argument" />
+									<xs:field xpath="@Name" />
+								</xs:unique>
+							</xs:element>
+							<xs:element name="CommandFamily" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Command" type="Command" minOccurs="1" maxOccurs="unbounded">
+											<xs:unique name="UniqueNameInFamilyCommand">
+												<xs:selector xpath="g1ant:Argument" />
+												<xs:field xpath="@Name" />
+											</xs:unique>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="Name" type="Identifier" use="required" />
+								</xs:complexType>
+								<xs:unique name="UniqueNameAmoungFamilyCommands">
+									<xs:selector xpath="g1ant:Command" />
+									<xs:field xpath="@Name" />
+								</xs:unique>
+							</xs:element>
+
+							<xs:element name="GlobalArguments">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Argument" type="CommandArgument" minOccurs="0" maxOccurs="unbounded" />
+									</xs:sequence>
+								</xs:complexType>
+
+								<xs:unique name="UniqueNameInGlobalArgs">
+									<xs:selector xpath="g1ant:Argument" />
+									<xs:field xpath="@Name" />
+								</xs:unique>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+
+					<xs:unique name="UniqueNameAmoungFamilies">
+						<xs:selector xpath="g1ant:CommandFamily" />
+						<xs:field xpath="@Name" />
+					</xs:unique>
+					<xs:unique name="UniqueNameAmoungCommands">
+						<xs:selector xpath="g1ant:Command" />
+						<xs:field xpath="@Name" />
+					</xs:unique>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="Command">
+		<xs:sequence>
+			<xs:element name="Argument" type="CommandArgument" minOccurs="0" maxOccurs="unbounded">
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="Name" type="Identifier" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="CommandArgument">
+		<xs:attribute name="Name" type="Identifier" use="required" />
+		<xs:attribute name="Type" type="CommandArgumentType" use="required" />
+		<xs:attribute name="VariableType" type="CommandArgumentType" use="optional" />
+		<xs:attribute name="Required" type="xs:boolean" default="false" use="optional" />
+	</xs:complexType>
+
+	<xs:simpleType name="Identifier">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-zA-Z_][\w_]*" />
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="CommandArgumentType">
+		<xs:restriction base="xs:string">
+			<!-- Base C# types -->
+			<xs:enumeration value="string" />
+			<xs:enumeration value="integer" />
+			<xs:enumeration value="boolean" />
+			<!-- Special structures -->
+			<xs:enumeration value="point" />
+			<xs:enumeration value="rectangle" />
+			<xs:enumeration value="list" />
+			<!-- Special strings -->
+			<xs:enumeration value="label" />
+			<xs:enumeration value="variable" />
+			<xs:enumeration value="variablename" />
+			<xs:enumeration value="procedure" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
