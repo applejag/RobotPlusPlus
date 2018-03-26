@@ -50,6 +50,12 @@ namespace RobotPlusPlus.Core.Structures
 			return List.Pop(--Index);
 		}
 
+		/// <exception cref="IndexOutOfRangeException"></exception>
+		public T PopCurrent()
+		{
+			return List.Pop(Index--);
+		}
+
 		public void PushNext(T value)
 		{
 			List.Insert(Index + 1, value);

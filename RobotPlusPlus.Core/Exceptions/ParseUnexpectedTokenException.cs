@@ -1,5 +1,6 @@
 ﻿using System;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Exceptions
 {
@@ -9,7 +10,7 @@ namespace RobotPlusPlus.Core.Exceptions
 		{ }
 
 		public ParseUnexpectedTokenException(Token source, Exception innerException)
-			: base($"Unexpected {source.GetType().Name} token while parsing, value <{source.SourceCode}>.", source, innerException)
+			: base($"Unexpected {source.GetType().Name} token while parsing, value <{source.SourceCode.EscapeString()}>.", source, innerException)
 		{ }
 	}
 }

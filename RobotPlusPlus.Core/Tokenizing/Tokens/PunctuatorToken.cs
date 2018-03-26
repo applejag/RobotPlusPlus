@@ -19,7 +19,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			{ '{', '}' },
 		};
 
-		private static readonly IReadOnlyCollection<char> separators = new []
+		private static readonly IReadOnlyCollection<char> separators = new[]
 		{
 			';', ',',
 		};
@@ -27,9 +27,21 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public char Character { get; }
 		public Type PunctuatorType { get; }
 
+		public Token DotLHS
+		{
+			get => this[0];
+			set => this[0] = value;
+		}
+
+		public IdentifierToken DotRHS
+		{
+			get => this[1] as IdentifierToken;
+			set => this[1] = value;
+		}
+
 		public PunctuatorToken(TokenSource source) : base(source)
 		{
-			
+
 			Character = SourceCode[0];
 
 			if (parentasesPairs.ContainsKey(Character))
@@ -38,10 +50,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				PunctuatorType = Type.ClosingParentases;
 			else if (separators.Contains(Character))
 				PunctuatorType = Type.Separator;
+			else if (Character == '.')
+				PunctuatorType = Type.Dot;
 			else
 				throw new ParseUnexpectedTokenException(this);
 		}
-		
+
 
 		public override void ParseToken(IteratedList<Token> parent)
 		{
@@ -49,11 +63,48 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			{
 				case Type.OpeningParentases:
 					CollectUntilClosingParentases(parent);
+
+					if (Character == '(')
+					{
+						// Merge with identifier, this is a function call
+						if (parent.Previous is IdentifierToken id1)
+						{
+							TokenSource tokenSource = id1.source;
+							tokenSource.code += "()";
+							parent.PopPrevious(); // id
+							parent.PushPrevious(new FunctionCallToken(tokenSource, id1, this));
+							parent.PopCurrent(); // parentases
+							parent.ParseTokenAt(parent.Index);
+						}
+						else if (Count == 0)
+							throw new ParseTokenException("Unexpected empty parentases group <()>.", this);
+					}
+
 					break;
 
 				case Type.Separator:
 					break;
-					
+
+				case Type.Dot:
+					// Expect trailing identifier and no whitespace
+					if (TrailingWhitespaceToken != null)
+						throw new ParseUnexpectedTrailingTokenException(this, TrailingWhitespaceToken);
+					if (!(parent.Next is IdentifierToken rhs))
+						throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
+
+					Token lhs = parent.Previous;
+					if (!(lhs is IdentifierToken
+						|| (lhs is PunctuatorToken pun && pun.Character == '(')
+						|| lhs is LiteralToken
+						|| lhs is FunctionCallToken))
+						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
+
+					DotLHS = lhs;
+					DotRHS = rhs;
+					parent.PopPrevious();
+					parent.PopNext();
+					break;
+
 				// Closing parentases should be caught by the opening ones, otherwise they're stray
 				default:
 					throw new ParseUnexpectedTokenException(this);
@@ -97,6 +148,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			OpeningParentases,
 			ClosingParentases,
 			Separator,
+			Dot,
 		}
 	}
 }
