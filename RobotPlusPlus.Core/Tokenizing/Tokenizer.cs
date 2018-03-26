@@ -113,12 +113,12 @@ namespace RobotPlusPlus.Core.Tokenizing
 			}
 
 			// Numbers
-			if ((source.code = MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[fF]?")) != null)
+			if ((source.code = MatchingRegex(@"(\d+\.?\d*[fF]|\d+\.?(?![\p{L}_])\d*[fF]?|\d*\.\d+[fF]?)")) != null)
 			{
 				// Ending with invalid char?
-				if (MatchingRegex(@"(\d+\.?\d*|\d*\.\d+)[\p{L}_]*") != source.code)
-					throw new ParseException("Unexpected character after number.", CurrentRow);
-
+				if (MatchingRegex(@"(\d+\.?\d*[fF]|\d+\.?(?![\p{L}_])\d*[fF]?|\d*\.\d+[fF]?)[\p{L}_]*") != source.code)
+					throw new ParseException($"Unexpected character(s) after number <{source.code}>.", CurrentRow);
+				
 				return new LiteralNumberToken(source);
 			}
 
@@ -134,7 +134,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 				return new OperatorToken(source);
 
 			// Unknown
-			throw new ParseException("Unable to parse next token.", CurrentRow);
+			throw new ParseException($"Unable to parse next token. Next {Math.Min(remainingCode.Length, 32)} characters: <{remainingCode.Substring(0, Math.Min(remainingCode.Length, 32))}>", CurrentRow);
 		}
 		
 		public void Iterate()
