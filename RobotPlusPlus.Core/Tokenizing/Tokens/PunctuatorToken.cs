@@ -94,7 +94,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 					Token lhs = parent.Previous;
 					if (!(lhs is IdentifierToken
-						|| (lhs is PunctuatorToken pun && pun.Character == '(')
+						|| (lhs is PunctuatorToken pun
+						    && (pun.Character == '('
+						        || pun.PunctuatorType == Type.Dot))
 						|| lhs is LiteralToken
 						|| lhs is FunctionCallToken))
 						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);

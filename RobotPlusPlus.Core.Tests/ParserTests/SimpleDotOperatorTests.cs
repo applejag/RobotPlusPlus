@@ -156,5 +156,27 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(func[1], '(', 0);
 			Assert.That.TokenIsOfType<IdentifierToken>(dot[1], "y");
 		}
+
+		[TestMethod]
+		public void Parse_DotAccessStacking()
+		{
+			// Arrange
+			const string code = "x.y.z";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(result);
+			Assert.AreEqual(1, result.Length);
+
+			Token dotz = result[0];
+			Assert.That.TokenIsDotOperation(dotz);
+			Assert.That.TokenIsOfType<IdentifierToken>(dotz[1], "z");
+			Token doty = dotz[0];
+			Assert.That.TokenIsDotOperation(doty);
+			Assert.That.TokenIsOfType<IdentifierToken>(doty[1], "y");
+			Assert.That.TokenIsOfType<IdentifierToken>(doty[0], "x");
+		}
 	}
 }
