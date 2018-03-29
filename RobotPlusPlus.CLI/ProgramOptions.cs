@@ -59,14 +59,14 @@ namespace RobotPlusPlus.CLI
 		[Option("-t --test",
 			Description = "Only try to compile. Don't write anything to the destination.")]
 		private bool OptDryRun { get; } = false;
-
-		[Option("-oe --outencoding <NAME>",
-			Description = "The encoding to use when writing the output file. Default: Current OS ASNI code page.")]
-		private Encodings? OptOutputEncoding { get; } = null;
-
+		
 		[Option("-ie --inencoding <NAME>",
 			Description = "The encoding to use when reading the source file. Default: Current OS ASNI code page.")]
 		private Encodings? OptInputEncoding { get; } = null;
+
+		[Option("-oe --outencoding <NAME>",
+			Description = "The encoding to use when writing the output file. Default: UTF-8.")]
+		private Encodings? OptOutputEncoding { get; } = null;
 		#endregion
 
 		#region Public option fields
@@ -89,7 +89,7 @@ namespace RobotPlusPlus.CLI
 		public bool DryRun => OptDryRun;
 
 		public Encoding InputEncoding => OptInputEncoding.HasValue ? Encoding.GetEncoding((int)OptInputEncoding.Value) : Encoding.Default;
-		public Encoding OutputEncoding => OptOutputEncoding.HasValue ? Encoding.GetEncoding((int)OptOutputEncoding.Value) : Encoding.Default;
+		public Encoding OutputEncoding => OptOutputEncoding.HasValue ? Encoding.GetEncoding((int)OptOutputEncoding.Value) : Encoding.UTF8;
 		#endregion
 
 		public static int Execute(string[] args)
