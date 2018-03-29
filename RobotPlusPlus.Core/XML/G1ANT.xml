@@ -202,5 +202,89 @@
 				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
+
+		<CommandFamily Name="excel">
+			<Command Name="activatesheet">
+				<Argument Name="name" Type="string" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="addsheet">
+				<Argument Name="name" Type="string" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="close">
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="duplicaterow">
+				<Argument Name="source" Type="integer" Required="true"/>
+				<Argument Name="destination" Type="integer" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="export">
+				<Argument Name="path" Type="string" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="getformula">
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="getrow">
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="result" Type="variable" VariableType="list"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="getvalue">
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="result" Type="variable" VariableType="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="importtext">
+				<Argument Name="path" Type="string" Required="true"/>
+				<Argument Name="destination" Type="string"/>
+				<Argument Name="delimiter" Type="string"/>
+				<Argument Name="name" Type="string"/>
+				<Argument Name="resultrows" Type="variable" VariableType="integer"/>
+				<Argument Name="resultcolumns" Type="variable" VariableType="integer"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="insertcolumn">
+				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="where" Type="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="insertrow">
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="where" Type="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="open">
+				<Argument Name="path" Type="string"/>
+				<Argument Name="inbackground" Type="boolean"/>
+				<Argument Name="sheet" Type="string"/>
+				<Argument Name="result" Type="variable" VariableType="integer"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="removecolumn">
+				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="removerow">
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="runmacro">
+				<Argument Name="name" Type="string" Required="true"/>
+				<Argument Name="args" Type="string"/>
+				<Argument Name="result" Type="variable" VariableType="integer"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+		</CommandFamily>
 	</Commands>
 </G1ANT>

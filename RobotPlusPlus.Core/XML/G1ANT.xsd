@@ -79,6 +79,7 @@
 		<xs:attribute name="Type" type="CommandArgumentType" use="required" />
 		<xs:attribute name="VariableType" type="CommandArgumentType" use="optional" />
 		<xs:attribute name="Required" type="xs:boolean" default="false" use="optional" />
+		<xs:attribute name="RequiredGroup" type="xs:integer" use="optional" />
 	</xs:complexType>
 
 	<xs:simpleType name="Identifier">
@@ -98,6 +99,7 @@
 			<xs:enumeration value="point" />
 			<xs:enumeration value="rectangle" />
 			<xs:enumeration value="list" />
+			<xs:enumeration value="dictionary" />
 			<!-- Special strings -->
 			<xs:enumeration value="label" />
 			<xs:enumeration value="variable" />
