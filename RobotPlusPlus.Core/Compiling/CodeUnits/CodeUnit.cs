@@ -44,6 +44,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case StatementToken st when st.StatementType == StatementToken.Type.If:
 					return new IfUnit(st);
 
+				case FunctionCallToken func:
+					return new CommandUnit(func);
+
 				default:
 					throw new CompileUnexpectedTokenException(token);
 			}

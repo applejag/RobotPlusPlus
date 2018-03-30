@@ -39,6 +39,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			set => this[1] = value;
 		}
 
+		public IdentifierToken ColonName
+		{
+			get => this[0] as IdentifierToken;
+			set => this[0] = value;
+		}
+
 		public PunctuatorToken(TokenSource source) : base(source)
 		{
 
@@ -52,6 +58,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				PunctuatorType = Type.Separator;
 			else if (Character == '.')
 				PunctuatorType = Type.Dot;
+			else if (Character == ':')
+				PunctuatorType = Type.Colon;
 			else
 				throw new ParseUnexpectedTokenException(this);
 		}
@@ -105,6 +113,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					parent.PopNext();
 					break;
 
+				case Type.Colon:
+					if (!(parent.Previous is IdentifierToken name))
+						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
+
+					ColonName = name;
+					parent.PopPrevious();
+					break;
+
 				// Closing parentases should be caught by the opening ones, otherwise they're stray
 				default:
 					throw new ParseUnexpectedTokenException(this);
@@ -141,7 +157,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public static bool IsPunctuatorOfType(Token token, Type type)
 		{
 			return token is PunctuatorToken pun
-				   && pun.PunctuatorType == type;
+			       && pun.PunctuatorType == type;
+		}
+
+		public static bool IsSeparatorOfChar(Token token, char sepChar)
+		{
+			return token is PunctuatorToken pun
+			       && pun.PunctuatorType == Type.Separator
+			       && pun.Character == sepChar;
 		}
 
 		public static bool IsOpenParentasesOfChar(Token token, char openChar)
@@ -162,6 +185,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			ClosingParentases,
 			Separator,
 			Dot,
+			Colon,
 		}
 	}
 }
