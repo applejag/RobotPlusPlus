@@ -1,147 +1,182 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
+	[XmlRoot("G1ANT", Namespace = "my://g1ant")]
+	[Serializable]
 	public class G1ANTRepository
 	{
-		public List<Argument> GlobalArguments = new List<Argument>();
-		public List<Command> Commands = new List<Command>();
+		[XmlElement("Commands")]
+		public CommandsElement Commands { get; set; }
 
-		private G1ANTRepository()
+		public static G1ANTRepository FromXDocument(XDocument document)
 		{
-
+			return SerializationUtilities.Deserialize<G1ANTRepository>(document);
 		}
 
 		public static G1ANTRepository FromEmbeddedXML(string xmlResource, string xsdResource)
 		{
 			XDocument doc = ResourcesUtilities.LoadAndValidateEmbeddedXML(xmlResource, xsdResource);
-			XElement root = doc.Root ?? throw new NullReferenceException("Document contains no root element!");
-			XNamespace ns = root.Name.Namespace;
-
-			XElement commands = root.Element(ns + "Commands") ?? throw new NullReferenceException("Document contains no Commands list!");
-
-			return new G1ANTRepository
-			{
-				Commands = commands.Elements(ns + "Command")
-					.Select(c => new Command(c, c.Elements(ns + "Argument")
-						.Select(a => new Argument(a))))
-					.Concat(commands.Elements(ns + "CommandFamily")
-						.SelectMany(f => f.Elements(ns + "Command")
-							.Select(c => new Command(c, f, c.Elements(ns + "Argument")
-								.Select(a => new Argument(a))))))
-					.ToList(),
-
-				GlobalArguments = commands.Element(ns + "GlobalArguments")
-					?.Elements(ns + "Argument")
-					.Select(a => new Argument(a))
-					.ToList(),
-			};
+			return FromXDocument(doc);
 		}
 
 		public static G1ANTRepository FromEmbeddedXML()
 		{
 			return FromEmbeddedXML(
-				xmlResource: "RobotPlusPlus.Core.XML.G1ANT.xml",
-				xsdResource: "RobotPlusPlus.Core.XML.G1ANT.xsd"
+				xmlResource: nameof(RobotPlusPlus) + "." + nameof(Core) + ".XML.G1ANT.xml",
+				xsdResource: nameof(RobotPlusPlus) + "." + nameof(Core) + ".XML.G1ANT.xsd"
 			);
 		}
 
-		public struct Command
+		[Serializable]
+		public class CommandsElement
 		{
-			public string Family;
-			public string Name;
-			public List<Argument> Arguments;
+			[XmlElement("Command")]
+			public List<CommandElement> Commands { get; set; }
 
-			public Command([NotNull] XElement element,
-				[NotNull] XElement family,
-				[NotNull] IEnumerable<Argument> arguments)
-			{
-				Family = family.Attribute("Name")?.Value
-				         ?? throw new FormatException("Command family contains no Name attribute!");
+			[XmlElement("CommandFamily")]
+			public List<CommandFamilyElement> CommandFamilies { get; set; }
 
-				Name = element.Attribute("Name")?.Value
-				       ?? throw new FormatException("Command contains no Name attribute!");
+			[XmlElement("GlobalArguments")]
+			public GlobalArgumentsElement GlobalArguments { get; set; }
+		}
 
-				Arguments = arguments.ToList();
-			}
+		[Serializable]
+		public class GlobalArgumentsElement
+		{
+			[XmlElement("Argument")]
+			public List<ArgumentElement> Arguments { get; set; }
+		}
 
-			public Command([NotNull] XElement element,
-				[NotNull] IEnumerable<Argument> arguments)
-			{
-				Family = null;
+		[Serializable]
+		public class CommandFamilyElement
+		{
+			[XmlAttribute("Name")]
+			public string Name { get; set; }
 
-				Name = element.Attribute("Name")?.Value
-				       ?? throw new FormatException("Command contains no Name attribute!");
-
-				Arguments = arguments.ToList();
-			}
+			[XmlElement("Command")]
+			public List<CommandElement> Commands { get; set; }
 
 			public override string ToString()
 			{
-				return (Family==null ? Name : $"{Family}.{Name}") + $"({string.Join(", ", Arguments)})";
+				return $"{Name}.{Commands?.Count ?? 0}";
 			}
 		}
 
-		public struct Argument
+		[Serializable]
+		public class CommandElement
 		{
-			public string Name;
-			public Type Type;
-			public bool Required;
+			[XmlAttribute("Name")]
+			public string Name { get; set; }
 
-			public Argument([NotNull] XElement element)
-			{
-				Name = element.Attribute("Name")?.Value
-					   ?? throw new FormatException("Argument contains no Name attribute!");
-				Type = EvaluateType(element.Attribute("Type")?.Value);
-				Required = ParseBool(element.Attribute("Required")?.Value);
-			}
+			[XmlElement("Argument")]
+			public List<ArgumentElement> Arguments { get; set; }
 
-			public static bool ParseBool(string val)
-			{
-				val = val?.Trim().ToLower();
-				switch (val)
-				{
-					case "true":
-					case "1":
-						return true;
-					default:
-						return false;
-				}
-			}
-
-			public static Type EvaluateType(string type)
-			{
-				switch (type)
-				{
-					case "string": return typeof(string);
-					case "integer": return typeof(int);
-					case "boolean": return typeof(bool);
-					case "point": return typeof(Point);
-					case "rectangle": return typeof(Rectangle);
-					case "list": return typeof(List<object>);
-					case "variable": return typeof(IdentifierToken);
-					case "variablename": return typeof(string);
-
-					case "label":
-					case "procedure":
-						throw new NotImplementedException();
-
-					default:
-						throw new FormatException($"Unkown type <{type ?? "null"}>!");
-				}
-			}
+			[XmlIgnore]
+			public List<List<ArgumentElement>> RequiredArguments => 
+				Arguments.Where(a => a.Required)
+					.GroupBy(a => a.RequiredGroup == -1 ? a.Name.GetHashCode() : a.RequiredGroup,
+						(k, elmList) => elmList.ToList())
+					.ToList();
 
 			public override string ToString()
 			{
-				return $"{Type.Name} {Name}{(Required ? "" : "?")}";
+				return $"{Name}({string.Join(", ", Arguments)}";
 			}
+		}
+
+		[Serializable]
+		public class ArgumentElement
+		{
+			[XmlAttribute("Name")]
+			public string Name { get; set; }
+
+			[XmlAttribute("Type")]
+			public ArgumentType Type { get; set; }
+
+			[XmlAttribute("VariableType")]
+			public ArgumentType VariableType { get; set; }
+
+			[XmlAttribute("Required")]
+			public bool Required { get; set; } = false;
+
+			[XmlAttribute("RequiredGroup")]
+			public int RequiredGroup { get; set; } = -1;
+			
+			public static Type EvaluateType(ArgumentType? type)
+			{
+				switch (type)
+				{
+					case ArgumentType.String: return typeof(string);
+					case ArgumentType.Integer: return typeof(int);
+					case ArgumentType.Boolean: return typeof(bool);
+					case ArgumentType.Point: return typeof(Point);
+					case ArgumentType.Rectangle: return typeof(Rectangle);
+					case ArgumentType.List: return typeof(List<object>);
+					case ArgumentType.Variable: return typeof(IdentifierToken);
+					case ArgumentType.VariableName: return typeof(string);
+
+					case ArgumentType.Label:
+					case ArgumentType.Procedure:
+						throw new NotImplementedException();
+
+					default:
+						throw new FormatException($"Unkown type <{type?.ToString() ?? "null"}>!");
+				}
+			}
+			public override string ToString()
+			{
+				var sb = new StringBuilder();
+
+				sb.Append(Type);
+				if (Type == ArgumentType.Variable)
+					sb.AppendFormat("<{0}>",VariableType);
+				if (!Required)
+					sb.Append('?');
+				sb.Append(' ');
+				sb.Append(Name);
+
+				return sb.ToString();
+			}
+		}
+
+		[Serializable]
+		public enum ArgumentType
+		{
+			Unknown,
+
+			[XmlEnum("string")]
+			String,
+			[XmlEnum("integer")]
+			Integer,
+			[XmlEnum("boolean")]
+			Boolean,
+			[XmlEnum("point")]
+			Point,
+			[XmlEnum("rectangle")]
+			Rectangle,
+			[XmlEnum("list")]
+			List,
+			[XmlEnum("dictionary")]
+			Dictionary,
+			[XmlEnum("label")]
+			Label,
+			[XmlEnum("variable")]
+			Variable,
+			[XmlEnum("variablename")]
+			VariableName,
+			[XmlEnum("procedure")]
+			Procedure,
 		}
 	}
 }
