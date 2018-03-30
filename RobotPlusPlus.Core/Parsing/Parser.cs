@@ -35,13 +35,15 @@ namespace RobotPlusPlus.Core.Parsing
 				var any = false;
 				
 				foreach (Token token in parent)
-				{
-					if (parent.Current == null) continue;
-					
+				{	
 					ParseTokens(parent.Current, filter, parent.Reversed);
+
+					if (token.IsParsed) continue;
 					if (filter != null && !filter.Invoke(token)) continue;
 
-					any |= parent.ParseTokenAt(parent.Index);
+					token.ParseToken(parent);
+					token.IsParsed = true;
+					any = true;
 				}
 
 				if (!any) return;

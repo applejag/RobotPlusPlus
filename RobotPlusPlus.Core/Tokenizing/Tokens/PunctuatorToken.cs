@@ -66,14 +66,13 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 					if (Character == '(')
 					{
+						Token prev = parent.Previous;
+
 						// Merge with identifier, this is a function call
-						if (parent.Previous is IdentifierToken id1)
+						if (OperatorToken.ExpressionHasValue(prev))
 						{
-							TokenSource tokenSource = id1.source;
-							tokenSource.code += "()";
 							parent.PopPrevious(); // id
-							parent.PushPrevious(new FunctionCallToken(tokenSource, id1, this));
-							parent.PopCurrent(); // parentases
+							parent.SwapCurrent(new FunctionCallToken(source, prev, this));
 							parent.ParseTokenAt(parent.Index);
 						}
 						else if (Count == 0)
@@ -94,11 +93,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 					Token lhs = parent.Previous;
 					if (!(lhs is IdentifierToken
-						|| (lhs is PunctuatorToken pun
-						    && (pun.Character == '('
-						        || pun.PunctuatorType == Type.Dot))
-						|| lhs is LiteralToken
-						|| lhs is FunctionCallToken))
+					      || IsPunctuatorOfType(lhs, Type.Dot)
+					      || IsOpenParentasesOfChar(lhs, '(')
+					      || lhs is LiteralToken
+					      || lhs is FunctionCallToken))
 						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
 
 					DotLHS = lhs;
@@ -138,6 +136,19 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						break;
 				}
 			}
+		}
+
+		public static bool IsPunctuatorOfType(Token token, Type type)
+		{
+			return token is PunctuatorToken pun
+				   && pun.PunctuatorType == type;
+		}
+
+		public static bool IsOpenParentasesOfChar(Token token, char openChar)
+		{
+			return token is PunctuatorToken pun
+				   && pun.PunctuatorType == Type.OpeningParentases
+				   && pun.Character == openChar;
 		}
 
 		public static char GetMatchingParentases(char c)

@@ -16,9 +16,9 @@ namespace RobotPlusPlus.Core.Parsing
 			Token token = parent[index];
 
 			if (token == null) return false;
-
 			if (token.IsParsed) return false;
-			token.ParseToken(new IteratedList<Token>(parent.List, index, parent.Reversed));
+
+			token.ParseToken(new IteratedList<Token>(parent, index, parent.Reversed));
 			token.IsParsed = true;
 
 			return true;

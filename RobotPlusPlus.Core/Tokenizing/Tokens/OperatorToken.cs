@@ -122,8 +122,13 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					else
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
 
-				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '(':
-					return pun.Any(ExpressionHasValue);
+				case PunctuatorToken pun when PunctuatorToken.IsOpenParentasesOfChar(token, '('):
+					return pun.Count == 1 && ExpressionHasValue(pun[0]);
+
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
+					return pun.Count == 2
+					       && ExpressionHasValue(pun.DotLHS)
+					       && ExpressionHasValue(pun.DotRHS);
 
 				default:
 					return false;
@@ -132,13 +137,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override void ParseToken(IteratedList<Token> parent)
 		{
-			Token prev = parent.Previous;
-			Token next = parent.Next;
-
 			switch (OperatorType)
 			{
 				// Expression
-				case Type.Expression when prev is IdentifierToken:
+				case Type.Expression when parent.Previous is IdentifierToken:
 					LHS = parent.PopPrevious();
 					break;
 				case Type.Expression:
@@ -160,22 +162,22 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case Type.BitwiseOR:
 				case Type.BooleanAND:
 				case Type.BooleanOR:
-					if (ExpressionHasValue(prev))
+					if (ExpressionHasValue(parent.Previous))
 						LHS = parent.PopPrevious();
 					else
-						throw new ParseUnexpectedLeadingTokenException(this, prev);
+						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
 
-					if (ExpressionHasValue(next))
+					if (ExpressionHasValue(parent.Next))
 						RHS = parent.PopNext();
 					else
-						throw new ParseUnexpectedTrailingTokenException(this, next);
+						throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
 					break;
 
 				case Type.Assignment:
-					if (prev is IdentifierToken)
+					if (parent.Previous is IdentifierToken)
 						LHS = parent.PopPrevious();
 					else
-						throw new ParseUnexpectedLeadingTokenException(this, prev);
+						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
 
 					// ex: <<=, +=, %=
 					// Add identifier & operator to pool
@@ -194,10 +196,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						parent.ParseTokenAt(parent.Index + 2);
 					}
 
-					if (ExpressionHasValue(next))
+					if (ExpressionHasValue(parent.Next))
 						RHS = parent.PopNext();
 					else
-						throw new ParseUnexpectedTrailingTokenException(this, next);
+						throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
 					break;
 
 				default:
