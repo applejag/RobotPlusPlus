@@ -67,9 +67,10 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsOfType<IdentifierToken>(func[0], "func");
 
 			Token par = func[1];
-			Assert.That.TokenIsParentases(par, '(', 2);
+			Assert.That.TokenIsParentases(par, '(', 3);
 			Assert.That.TokenIsLiteralString(par[0], "foo");
-			Assert.That.TokenIsLiteralInteger(par[1], 2);
+			Assert.That.TokenIsOfType<PunctuatorToken>(par[1], ",");
+			Assert.That.TokenIsLiteralInteger(par[2], 2);
 		}
 
 		[TestMethod]

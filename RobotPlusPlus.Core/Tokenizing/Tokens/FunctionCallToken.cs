@@ -27,8 +27,6 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		}
 
 		public override void ParseToken(IteratedList<Token> parent)
-		{
-			// TODO: Validate that they're comma seperated
-		}
+		{ }
 	}
 }
