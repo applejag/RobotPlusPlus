@@ -151,7 +151,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Token dot = result[0];
 			Assert.That.TokenIsDotOperation(dot);
 			Token func = dot[0];
-			Assert.That.TokenIsOfType<FunctionCallToken>(func, "x()");
+			Assert.That.TokenIsOfType<FunctionCallToken>(func, "(");
 			Assert.That.TokenIsOfType<IdentifierToken>(func[0], "x");
 			Assert.That.TokenIsParentases(func[1], '(', 0);
 			Assert.That.TokenIsOfType<IdentifierToken>(dot[1], "y");

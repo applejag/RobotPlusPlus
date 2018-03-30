@@ -123,7 +123,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
 
 				case PunctuatorToken pun when PunctuatorToken.IsOpenParentasesOfChar(token, '('):
-					return pun.Count == 1 && ExpressionHasValue(pun[0]);
+					return pun.Any(ExpressionHasValue);
 
 				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 					return pun.Count == 2

@@ -103,7 +103,7 @@ namespace RobotPlusPlus.Core.Tests
 		{
 			Assert.IsNotNull(token);
 			Assert.IsInstanceOfType(token, typeof(T));
-			Assert.AreEqual(expectedSource, token.SourceCode);
+			Assert.AreEqual(expectedSource, token.SourceCode, "Incorrect token source code.");
 		}
 
 		private static void TokensAreParsed(
