@@ -150,7 +150,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		// TODO: Add exception type
 		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongArgName()
 		{
@@ -162,7 +161,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		// TODO: Add exception type
 		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongFamilyName()
 		{
@@ -174,7 +172,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		// TODO: Add exception type
 		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongCmdName()
 		{
