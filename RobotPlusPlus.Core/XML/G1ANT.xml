@@ -285,6 +285,21 @@
 				<Argument Name="result" Type="variable" VariableType="integer"/>
 				<Argument Name="timeout" Type="integer"/>
 			</Command>
+			<Command Name="save">
+				<Argument Name="path" Type="string"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="setvalue">
+				<Argument Name="value" Type="string" Required="true"/>
+				<Argument Name="row" Type="integer" Required="true"/>
+				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
+			<Command Name="switch">
+				<Argument Name="id" Type="integer" Required="true"/>
+				<Argument Name="timeout" Type="integer"/>
+			</Command>
 		</CommandFamily>
 	</Commands>
 </G1ANT>

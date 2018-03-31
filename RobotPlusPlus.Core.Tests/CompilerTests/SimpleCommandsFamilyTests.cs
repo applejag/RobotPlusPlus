@@ -110,7 +110,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "excel.switch(id: 5 + 3)";
-			const string expected = @"excel.switch 5+3";
+			const string expected = @"excel.switch id 5+3";
 
 			// Act
 			string compiled = Compiler.Compile(code);
