@@ -145,8 +145,10 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			{
 				switch (type)
 				{
+					case ArgumentType.Undefined: return typeof(object);
 					case ArgumentType.String: return typeof(string);
 					case ArgumentType.Integer: return typeof(int);
+					case ArgumentType.Float: return typeof(float);
 					case ArgumentType.Boolean: return typeof(bool);
 					case ArgumentType.Point: return typeof(Point);
 					case ArgumentType.Rectangle: return typeof(Rectangle);
@@ -181,12 +183,15 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[Serializable]
 		public enum ArgumentType
 		{
-			Unknown,
+			[XmlEnum("undefined")]
+			Undefined,
 
 			[XmlEnum("string")]
 			String,
 			[XmlEnum("integer")]
 			Integer,
+			[XmlEnum("float")]
+			Float,
 			[XmlEnum("boolean")]
 			Boolean,
 			[XmlEnum("point")]

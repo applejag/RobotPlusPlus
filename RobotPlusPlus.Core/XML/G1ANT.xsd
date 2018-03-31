@@ -94,6 +94,7 @@
 			<!-- Base C# types -->
 			<xs:enumeration value="string" />
 			<xs:enumeration value="integer" />
+			<xs:enumeration value="float" />
 			<xs:enumeration value="boolean" />
 			<!-- Special structures -->
 			<xs:enumeration value="point" />
@@ -105,6 +106,8 @@
 			<xs:enumeration value="variable" />
 			<xs:enumeration value="variablename" />
 			<xs:enumeration value="procedure" />
+			<!-- Aka dynamic -->
+			<xs:enumeration value="undefined" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
