@@ -110,7 +110,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "excel.switch(id: 5 + 3)";
-			const string expected = @"excel.switch ⊂5+3⊃";
+			const string expected = @"excel.switch 5+3";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -151,7 +151,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		// TODO: Add exception type
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongArgName()
 		{
 			// Arrange
@@ -163,7 +163,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		// TODO: Add exception type
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongFamilyName()
 		{
 			// Arrange
@@ -175,7 +175,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		// TODO: Add exception type
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_Family_WrongCmdName()
 		{
 			// Arrange

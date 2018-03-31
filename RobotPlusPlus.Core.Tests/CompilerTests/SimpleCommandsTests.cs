@@ -66,7 +66,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "delay(5 + 3)";
-			const string expected = @"delay seconds ⊂5+3⊃";
+			const string expected = @"delay seconds 5+3";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -138,7 +138,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "delay(seconds: 5 + 3)";
-			const string expected = @"delay seconds ⊂5+3⊃";
+			const string expected = @"delay seconds 5+3";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -179,7 +179,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		// TODO: Add exception type
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_WrongArgName()
 		{
 			// Arrange
@@ -192,7 +192,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		// TODO: Add exception type
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_WrongCmdName()
 		{
 			// Arrange
