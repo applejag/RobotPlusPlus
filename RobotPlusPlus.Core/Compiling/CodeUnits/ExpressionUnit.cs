@@ -30,6 +30,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void PreCompile(Compiler compiler)
 		{
+			NeedsCSSnippet = false;
+
 			foreach (CodeUnit pre in PreUnits)
 				pre.PreCompile(compiler);
 			foreach (CodeUnit post in PostUnits)
@@ -66,10 +68,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (!(t is IdentifierToken id)) return;
 
-				variableLookup[id] = compiler.VariableContext.GetGenerated(id.SourceCode);
+				variableLookup[id] = compiler.Context.GetGenerated(id.SourceCode);
 
 				// Check variables for registration
-				if (!compiler.VariableContext.PrefferedExists(id.SourceCode))
+				if (!compiler.Context.PrefferedExists(id.SourceCode))
 					throw new UnassignedVariableException(id);
 			}, includeTop: true);
 			

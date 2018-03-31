@@ -63,13 +63,13 @@ namespace RobotPlusPlus.Core.Structures
 			return null;
 		}
 
-		public string GetOrGenerateName([NotNull] string preffered)
+		public string GetOrRegisterName([NotNull] string preffered)
 		{
 			return GetGenerated(preffered)
-			       ?? GenerateName(preffered);
+			       ?? RegisterName(preffered);
 		}
-
-		public string GenerateName([NotNull] string preffered)
+		
+		private string GenerateName(string preffered)
 		{
 			string generated = preffered;
 			var iter = 1;
@@ -78,9 +78,21 @@ namespace RobotPlusPlus.Core.Structures
 			{
 				generated = preffered + ++iter;
 			}
+			
+			return generated;
+		}
 
+		public string RegisterName([NotNull] string preffered)
+		{
+			string generated = GenerateName(preffered);
 			occupied.Peek()[preffered] = generated;
+			return generated;
+		}
 
+		public string RegisterGlobalName([NotNull] string preffered)
+		{
+			string generated = GenerateName(preffered);
+			occupied.Last()[preffered] = generated;
 			return generated;
 		}
 	}

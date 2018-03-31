@@ -1,76 +1,169 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class CommandUnit : CodeUnit
 	{
-		public ExpressionUnit Identifier { get; }
-		public List<ExpressionUnit> Arguments { get; }
-		public Dictionary<string, ExpressionUnit> NamedArguments { get; }
+		public List<Argument> Arguments { get; }
+
+		public string CommandName { get; }
+		public string CommandFamilyName { get; }
+
+		public G1ANTRepository.CommandFamilyElement CommandFamilyElement { get; private set; }
+		public G1ANTRepository.CommandElement CommandElement { get; private set; }
+		public List<G1ANTRepository.ArgumentElement> CommandArgumentElements { get; private set; }
 
 		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
 		{
-			Identifier = new ExpressionUnit(token.LHS, parent);
+			Arguments = SplitArguments(token.ParentasesGroup);
 
-			List<Argument> arguments = SplitArguments(token.ParentasesGroup);
+			switch (token.LHS)
+			{
+				case IdentifierToken id:
+					CommandName = id.SourceCode;
+					CommandFamilyName = null;
+					break;
 
-			Arguments = arguments.OfType<IndexedArgument>()
-				.Select(a => a.expression).ToList();
+				case PunctuatorToken dot when dot.PunctuatorType == PunctuatorToken.Type.Dot:
+					if (dot.TryFirstRecursive(t => !(t is IdentifierToken), out Token faulty))
+						throw new CompileException($"Dot operation for non-identifier token <{faulty?.SourceCode.EscapeString() ?? "null"}> are not supported!", faulty);
 
-			NamedArguments = arguments.OfType<NamedArgument>()
-				.ToDictionary(a => a.name, a => a.expression);
+					if (PunctuatorToken.IsPunctuatorOfType(dot.DotLHS, PunctuatorToken.Type.Dot))
+						throw new CompileException("Multidepth command family names are not supported!", dot.DotLHS);
+
+					CommandFamilyName = dot.DotLHS.SourceCode;
+					CommandName = dot.DotRHS.SourceCode;
+					break;
+
+				default:
+					throw new CompileUnexpectedTokenException(token.LHS);
+			}
+		}
+
+		public override void PreCompile(Compiler compiler)
+		{
+			foreach (Argument argument in Arguments)
+				argument.expression.PreCompile(compiler);
+		}
+
+		public override void PostCompile(Compiler compiler)
+		{
+			foreach (Argument argument in Arguments)
+				argument.expression.PostCompile(compiler);
 		}
 
 		public override void Compile(Compiler compiler)
 		{
-			throw new System.NotImplementedException();
+			foreach (Argument argument in Arguments)
+				argument.expression.Compile(compiler);
+
+			CommandFamilyElement = CommandFamilyName == null
+				? null
+				: compiler.G1ANTRepository.FindCommandFamily(CommandFamilyName)
+				  ?? throw new CompileFunctionException($"Command family <{CommandFamilyName}> does not exist!", Token);
+
+			CommandElement = CommandFamilyName == null
+				? compiler.G1ANTRepository.FindCommand(CommandName)
+				  ?? throw new CompileFunctionException($"Command <{CommandName}> does not exist!", Token)
+				: compiler.G1ANTRepository.FindCommand(CommandName, CommandFamilyName)
+				  ?? throw new CompileFunctionException($"Command <{CommandName}> in family <{CommandFamilyName}> does not exist!", Token);
+
+			CommandArgumentElements = compiler.G1ANTRepository.ListCommandArguments(CommandElement);
+
+			for (var i = 0; i < Arguments.Count; i++)
+			{
+				// Convert positional to named
+				if (Arguments[i] is PositionalArgument pos)
+				{
+					G1ANTRepository.ArgumentElement arg = CommandArgumentElements.TryGet(pos.index)
+														  ?? throw new CompileFunctionException(
+															  $"Command <{CommandName}> can at max take {CommandArgumentElements.Count} arguments!",
+															  Token);
+
+					Arguments[i] = new NamedArgument(arg.Name, Arguments[i].expression);
+				}
+				else if (Arguments[i] is NamedArgument named)
+				{
+					// Validate its name
+					if (CommandArgumentElements.All(a => a.Name != named.name))
+						throw new CompileFunctionException($"Command <{CommandName}> does not have a parameter named <{named.name}>.", Token);
+				}
+				else
+					throw new InvalidOperationException();
+			}
 		}
 
 		public override string AssembleIntoString()
 		{
-			throw new System.NotImplementedException();
+			var row = new RowBuilder();
+
+			// Pre units
+			foreach (Argument argument in Arguments)
+				foreach (CodeUnit preUnit in argument.expression.PreUnits)
+					row.AppendLine(preUnit.AssembleIntoString());
+
+			// Assemble command with arguments
+			var cmd = new StringBuilder();
+			cmd.Append(CommandFamilyName == null ? CommandName : $"{CommandFamilyName}.{CommandName}");
+
+			foreach (NamedArgument argument in Arguments.OfType<NamedArgument>())
+			{
+				cmd.AppendFormat(" {0} {1}", argument.name, argument.expression.AssembleIntoString());
+			}
+
+			row.AppendLine(cmd.ToString());
+
+			// Post units
+			foreach (Argument argument in Arguments)
+				foreach (CodeUnit postUnit in argument.expression.PostUnits)
+					row.AppendLine(postUnit.AssembleIntoString());
+
+			return row.ToString();
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)
 		{
-			string name = null;
-
+			var named = false;
 			var arguments = new List<Argument>();
 
 			var iterator = new IteratedList<Token>(parentases);
 			foreach (Token token in iterator)
 			{
-				// Check if named or indexed
+				// Check if named or positional
 				if (token is PunctuatorToken pun
-				    && pun.PunctuatorType == PunctuatorToken.Type.Colon)
+					&& pun.PunctuatorType == PunctuatorToken.Type.Colon)
 				{
-					if (iterator.Next == null)
-						throw new ParseUnexpectedTrailingTokenException(token, null);
+					if (iterator.Next == null
+						|| PunctuatorToken.IsSeparatorOfChar(iterator.Next, ','))
+						throw new CompileFunctionException(
+							$"Missing expression for named parameter <{pun.ColonName.SourceCode}>.", token);
 
-					if (PunctuatorToken.IsSeparatorOfChar(iterator.Next, ','))
-						throw new CompileUnexpectedTokenException(iterator.Next);
-
-					name = pun.ColonName.SourceCode;
-					arguments.Add(new NamedArgument(name, new ExpressionUnit(iterator.PopNext(), this)));
-				} else if (name != null)
-				{
-					throw new CompileException($"Expected named parameter, got <{token.SourceCode}>", token);
+					arguments.Add(new NamedArgument(pun.ColonName, new ExpressionUnit(iterator.PopNext(), this)));
+					named = true;
 				}
 				else
 				{
-					arguments.Add(new IndexedArgument(new ExpressionUnit(token, this)));
+					if (named)
+						throw new CompileFunctionException("Positional argument cannot precede named argument.", token);
+
+					arguments.Add(new PositionalArgument(arguments.Count, new ExpressionUnit(token, this)));
 				}
 
 				// Check for comma seperators
 				if (PunctuatorToken.IsSeparatorOfChar(iterator.Next, ','))
 				{
 					if (iterator.Count - iterator.Index == 2)
-						throw new CompileException("Unexpected separator <,> with no followup parameter.", iterator.Next);
+						throw new CompileFunctionException("Unexpected separator <,> with no followup parameter.", iterator.Next);
 
 					// Remove the comma
 					iterator.PopNext();
@@ -82,7 +175,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Argument classes
 
-		private abstract class Argument
+		public abstract class Argument
 		{
 			public readonly ExpressionUnit expression;
 
@@ -92,9 +185,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			}
 		}
 
-		private class NamedArgument : Argument
+		public class NamedArgument : Argument
 		{
 			public readonly string name;
+			public readonly Token nameToken;
+
+			public NamedArgument(Token nameToken, ExpressionUnit expression)
+				: base(expression)
+			{
+				this.nameToken = nameToken;
+				name = nameToken.SourceCode;
+			}
 
 			public NamedArgument(string name, ExpressionUnit expression)
 				: base(expression)
@@ -103,11 +204,15 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			}
 		}
 
-		private class IndexedArgument : Argument
+		public class PositionalArgument : Argument
 		{
-			public IndexedArgument(ExpressionUnit expression)
+			public readonly int index;
+
+			public PositionalArgument(int index, ExpressionUnit expression)
 				: base(expression)
-			{ }
+			{
+				this.index = index;
+			}
 		}
 
 		#endregion

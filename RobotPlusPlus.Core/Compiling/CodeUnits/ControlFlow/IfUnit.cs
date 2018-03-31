@@ -20,7 +20,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 		public override void PreCompile(Compiler compiler)
 		{
-			compiler.VariableContext.PushLayer();
+			compiler.Context.PushLayer();
 			Condition.PreCompile(compiler);
 			CodeBlock.PreCompile(compiler);
 		}
@@ -29,14 +29,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			Condition.PostCompile(compiler);
 			CodeBlock.PostCompile(compiler);
-			compiler.VariableContext.PopLayer();
+			compiler.Context.PopLayer();
 		}
 
 		public override void Compile(Compiler compiler)
 		{
-			GeneratedLabel = compiler.LabelContext.GenerateName("noif");
+			GeneratedLabel = compiler.Context.RegisterName("noif");
 			GeneratedTemporaryVariable = Condition.PostUnits.Count > 0
-				? compiler.VariableContext.GenerateName("tmp") : null;
+				? compiler.Context.RegisterName("tmp") : null;
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);

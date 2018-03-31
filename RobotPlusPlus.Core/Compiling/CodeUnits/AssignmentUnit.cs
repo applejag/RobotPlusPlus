@@ -43,7 +43,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Expression.Compile(compiler);
 
 			// Register variable, or use already registered
-			VariableGeneratedName = compiler.VariableContext.GetOrGenerateName(VariableOriginalName);
+			VariableGeneratedName = compiler.Context.GetOrRegisterName(VariableOriginalName);
 		}
 
 		public override string AssembleIntoString()

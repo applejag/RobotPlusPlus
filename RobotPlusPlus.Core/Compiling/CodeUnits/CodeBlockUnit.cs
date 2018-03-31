@@ -23,12 +23,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void PreCompile(Compiler compiler)
 		{
-			compiler.VariableContext.PushLayer();
+			compiler.Context.PushLayer();
 		}
 
 		public override void PostCompile(Compiler compiler)
 		{
-			compiler.VariableContext.PopLayer();
+			compiler.Context.PopLayer();
 		}
 
 		public override void Compile(Compiler compiler)

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
@@ -18,6 +16,32 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 	{
 		[XmlElement("Commands")]
 		public CommandsElement Commands { get; set; }
+
+		[CanBeNull]
+		public CommandElement FindCommand([NotNull] string commandName, [CanBeNull] string familyName = null)
+		{
+			List<CommandElement> pool = familyName != null
+				? FindCommandFamily(familyName)?.Commands
+				: Commands.Commands;
+
+			return pool?.FirstOrDefault(c => c.Name == commandName);
+		}
+
+		[CanBeNull]
+		public CommandFamilyElement FindCommandFamily([NotNull] string familyName)
+		{
+			return Commands.CommandFamilies.FirstOrDefault(fam => fam.Name == familyName);
+		}
+
+		[NotNull, ItemNotNull]
+		public List<ArgumentElement> ListCommandArguments([NotNull] CommandElement command, bool includeGlobal = true)
+		{
+			return command.Arguments
+				.Concat(Commands.GlobalArguments.Arguments)
+				.ToList();
+		}
+
+		#region Static creators
 
 		public static G1ANTRepository FromXDocument(XDocument document)
 		{
@@ -38,6 +62,10 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			);
 		}
 
+		#endregion
+
+		#region Element objects
+		
 		[Serializable]
 		public class CommandsElement
 		{
@@ -178,5 +206,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlEnum("procedure")]
 			Procedure,
 		}
+		
+		#endregion
 	}
 }
