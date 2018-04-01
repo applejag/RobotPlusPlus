@@ -102,20 +102,26 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			}
 
 			// Validate all required ones
+			var missingReqArgs = new List<string>();
+
 			foreach (List<G1ANTRepository.ArgumentElement> group in CommandElement.RequiredArguments)
 			{
 				int matches = Arguments.OfType<NamedArgument>().Count(a => group.Any(g => g.Name == a.name));
 
 				string displayName = group.Count == 1
 					? $"<{group[0].Name}>"
-					: "group " + string.Join(", ", group.Select(a => $"<{a.Name}>"));
+					: string.Join(" or ", group.Select(a => $"<{a.Name}>"));
 
 				if (matches == 0)
-					throw new CompileFunctionException($"Command <{CommandName}> requires argument {displayName}.", Token);
-
-				if (matches > 1)
-					throw new CompileFunctionException($"Command <{CommandName}> requires single value amoung {displayName}.", Token);
+					missingReqArgs.Add(displayName);
+				else if (matches > 1)
+					throw new CompileFunctionException($"Command <{CommandName}> requires single value amoung arguments {displayName}.", Token);
 			}
+
+			if (missingReqArgs.Count == 1)
+				throw new CompileFunctionException($"Command <{CommandName}> requires argument {missingReqArgs[0]}.", Token);
+			if (missingReqArgs.Count > 1)
+				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join("; ",missingReqArgs)}.", Token);
 		}
 
 		public override string AssembleIntoString()
