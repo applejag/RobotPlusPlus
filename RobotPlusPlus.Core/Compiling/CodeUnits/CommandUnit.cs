@@ -101,6 +101,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					throw new InvalidOperationException();
 			}
 
+			// Validate duplicate arguments
+			NamedArgument duplicateArg = Arguments.OfType<NamedArgument>()
+				.GroupBy(a => a.name)
+				.Select(g => new {Count = g.Count(), Arg = g.First()})
+				.FirstOrDefault(g => g.Count > 1)?.Arg;
+
+			if (duplicateArg != null)
+			{
+				throw new CompileFunctionException($"Argument <{duplicateArg.name}> cannot be inferred multiple times!", duplicateArg.expression.Token);
+			}
+
 			// Validate all required ones
 			var missingReqArgs = new List<string>();
 

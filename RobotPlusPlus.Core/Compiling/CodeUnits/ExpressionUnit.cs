@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
@@ -16,7 +15,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public bool NeedsCSSnippet { get; set; }
 
-		private Dictionary<IdentifierToken, string> variableLookup = null;
+		private Dictionary<IdentifierToken, string> variableLookup;
 
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -138,6 +137,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		private Token ExtractInnerAssignments(Token token)
 		{
 			// TODO: Add support for x++, x--, ++x, --x, ?:
+
+			// Convert assignment to expression
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
 			{
@@ -145,11 +146,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				token = op.LHS;
 			}
 
+			// Run on childs
 			for (var i = 0; i < token.Count; i++)
 			{
 				token[i] = ExtractInnerAssignments(token[i]);
 			}
 
+			// Returns altered
 			return token;
 		}
 

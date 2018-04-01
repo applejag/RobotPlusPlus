@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
-using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
-using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {

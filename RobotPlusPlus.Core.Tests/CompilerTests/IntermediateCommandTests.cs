@@ -179,5 +179,27 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual(expected, actual);
 		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileFunctionException))]
+		public void Compile_DuplicateNamedArguments()
+		{
+			// Arrange
+			const string code = "dialog(message: 'foo', message: 'bar')";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileFunctionException))]
+		public void Compile_DuplicatePositionalArguments()
+		{
+			// Arrange
+			const string code = "dialog('foo', message: 'bar')";
+
+			// Act
+			Compiler.Compile(code);
+		}
 	}
 }
