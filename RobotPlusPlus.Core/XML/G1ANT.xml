@@ -62,8 +62,8 @@
 
 		<CommandFamily Name="dialog">
 			<Command Name="ask">
-				<Argument Name="result" Type="variable" VariableType="string" />
 				<Argument Name="message" Type="string"/>
+				<Argument Name="result" Type="variable" VariableType="string" />
 			</Command>
 		</CommandFamily>
 

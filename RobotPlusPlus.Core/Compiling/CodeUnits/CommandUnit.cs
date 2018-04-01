@@ -22,9 +22,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public G1ANTRepository.CommandElement CommandElement { get; private set; }
 		public List<G1ANTRepository.ArgumentElement> CommandArgumentElements { get; private set; }
 
-		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
+		public IdentifierToken ResultToken { get; }
+
+		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] IdentifierToken resultToken = null, [CanBeNull] CodeUnit parent = null) : base(token, parent)
 		{
 			Arguments = SplitArguments(token.ParentasesGroup);
+
+			// Add result argument
+			ResultToken = resultToken;
+			if (ResultToken != null)
+				Arguments.Add(new NamedArgument("result", new ExpressionUnit(ResultToken, this)));
 
 			switch (token.LHS)
 			{
@@ -51,21 +58,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void PreCompile(Compiler compiler)
 		{
-			foreach (Argument argument in Arguments)
-				argument.expression.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			foreach (Argument argument in Arguments)
-				argument.expression.PostCompile(compiler);
-		}
-
-		public override void Compile(Compiler compiler)
-		{
-			foreach (Argument argument in Arguments)
-				argument.expression.Compile(compiler);
-
+			// Fetch elements from repo
 			CommandFamilyElement = CommandFamilyName == null
 				? null
 				: compiler.G1ANTRepository.FindCommandFamily(CommandFamilyName)
@@ -78,7 +71,31 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				  ?? throw new CompileFunctionException($"Command <{CommandName}> in family <{CommandFamilyName}> does not exist!", Token);
 
 			CommandArgumentElements = compiler.G1ANTRepository.ListCommandArguments(CommandElement);
+			
+			// Alter & validate arguments
+			ConvertArgumentsToNamed();
+			ValidateArguments(compiler);
 
+			// Precompile arguments
+			foreach (Argument argument in Arguments)
+				argument.expression.PreCompile(compiler);
+		}
+
+		public override void PostCompile(Compiler compiler)
+		{
+			// Postcompile arguments
+			foreach (Argument argument in Arguments)
+				argument.expression.PostCompile(compiler);
+		}
+
+		public override void Compile(Compiler compiler)
+		{
+			foreach (Argument argument in Arguments)
+				argument.expression.Compile(compiler);
+		}
+
+		private void ConvertArgumentsToNamed()
+		{
 			for (var i = 0; i < Arguments.Count; i++)
 			{
 				// Convert positional to named
@@ -91,21 +108,27 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 					Arguments[i] = new NamedArgument(arg.Name, Arguments[i].expression);
 				}
-				else if (Arguments[i] is NamedArgument named)
+
+				if (Arguments[i] is NamedArgument named)
 				{
-					// Validate its name
-					if (CommandArgumentElements.All(a => a.Name != named.name))
+					G1ANTRepository.ArgumentElement argElem = CommandArgumentElements
+						.FirstOrDefault(a => a.Name == named.name);
+
+					// Validate it exists
+					if (argElem == null)
 						throw new CompileFunctionException($"Command <{CommandName}> does not have a parameter named <{named.name}>.", Token);
 				}
 				else
 					throw new InvalidOperationException();
 			}
+		}
 
+		private void ValidateArguments(Compiler compiler)
+		{
 			// Validate duplicate arguments
 			NamedArgument duplicateArg = Arguments.OfType<NamedArgument>()
 				.GroupBy(a => a.name)
-				.Select(g => new {Count = g.Count(), Arg = g.First()})
-				.FirstOrDefault(g => g.Count > 1)?.Arg;
+				.FirstOrDefault(g => g.Count() > 1)?.First();
 
 			if (duplicateArg != null)
 			{
@@ -132,7 +155,24 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			if (missingReqArgs.Count == 1)
 				throw new CompileFunctionException($"Command <{CommandName}> requires argument {missingReqArgs[0]}.", Token);
 			if (missingReqArgs.Count > 1)
-				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join("; ",missingReqArgs)}.", Token);
+				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join("; ", missingReqArgs)}.", Token);
+
+			// Validate types
+			foreach (NamedArgument named in Arguments.OfType<NamedArgument>())
+			{
+				G1ANTRepository.ArgumentElement argElem = CommandArgumentElements
+					.FirstOrDefault(a => a.Name == named.name);
+
+				// Validate variable types
+				if (argElem?.Type == G1ANTRepository.ArgumentType.Variable)
+				{
+					if (!(named.expression.Token is IdentifierToken))
+						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+
+					// Register variable if needed
+					compiler.Context.GetOrRegisterName(named.expression.Token.SourceCode);
+				}
+			}
 		}
 
 		public override string AssembleIntoString()

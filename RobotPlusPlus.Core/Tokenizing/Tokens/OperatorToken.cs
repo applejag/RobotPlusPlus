@@ -112,8 +112,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				case null:
 					return false;
 
-				case LiteralToken lit:
-				case IdentifierToken id:
+				case FunctionCallToken _:
+				case LiteralToken _:
+				case IdentifierToken _:
 					return true;
 
 				case OperatorToken op:
