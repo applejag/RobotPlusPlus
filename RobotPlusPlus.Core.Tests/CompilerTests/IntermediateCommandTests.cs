@@ -119,6 +119,21 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
+		public void Compile_ReturnValueEmbedded()
+		{
+			// Arrange
+			const string code = "y = 'lorem' + (x = dialog.ask('hello world'))";
+			const string expected = "dialog.ask message ‴hello world‴ result ♥x\n" +
+									"♥y=⊂\"lorem\"+♥x⊃";
+
+			// Act
+			string actual = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(CompileFunctionException))]
 		public void Compile_ReturnValueNoResult()
 		{

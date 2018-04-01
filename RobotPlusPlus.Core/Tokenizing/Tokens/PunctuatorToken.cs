@@ -64,29 +64,13 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				throw new ParseUnexpectedTokenException(this);
 		}
 
-
 		public override void ParseToken(IteratedList<Token> parent)
 		{
 			switch (PunctuatorType)
 			{
 				case Type.OpeningParentases:
 					CollectUntilClosingParentases(parent);
-
-					if (Character == '(')
-					{
-						Token prev = parent.Previous;
-
-						// Merge with identifier, this is a function call
-						if (OperatorToken.ExpressionHasValue(prev))
-						{
-							parent.PopPrevious(); // id
-							parent.SwapCurrent(new FunctionCallToken(source, prev, this));
-							parent.ParseTokenAt(parent.Index);
-						}
-						else if (Count == 0)
-							throw new ParseTokenException("Unexpected empty parentases group <()>.", this);
-					}
-
+					ConvertIntoFunctionCall(parent);
 					break;
 
 				case Type.Separator:
@@ -125,6 +109,23 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				default:
 					throw new ParseUnexpectedTokenException(this);
 			}
+		}
+
+		public void ConvertIntoFunctionCall(IteratedList<Token> parent)
+		{
+			if (!IsOpenParentasesOfChar(this, '(')) return;
+
+			Token prev = parent.Previous;
+
+			// Merge with identifier, this is a function call
+			if (OperatorToken.ExpressionHasValue(prev))
+			{
+				parent.PopPrevious(); // id
+				parent.SwapCurrent(new FunctionCallToken(source, prev, this));
+				parent.ParseTokenAt(parent.Index);
+			}
+			else if (Count == 0)
+				throw new ParseTokenException("Unexpected empty parentases group <()>.", this);
 		}
 
 		private void CollectUntilClosingParentases(IteratedList<Token> parent)

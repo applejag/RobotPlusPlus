@@ -11,8 +11,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("0.5.18091.2542")]
-[assembly: AssemblyFileVersion("0.5.18091.2542")]
+[assembly: AssemblyVersion("0.5.18091.2628")]
+[assembly: AssemblyFileVersion("0.5.18091.2628")]
 
 [assembly: AssemblyTitle("Robot++ Compiler")]
 [assembly: AssemblyDescription("Compiler library for the Robot++ language.")]
