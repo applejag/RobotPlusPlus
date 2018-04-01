@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
@@ -100,6 +99,22 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 				else
 					throw new InvalidOperationException();
+			}
+
+			// Validate all required ones
+			foreach (List<G1ANTRepository.ArgumentElement> group in CommandElement.RequiredArguments)
+			{
+				int matches = Arguments.OfType<NamedArgument>().Count(a => group.Any(g => g.Name == a.name));
+
+				string displayName = group.Count == 1
+					? $"<{group[0].Name}>"
+					: "group " + string.Join(", ", group.Select(a => $"<{a.Name}>"));
+
+				if (matches == 0)
+					throw new CompileFunctionException($"Command <{CommandName}> requires argument {displayName}.", Token);
+
+				if (matches > 1)
+					throw new CompileFunctionException($"Command <{CommandName}> requires single value amoung {displayName}.", Token);
 			}
 		}
 
