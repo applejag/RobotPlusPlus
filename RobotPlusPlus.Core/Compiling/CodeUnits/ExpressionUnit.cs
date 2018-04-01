@@ -72,7 +72,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				// Check variables for registration
 				if (!compiler.Context.PrefferedExists(id.SourceCode))
-					throw new UnassignedVariableException(id);
+					throw new CompileUnassignedVariableException(id);
 			}, includeTop: true);
 			
 			foreach (CodeUnit post in PostUnits)
