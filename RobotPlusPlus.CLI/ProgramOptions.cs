@@ -122,22 +122,25 @@ namespace RobotPlusPlus.CLI
 			}
 			catch (Exception e)
 			{
-	#if TRACE
+#if TRACE
 				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("UNHANDLED EXCEPTION!");
+				Console.WriteLine("Please report all errors to https://github.com/jilleJr/RobotPlusPlus/issues");
+				Console.WriteLine();
 				Console.WriteLine(e);
 				Console.ResetColor();
-	#endif
+#endif
 			}
 			finally
 			{
 #endif
-				if (PauseAtEnd)
+			if (PauseAtEnd)
 				{
 					// Clear buffer & colors
 					while (Console.KeyAvailable) Console.ReadKey(true);
 					Console.ResetColor();
 					// Await input
-					Console.Write("\nExecution finished. Press any key to exit...");
+					Console.Write(Environment.NewLine+"Execution finished. Press any key to exit...");
 					Console.ReadKey(true);
 					Console.WriteLine();
 				}

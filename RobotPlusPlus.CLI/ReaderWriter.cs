@@ -110,7 +110,7 @@ namespace RobotPlusPlus.CLI
 			string filename = Path.GetFileName(options.Destination);
 			string encoding = options.Verbose ? $" using encoding {options.OutputEncoding.EncodingName}" : string.Empty;
 			if (!TryExecAction($"Writing file \"{filename}\"{encoding}", "writing to file",
-				() => File.WriteAllText(destination, compiledCode, options.OutputEncoding)))
+				() => File.WriteAllText(destination, $"{GetGeneratedWatermark()}\n{compiledCode}", options.OutputEncoding)))
 				return false;
 
 			console.WriteLine();
@@ -263,6 +263,14 @@ namespace RobotPlusPlus.CLI
 			}
 
 			return true;
+		}
+
+		public static string GetGeneratedWatermark()
+		{
+			return "-- G1ANT.Robot code generated via the command-line interface for the Robot++ language compiler.\n" +
+			       $"-- Version: {Program.GetShortVersion()}\n" +
+			       $"-- Generated at: {DateTime.Now:g}\n" +
+			       "-- Please report compilation bugs at https://github.com/jilleJr/RobotPlusPlus/issues\n";
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.CLI
 {
@@ -12,6 +13,11 @@ namespace RobotPlusPlus.CLI
 		public static string CompilerVersion { get; } = FormatVersion(Assembly.GetAssembly(typeof(Compiler)).GetName().Version);
 
 		public static string CLIVersion { get; } = FormatVersion(Assembly.GetExecutingAssembly().GetName().Version);
+
+		public static string AssemblyDescription => Assembly.GetExecutingAssembly()
+			.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
+		public static string AssemblyCopyrights => Assembly.GetExecutingAssembly()
+			.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright;
 
 		private static string FormatVersion(Version v)
 		{
@@ -34,9 +40,10 @@ namespace RobotPlusPlus.CLI
 			{
 				FullName = "G1ANT.Robot++ Compiler CLI",
 				Name = "RobotPlusPlus.CLI",
+				ExtendedHelpText = $"\n{AssemblyDescription}\n{AssemblyCopyrights}",
 			};
 			app.Conventions.UseDefaultConventions();
-			app.VersionOption("-v --version", GetShortVersion, GetLongVersion);
+			app.VersionOption("--version", GetShortVersion, GetLongVersion);
 
 #if DEBUG
 			return app.Execute(args);
