@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures
@@ -94,6 +95,16 @@ namespace RobotPlusPlus.Core.Structures
 			string generated = GenerateName(preffered);
 			occupied.Last()[preffered] = generated;
 			return generated;
+		}
+
+		public string GetOrRegisterName([NotNull] IdentifierToken identifier)
+		{
+			if (identifier is IdentifierTempToken temp)
+			{
+				return temp.GeneratedName = RegisterName("tmp");
+			}
+
+			return GetOrRegisterName(identifier.SourceCode);
 		}
 	}
 }

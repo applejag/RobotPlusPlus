@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PreUnits = new FlexibleList<CodeUnit>();
 			PostUnits = new FlexibleList<CodeUnit>();
 
-			Token = RemoveParentases(token, null);
+			Token = RemoveParentases(token);
 			Token = ExtractInnerAssignments(Token);
 		}
 
@@ -67,10 +67,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (!(t is IdentifierToken id)) return;
 
-				variableLookup[id] = compiler.Context.GetGenerated(id.SourceCode);
+				variableLookup[id] = compiler.Context.GetGenerated(id.Identifier);
 
 				// Check variables for registration
-				if (!compiler.Context.PrefferedExists(id.SourceCode))
+				if (!compiler.Context.PrefferedExists(id.Identifier))
 					throw new CompileUnassignedVariableException(id);
 			}, includeTop: true);
 			
@@ -99,7 +99,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case LiteralNumberToken num:
 					return num.AssembleIntoString();
 
-				case LiteralKeywordToken kw:
+				case LiteralKeywordToken _:
 					return token.SourceCode;
 
 				case IdentifierToken id:
@@ -134,29 +134,38 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Construction alterations
 
-		private Token ExtractInnerAssignments(Token token)
+		private Token ExtractInnerAssignments(Token token, Token parent = null)
 		{
 			// TODO: Add support for x++, x--, ++x, --x, ?:
+
+			// Convert command call to assignment
+			if (token is FunctionCallToken
+			&& parent != null)
+			{
+				(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
+				PreUnits.Add(unit);
+				token = temp;
+			}
 
 			// Convert assignment to expression
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
 			{
-				PreUnits.Add(CompileParsedToken(op));
+				PreUnits.Add(CompileParsedToken(op, this));
 				token = op.LHS;
 			}
 
 			// Run on childs
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = ExtractInnerAssignments(token[i]);
+				token[i] = ExtractInnerAssignments(token[i], token);
 			}
 
 			// Returns altered
 			return token;
 		}
 
-		public static Token RemoveParentases(Token token, Token parent)
+		public static Token RemoveParentases(Token token, Token parent = null)
 		{
 			Repeat:
 

@@ -171,11 +171,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				// Validate variable types
 				if (argElem?.Type == G1ANTRepository.ArgumentType.Variable)
 				{
-					if (!(named.expression.Token is IdentifierToken))
+					if (!(named.expression.Token is IdentifierToken id))
 						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
 
 					// Register variable if needed
-					compiler.Context.GetOrRegisterName(named.expression.Token.SourceCode);
+					compiler.Context.GetOrRegisterName(id);
 				}
 			}
 		}

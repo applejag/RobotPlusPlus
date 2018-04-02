@@ -150,7 +150,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'lorem' + dialog.ask('hello world')";
 			const string expected = "dialog.ask message ‴hello world‴ result ♥tmp\n" +
-			                        "♥x = ⊂\"lorem\"+♥tmp⊃";
+			                        "♥x=⊂\"lorem\"+♥tmp⊃";
 
 			// Act
 			string actual = Compiler.Compile(code);
