@@ -1,12 +1,16 @@
-
+﻿
 x = "hello dog" + 250
-y = -10
+y = "00: "+dialog.ask("lorem ipsum")
 
 if x == "hello dog250" {
-    y += 10
+    y += 10 + (x=": " + dialog.ask("how are you?"))
 
-    if y == 0 
-        y-=x
+    if y == "00: 10: 01" 
+        y+=x
 }
 
+pause("⋘enter⋙")
+
 z = y
+
+dialog("z="+z)
