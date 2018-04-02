@@ -40,8 +40,8 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Assert.That.TokenIsOperator(result[0], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsOperator(result[0][0], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsLiteralInteger(result[0][0][1], 50);
+			Assert.That.TokenIsOperator(result[0][1], OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsLiteralInteger(result[0][1][1], 50);
 		}
 
 		[TestMethod]
@@ -105,6 +105,30 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
+		public void Parse_InExpressionWithChain()
+		{
+			// Arrange
+			const string code = "50 + - - -5";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(result);
+			Assert.AreEqual(1, result.Length);
+
+			Token add = result[0];
+			Assert.That.TokenIsLiteralInteger(add[0], 50);
+
+			Token chain = add[1];
+			Assert.That.TokenIsOperator(chain, OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsOperator(chain[1], OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsOperator(chain[1][1], OperatorToken.Type.Unary, "-");
+
+			Assert.That.TokenIsLiteralInteger(chain[1][1][1], 5);
+		}
+
+		[TestMethod]
 		public void Parse_NegateBoolean()
 		{
 			// Arrange
@@ -143,21 +167,15 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
+		// Because of the tokenizer, this should compile to --(-x)
+		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
 		public void Parse_TrippleNegateVariable()
 		{
 			// Arrange
 			const string code = "---x";
 
 			// Act
-			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
-
-			// Assert
-			CollectionAssert.That.TokensAreParsed(result);
-			Assert.AreEqual(1, result.Length);
-
-			Token exp = result[0];
-			Assert.That.TokenIsOperator(exp, OperatorToken.Type.Expression, "++");
-			Assert.That.TokenIsOfType<IdentifierToken>(exp[1], "x");
+			Parser.Parse(Tokenizer.Tokenize(code));
 		}
 
 		[TestMethod]
@@ -196,7 +214,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Token exp = result[0];
-			Assert.That.TokenIsOperator(exp, OperatorToken.Type.Expression, "++");
+			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PreExpression, "++");
 			Assert.That.TokenIsOfType<IdentifierToken>(exp[1], "x");
 		}
 
@@ -214,7 +232,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Token exp = result[0];
-			Assert.That.TokenIsOperator(exp, OperatorToken.Type.Expression, "++");
+			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PostExpression, "++");
 			Assert.That.TokenIsOfType<IdentifierToken>(exp[0], "x");
 		}
 
@@ -234,7 +252,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Token unary = result[0];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "-");
 			Token exp = unary[1];
-			Assert.That.TokenIsOperator(exp, OperatorToken.Type.Expression, "++");
+			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PostExpression, "++");
 			Assert.That.TokenIsOfType<IdentifierToken>(exp[0], "x");
 		}
 
@@ -254,7 +272,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Token unary = result[0];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "-");
 			Token exp = unary[1];
-			Assert.That.TokenIsOperator(exp, OperatorToken.Type.Expression, "++");
+			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PreExpression, "++");
 			Assert.That.TokenIsOfType<IdentifierToken>(exp[1], "x");
 		}
 

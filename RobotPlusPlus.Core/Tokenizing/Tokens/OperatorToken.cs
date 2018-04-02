@@ -27,15 +27,22 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			set => this[1] = value;
 		}
 
+		private OperatorToken(TokenSource source, Type operatorType) : base(source)
+		{
+			OperatorType = operatorType;
+		}
+
 		public OperatorToken(TokenSource source) : base(source)
 		{
 			switch (SourceCode)
 			{
 				case "++":
 				case "--":
-					OperatorType = Type.Expression;
+					OperatorType = Type.PostExpression;
 					break;
 
+				case "+":
+				case "-":
 				case "!":
 				case "~":
 					OperatorType = Type.Unary;
@@ -47,10 +54,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					OperatorType = Type.Multiplicative;
 					break;
 
-				case "+":
-				case "-":
-					OperatorType = Type.Additive;
-					break;
+				//case "+":
+				//case "-":
+				//	OperatorType = Type.Additive;
+				//	break;
 
 				case "<<":
 				case ">>":
@@ -118,7 +125,9 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					return true;
 
 				case OperatorToken op:
-					if (op.OperatorType == Type.Unary)
+					if (op.OperatorType == Type.Unary || op.OperatorType == Type.PreExpression)
+						return ExpressionHasValue(op.RHS) && op.LHS == null;
+					else if (op.OperatorType == Type.PostExpression)
 						return ExpressionHasValue(op.LHS) && op.RHS == null;
 					else
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
@@ -141,15 +150,34 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			switch (OperatorType)
 			{
 				// Expression
-				case Type.Expression when parent.Previous is IdentifierToken:
-					LHS = parent.PopPrevious();
+				case Type.PostExpression:
+					if (parent.Previous is IdentifierToken)
+						LHS = parent.PopPrevious();
+					else
+						parent.SwapCurrent(new OperatorToken(source, Type.PreExpression));
 					break;
-				case Type.Expression:
-					throw new NotImplementedException("Expressions are not yet implemented! (ex: ++x, --x)");
+
+				case Type.PreExpression:
+					if (!(parent.Next is IdentifierToken))
+						throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
+
+					RHS = parent.PopNext();
+					break;
 
 				// Unary
 				case Type.Unary:
-					RHS = parent.PopNext();
+					if ((SourceCode == "-" || SourceCode == "+") && ExpressionHasValue(parent.Previous))
+						parent.SwapCurrent(new OperatorToken(source, Type.Additive));
+					else
+					{
+						if (parent.Next is OperatorToken un && un.OperatorType == Type.Unary)
+							parent.ParseNextToken();
+
+						if (ExpressionHasValue(parent.Next))
+							RHS = parent.PopNext();
+						else
+							throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
+					}
 					break;
 
 				// Two sided expressions
@@ -210,8 +238,11 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public enum Type
 		{
-			///<summary>++, --</summary>
-			Expression,
+			///<summary>x++, x--</summary>
+			PostExpression,
+
+			///<summary>++x, --x</summary>
+			PreExpression,
 
 			///<summary>-x, !x, ~x</summary>
 			Unary,
@@ -248,6 +279,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 			/////<summary>x?true:false</summary>
 			//Conditional,
+
 			///<summary>x=y, x+=y, x-=y, x*=y, x/=y, etc.</summary>
 			Assignment,
 		}

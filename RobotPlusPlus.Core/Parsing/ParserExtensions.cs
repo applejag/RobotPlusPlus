@@ -18,10 +18,18 @@ namespace RobotPlusPlus.Core.Parsing
 			if (token == null) return false;
 			if (token.IsParsed) return false;
 
-			token.ParseToken(new IteratedList<Token>(parent, index, parent.Reversed));
-			token.IsParsed = true;
+			for (var i = 0; i < 42; i++)
+			{
+				token.ParseToken(new IteratedList<Token>(parent, index, parent.Reversed));
+				token.IsParsed = true;
 
-			return true;
+				token = index < parent.Count ? parent[index] : null;
+
+				if (token?.IsParsed != false)
+					return true;
+			}
+
+			throw new ParseTokenException($"Detected loop while parsing token <{token.SourceCode}>.", token);
 		}
 
 		public static bool ParseNextToken([NotNull] this IteratedList<Token> parent)
