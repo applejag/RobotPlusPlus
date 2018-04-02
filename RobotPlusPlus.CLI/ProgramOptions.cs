@@ -2,19 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using McMaster.Extensions.CommandLineUtils;
 using RobotPlusPlus.CLI.Validation;
 
 namespace RobotPlusPlus.CLI
 {
-	[VersionOptionFromMember(MemberName = nameof(Version))]
 	[HelpOption]
 	public class ProgramOptions
 	{
-		public string Version => "hellodog";
-
 		#region Private option fields
 		[Required]
 		[FileExists]
@@ -25,13 +21,13 @@ namespace RobotPlusPlus.CLI
 
 		[ValidPathCharacters(ErrorMessage = "The output folder must not contains invalid characters!")]
 		[Option("-d --dest <FOLDER>",
-			Description = "The destination for the compiled `.robot` script.\n" +
+			Description = "The destination for the compiled `.robot` script.\r\n" +
 						  "Default: Same folder as <Script>.")]
 		private string OptDestinationFolder { get; } = null;
 
 		[ValidFileNameCharacters(ErrorMessage = "The output filename must not contains invalid characters!")]
 		[Option("-n --name <FILENAME>",
-			Description = "The output filename. The extension `.robot` will be added if one is omitted.\n" +
+			Description = "The output filename. The extension `.robot` will be added if one is omitted.\r\n" +
 						  "Default: Same name as <Script> but with `.robot` extension.")]
 		private string OptDestinationFileName { get; } = null;
 
@@ -41,14 +37,14 @@ namespace RobotPlusPlus.CLI
 
 		[Option("-o --overwrite",
 			Description = "Will overwrite without prompting the user.")]
-		private bool OptOverwriteWithoutPrompt { get; set; } = false;
+		private bool OptOverwriteWithoutPrompt { get; set; }
 
 		[Option("-f --folder",
 			Description = "Will create folder if it doesn't already exist.")]
 		private bool OptCreateFolder { get; } = false;
 
 		[Option("-q --quiet",
-			Description = "Disables all writing to the console.\n" +
+			Description = "Disables all writing to the console.\r\n" +
 						  "This flag enables --Overwrite and --NoPause, and disables --Verbose.")]
 		private bool OptQuietMode { get; } = false;
 
@@ -61,11 +57,13 @@ namespace RobotPlusPlus.CLI
 		private bool OptDryRun { get; } = false;
 		
 		[Option("-ie --inencoding <NAME>",
-			Description = "The encoding to use when reading the source file. Default: Current OS ASNI code page.")]
+			Description = "The encoding to use when reading the source file.\r\n" +
+			              "Default: Current OS ASNI code page.")]
 		private Encodings? OptInputEncoding { get; } = null;
 
 		[Option("-oe --outencoding <NAME>",
-			Description = "The encoding to use when writing the output file. Default: UTF-8.")]
+			Description = "The encoding to use when writing the output file.\r\n" +
+			              "Default: UTF-8.")]
 		private Encodings? OptOutputEncoding { get; } = null;
 		#endregion
 
