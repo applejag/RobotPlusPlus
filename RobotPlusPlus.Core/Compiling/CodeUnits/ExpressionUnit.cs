@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public bool NeedsCSSnippet { get; set; }
 
-		private Dictionary<IdentifierToken, string> variableLookup = null;
+		private Dictionary<IdentifierToken, string> variableLookup;
 
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -30,6 +30,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void PreCompile(Compiler compiler)
 		{
+			NeedsCSSnippet = false;
+
 			foreach (CodeUnit pre in PreUnits)
 				pre.PreCompile(compiler);
 			foreach (CodeUnit post in PostUnits)
@@ -66,11 +68,15 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (!(t is IdentifierToken id)) return;
 
-				variableLookup[id] = compiler.VariableContext.GetGenerated(id.SourceCode);
+				variableLookup[id] = compiler.Context.GetGenerated(id);
+
+				if (id is IdentifierTempToken tmp
+					&& string.IsNullOrEmpty(tmp.GeneratedName))
+					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
-				if (!compiler.VariableContext.PrefferedExists(id.SourceCode))
-					throw new UnassignedVariableException(id);
+				if (!compiler.Context.PrefferedExists(id))
+					throw new CompileUnassignedVariableException(id);
 			}, includeTop: true);
 			
 			foreach (CodeUnit post in PostUnits)
@@ -79,7 +85,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override string AssembleIntoString()
 		{
-			return NeedsCSSnippet
+			return NeedsCSSnippet && !(Parent is IfUnit)
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
@@ -98,7 +104,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case LiteralNumberToken num:
 					return num.AssembleIntoString();
 
-				case LiteralKeywordToken kw:
+				case LiteralKeywordToken _:
 					return token.SourceCode;
 
 				case IdentifierToken id:
@@ -133,31 +139,45 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Construction alterations
 
-		private Token ExtractInnerAssignments(Token token)
+		private Token ExtractInnerAssignments(Token token, Token parent = null)
 		{
 			// TODO: Add support for x++, x--, ++x, --x, ?:
+
+			// Convert command call to assignment
+			if (token is FunctionCallToken
+			&& parent != null)
+			{
+				(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
+				PreUnits.Add(unit);
+				token = temp;
+			}
+
+			// Convert assignment to expression
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
 			{
-				PreUnits.Add(new AssignmentUnit(op, this));
+				PreUnits.Add(CompileParsedToken(op, this));
 				token = op.LHS;
 			}
 
+			// Run on childs
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = ExtractInnerAssignments(token[i]);
+				token[i] = ExtractInnerAssignments(token[i], token);
 			}
 
+			// Returns altered
 			return token;
 		}
 
-		public static Token RemoveParentases(Token token)
+		public static Token RemoveParentases(Token token, Token parent = null)
 		{
 			Repeat:
 
 			if (token is PunctuatorToken pun
 				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
-				&& pun.Character == '(')
+				&& pun.Character == '('
+			    && !(parent is FunctionCallToken))
 			{
 				if (pun.Count != 1)
 					throw new CompileIncorrectTokenCountException(1, pun);
@@ -168,7 +188,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = RemoveParentases(token[i]);
+				token[i] = RemoveParentases(token[i], token);
 			}
 
 			return token;

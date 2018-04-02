@@ -27,6 +27,8 @@ namespace RobotPlusPlus.Core.Structures
 
 		public IList<T> List { get; }
 
+		private readonly IteratedList<T> parent = null;
+
 		public IteratedList(IList<T> list, bool reversed = false)
 			: this(list, reversed ? list.Count - 1 : 0, reversed)
 		{ }
@@ -36,6 +38,14 @@ namespace RobotPlusPlus.Core.Structures
 			List = list;
 			Reversed = reversed;
 			Index = index;
+		}
+
+		public IteratedList(IteratedList<T> parent, int index, bool? reversed = null)
+		{
+			List = parent.List;
+			Reversed = reversed ?? parent.Reversed;
+			Index = index;
+			this.parent = parent;
 		}
 
 		/// <exception cref="IndexOutOfRangeException"></exception>
@@ -48,6 +58,12 @@ namespace RobotPlusPlus.Core.Structures
 		public T PopPrevious()
 		{
 			return List.Pop(--Index);
+		}
+
+		/// <exception cref="IndexOutOfRangeException"></exception>
+		public T PopCurrent()
+		{
+			return List.Pop(Index--);
 		}
 
 		public void PushNext(T value)
@@ -74,6 +90,26 @@ namespace RobotPlusPlus.Core.Structures
 			{
 				PushPrevious(item);
 			}
+		}
+		public T SwapCurrent(T value)
+		{
+			T old = List[Index];
+			List[Index] = value;
+			return old;
+		}
+
+		public T SwapPrevious(T value)
+		{
+			T old = List[Index - 1];
+			List[Index - 1] = value;
+			return old;
+		}
+
+		public T SwapNext(T value)
+		{
+			T old = List[Index + 1];
+			List[Index + 1] = value;
+			return old;
 		}
 
 		public IteratedList<T> Copy()

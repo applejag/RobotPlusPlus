@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures
@@ -46,6 +47,11 @@ namespace RobotPlusPlus.Core.Structures
 			return occupied.Any(layer => layer.Keys.Contains(preffered, prefferedComparer));
 		}
 
+		public bool PrefferedExists([NotNull] IdentifierToken identifier)
+		{
+			return identifier is IdentifierTempToken || PrefferedExists(identifier.Identifier);
+		}
+
 		public bool GeneratedExists([NotNull] string generated)
 		{
 			return oldGenerated.Contains(generated, generatedComparer)
@@ -63,13 +69,20 @@ namespace RobotPlusPlus.Core.Structures
 			return null;
 		}
 
-		public string GetOrGenerateName([NotNull] string preffered)
+		public string GetGenerated([NotNull] IdentifierToken identifier)
 		{
-			return GetGenerated(preffered)
-			       ?? GenerateName(preffered);
+			if (identifier is IdentifierTempToken temp)
+				return temp.GeneratedName;
+			return GetGenerated(identifier.Identifier);
 		}
 
-		public string GenerateName([NotNull] string preffered)
+		public string GetOrRegisterName([NotNull] string preffered)
+		{
+			return GetGenerated(preffered)
+			       ?? RegisterName(preffered);
+		}
+		
+		private string GenerateName(string preffered)
 		{
 			string generated = preffered;
 			var iter = 1;
@@ -78,10 +91,32 @@ namespace RobotPlusPlus.Core.Structures
 			{
 				generated = preffered + ++iter;
 			}
-
-			occupied.Peek()[preffered] = generated;
-
+			
 			return generated;
+		}
+
+		public string RegisterName([NotNull] string preffered)
+		{
+			string generated = GenerateName(preffered);
+			occupied.Peek()[preffered] = generated;
+			return generated;
+		}
+
+		public string RegisterGlobalName([NotNull] string preffered)
+		{
+			string generated = GenerateName(preffered);
+			occupied.Last()[preffered] = generated;
+			return generated;
+		}
+
+		public string GetOrRegisterName([NotNull] IdentifierToken identifier)
+		{
+			if (identifier is IdentifierTempToken temp)
+			{
+				return temp.GeneratedName = RegisterName("tmp");
+			}
+
+			return GetOrRegisterName(identifier.SourceCode);
 		}
 	}
 }

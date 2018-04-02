@@ -9,6 +9,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	/// <summary>Variables. Ex: x, myValue, go_johnny_go</summary>
 	public class IdentifierToken : Token
 	{
+		public virtual string Identifier => SourceCode;
+
 		public IdentifierToken(TokenSource source) : base(source)
 		{ }
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
@@ -28,6 +29,20 @@ namespace RobotPlusPlus.Core.Tests
 			string actual = input.EscapeString();
 
 			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		public void G1ANTRepositoryLoading()
+		{
+			G1ANTRepository repo = G1ANTRepository.FromEmbeddedXML();
+
+			Assert.IsNotNull(repo);
+			Assert.IsNotNull(repo.Commands);
+			Assert.IsNotNull(repo.Commands.Commands);
+			Assert.AreNotEqual(0, repo.Commands.Commands.Count);
+			Assert.IsNotNull(repo.Commands.GlobalArguments);
+			Assert.IsNotNull(repo.Commands.GlobalArguments.Arguments);
+			Assert.AreNotEqual(0, repo.Commands.GlobalArguments.Arguments.Count);
 		}
 	}
 }

@@ -18,6 +18,18 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="XML\G1ANT.xml" />
+	  <None Remove="XML\G1ANT.xsd" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="XML\G1ANT.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="XML\G1ANT.xsd">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
 	  <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
 	</ItemGroup>
 

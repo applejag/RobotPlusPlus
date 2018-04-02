@@ -86,13 +86,24 @@ namespace RobotPlusPlus.Core.Tests
 		}
 
 		[AssertionMethod]
+		public static void TokenIsDotOperation(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)]
+			Token token)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(PunctuatorToken));
+			Assert.AreEqual(PunctuatorToken.Type.Dot, ((PunctuatorToken)token).PunctuatorType);
+			Assert.AreEqual('.', ((PunctuatorToken)token).Character);
+		}
+
+		[AssertionMethod]
 		public static void TokenIsOfType<T>(this Assert assert,
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, string expectedSource)
 			where T : Token
 		{
 			Assert.IsNotNull(token);
 			Assert.IsInstanceOfType(token, typeof(T));
-			Assert.AreEqual(expectedSource, token.SourceCode);
+			Assert.AreEqual(expectedSource, token.SourceCode, "Incorrect token source code.");
 		}
 
 		private static void TokensAreParsed(

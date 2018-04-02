@@ -58,7 +58,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(UnassignedVariableException))]
+		[ExpectedException(typeof(CompileUnassignedVariableException))]
 		public void Compile_VariableUnassigned()
 		{
 			// Act
@@ -69,7 +69,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(UnassignedVariableException))]
+		[ExpectedException(typeof(CompileUnassignedVariableException))]
 		public void Compile_VariableSelfAssign()
 		{
 			// Act
@@ -81,7 +81,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 
 		[TestMethod]
-		[ExpectedException(typeof(UnassignedVariableException))]
+		[ExpectedException(typeof(CompileUnassignedVariableException))]
 		public void Compile_VariableSelfIncrementAssign()
 		{
 			// Act

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
-using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
-using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class AssignmentUnit : CodeUnit
 	{
 		public ExpressionUnit Expression { get; }
-		public string VariableOriginalName { get; }
+		public IdentifierToken VariableOriginalToken { get; }
 		public string VariableGeneratedName { get; private set; }
 
 		public AssignmentUnit([NotNull] OperatorToken token, [CanBeNull] CodeUnit parent = null)
@@ -25,7 +23,32 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				throw new CompileUnexpectedTokenException(token);
 
 			Expression = new ExpressionUnit(token.RHS, this);
-			VariableOriginalName = id.SourceCode;
+			VariableOriginalToken = id;
+		}
+
+		public static (CodeUnit, IdentifierTempToken) CreateTemporaryAssignment([NotNull] Token RHS, [CanBeNull] CodeUnit parent = null)
+		{
+			// Fabricate tokens
+			TokenSource source = RHS.source;
+			source.code = "=";
+			var op = new OperatorToken(source);
+
+			source.code = string.Empty;
+			var id = new IdentifierTempToken(source);
+
+			// Fabricate environment
+			var env = new IteratedList<Token>(new List<Token>
+			{
+				id, op, RHS
+			});
+
+			// Parse
+			env.ParseTokenAt(1);
+
+			// Fabricate assignment unit
+			CodeUnit tempUnit = CompileParsedToken(op, parent);
+
+			return (tempUnit, id);
 		}
 
 		public override void PreCompile(Compiler compiler)
@@ -43,7 +66,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Expression.Compile(compiler);
 
 			// Register variable, or use already registered
-			VariableGeneratedName = compiler.VariableContext.GetOrGenerateName(VariableOriginalName);
+			VariableGeneratedName = compiler.Context.GetOrRegisterName(VariableOriginalToken);
 		}
 
 		public override string AssembleIntoString()

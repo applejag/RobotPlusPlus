@@ -1,5 +1,6 @@
 ﻿using System;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Exceptions
 {
@@ -11,7 +12,7 @@ namespace RobotPlusPlus.Core.Exceptions
 
 		public ParseUnexpectedLeadingTokenException(Token source, Token leading, Exception innerException)
 			: base(
-				$"Unexpected leading token <{(leading == null ? "null" : leading.GetType().Name + ", " + leading.SourceCode)}> before <{source.SourceCode}>.",
+				$"Unexpected leading token <{(leading == null ? "null" : leading.GetType().Name + ", " + leading.SourceCode.EscapeString())}> before <{source.SourceCode.EscapeString()}>.",
 				source, leading, innerException)
 		{ }
 	}

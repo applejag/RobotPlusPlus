@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Structures;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
@@ -16,8 +17,9 @@ namespace RobotPlusPlus.Core.Compiling
 	{
 		private readonly List<CodeUnit> codeUnits;
 
-		public NameContext VariableContext { get; private set; }
-		public NameContext LabelContext { get; private set; }
+		public NameContext Context { get; private set; }
+
+		public G1ANTRepository G1ANTRepository { get; private set; }
 
 		public Compiler()
 		{
@@ -49,8 +51,10 @@ namespace RobotPlusPlus.Core.Compiling
 		public void Compile()
 		{
 			// Reset contexts
-			VariableContext = new NameContext();
-			LabelContext = new NameContext();
+			Context = new NameContext();
+
+			// Load predefined values
+			G1ANTRepository = G1ANTRepository.FromEmbeddedXML();
 
 			// Compile
 			CompileUnits(codeUnits, this);
