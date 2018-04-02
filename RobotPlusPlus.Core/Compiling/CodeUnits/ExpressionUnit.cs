@@ -67,10 +67,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (!(t is IdentifierToken id)) return;
 
-				variableLookup[id] = compiler.Context.GetGenerated(id.Identifier);
+				variableLookup[id] = compiler.Context.GetGenerated(id);
+
+				if (id is IdentifierTempToken tmp
+					&& string.IsNullOrEmpty(tmp.GeneratedName))
+					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
-				if (!compiler.Context.PrefferedExists(id.Identifier))
+				if (!compiler.Context.PrefferedExists(id))
 					throw new CompileUnassignedVariableException(id);
 			}, includeTop: true);
 			

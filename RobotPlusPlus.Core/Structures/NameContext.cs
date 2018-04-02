@@ -47,6 +47,11 @@ namespace RobotPlusPlus.Core.Structures
 			return occupied.Any(layer => layer.Keys.Contains(preffered, prefferedComparer));
 		}
 
+		public bool PrefferedExists([NotNull] IdentifierToken identifier)
+		{
+			return identifier is IdentifierTempToken || PrefferedExists(identifier.Identifier);
+		}
+
 		public bool GeneratedExists([NotNull] string generated)
 		{
 			return oldGenerated.Contains(generated, generatedComparer)
@@ -62,6 +67,13 @@ namespace RobotPlusPlus.Core.Structures
 			}
 
 			return null;
+		}
+
+		public string GetGenerated([NotNull] IdentifierToken identifier)
+		{
+			if (identifier is IdentifierTempToken temp)
+				return temp.GeneratedName;
+			return GetGenerated(identifier.Identifier);
 		}
 
 		public string GetOrRegisterName([NotNull] string preffered)
