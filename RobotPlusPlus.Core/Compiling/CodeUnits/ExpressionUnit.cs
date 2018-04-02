@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -84,7 +85,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override string AssembleIntoString()
 		{
-			return NeedsCSSnippet
+			return NeedsCSSnippet && !(Parent is IfUnit)
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
