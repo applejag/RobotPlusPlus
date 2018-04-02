@@ -130,6 +130,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		private void CollectUntilClosingParentases(IteratedList<Token> parent)
 		{
+			var nestedParentases = 0;
 			// Collect all until group found
 			while (true)
 			{
@@ -140,13 +141,19 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 						throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", this);
 
 					case PunctuatorToken open when open.PunctuatorType == Type.OpeningParentases:
-						parent.ParseNextToken();
+						nestedParentases++;
 						goto default;
 
 					case PunctuatorToken close when close.PunctuatorType == Type.ClosingParentases
 						&& close.Character == GetMatchingParentases(Character):
-						parent.PopNext();
-						return; // stops
+						if (nestedParentases == 0)
+						{
+							parent.PopNext();
+							return; // stops
+						}
+
+						nestedParentases--;
+						goto default;
 
 					default:
 						this.Add(parent.PopNext());
