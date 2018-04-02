@@ -25,6 +25,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PostUnits = new FlexibleList<CodeUnit>();
 
 			Token = RemoveParentases(token);
+			Token = RemoveUnaries(Token);
 			Token = ExtractInnerAssignments(Token);
 		}
 
@@ -120,7 +121,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return $"{StringifyOperatorChildToken(op, op.LHS)}{op.SourceCode}{StringifyOperatorChildToken(op, op.RHS)}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
-					return $"{op.SourceCode}{StringifyToken(op.RHS)}";
+					return $"{op.SourceCode}{StringifyOperatorChildToken(op, op.UnaryValue)}";
 
 				default:
 					throw new CompileUnexpectedTokenException(token);
@@ -152,6 +153,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				token = temp;
 			}
 
+			// Convert prefix expressions
+			if (token is OperatorToken pre && pre.OperatorType == OperatorToken.Type.PreExpression)
+			{
+				PreUnits.Add(CompileParsedToken(pre, this));
+				token = pre.UnaryValue;
+			}
+
+			// Convert postfix expressions
+			if (token is OperatorToken post && post.OperatorType == OperatorToken.Type.PostExpression)
+			{
+				PostUnits.Add(CompileParsedToken(post, this));
+				token = post.UnaryValue;
+			}
+
 			// Convert assignment to expression
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
@@ -175,8 +190,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Repeat:
 
 			if (token is PunctuatorToken pun
-				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
-				&& pun.Character == '('
+			    && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
+			    && pun.Character == '('
 			    && !(parent is FunctionCallToken))
 			{
 				if (pun.Count != 1)
@@ -189,6 +204,38 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			for (var i = 0; i < token.Count; i++)
 			{
 				token[i] = RemoveParentases(token[i], token);
+			}
+
+			return token;
+		}
+
+		public static Token RemoveUnaries(Token token, Token parent = null)
+		{
+			Repeat:
+			
+			if (token is OperatorToken op
+			    && op.OperatorType == OperatorToken.Type.Unary)
+			{
+				// Remove + unary
+				if (op.SourceCode == "+")
+				{
+					token = op.UnaryValue;
+					goto Repeat;
+				}
+
+				// Remove double unary -(-x), !!x, ~~x
+				if (op.UnaryValue is OperatorToken op2
+				    && op.OperatorType == op2.OperatorType
+				    && op.SourceCode == op2.SourceCode)
+				{
+					token = op2.UnaryValue;
+					goto Repeat;
+				}
+			}
+
+			for (var i = 0; i < token.Count; i++)
+			{
+				token[i] = RemoveUnaries(token[i], token);
 			}
 
 			return token;

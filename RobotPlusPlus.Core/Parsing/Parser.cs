@@ -30,12 +30,15 @@ namespace RobotPlusPlus.Core.Parsing
 		private static void ParseTokens(IList<Token> tokens, Predicate<Token> filter, bool reversed)
 		{
 			var parent = new IteratedList<Token>(tokens, reversed);
-			while (true)
+
+			bool any;
+			do
 			{
-				var any = false;
-				
+				any = false;
 				foreach (Token token in parent)
-				{	
+				{
+					if (token is null) continue;
+
 					ParseTokens(parent.Current, filter, parent.Reversed);
 
 					if (token.IsParsed) continue;
@@ -46,8 +49,7 @@ namespace RobotPlusPlus.Core.Parsing
 					any = true;
 				}
 
-				if (!any) return;
-			}
+			} while (any);
 		}
 
 		protected void ParseAllTokenTypes()

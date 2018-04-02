@@ -111,14 +111,14 @@ namespace RobotPlusPlus.Core.Utility
 			[NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
-			return source.Any(item => predicate(item) || item.AnyRecursive(predicate));
+			return source.Any(item => predicate(item) || item?.AnyRecursive(predicate) == true);
 		}
 
 		public static bool AllRecursive<TSource>([NotNull] this IEnumerable<TSource> source,
 			[NotNull] Func<TSource, bool> predicate)
 			where TSource : IEnumerable<TSource>
 		{
-			return source.All(item => predicate(item) && item.AllRecursive(predicate));
+			return source.All(item => predicate(item) && item?.AllRecursive(predicate) == true);
 		}
 
 		public static bool AnyRecursive<TSource>([NotNull] this TSource source,
@@ -133,7 +133,7 @@ namespace RobotPlusPlus.Core.Utility
 			[NotNull] Func<TSource, bool> predicate, bool includeTop)
 			where TSource : IEnumerable<TSource>
 		{
-			if (includeTop) return predicate(source) && source.All(item => predicate(item) && item.AllRecursive(predicate));
+			if (includeTop) return predicate(source) && source.AllRecursive(predicate);
 			return source.AllRecursive(predicate);
 		}
 
