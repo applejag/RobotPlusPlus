@@ -61,6 +61,15 @@ namespace RobotPlusPlus.Core.Tests
 		}
 
 		[AssertionMethod]
+		public static void TokenIsLiteralKeyword(this Assert assert,
+			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, bool? value)
+		{
+			Assert.IsNotNull(token);
+			Assert.IsInstanceOfType(token, typeof(LiteralKeywordToken));
+			Assert.AreEqual(value, ((LiteralKeywordToken)token).Value);
+		}
+
+		[AssertionMethod]
 		public static void TokenIsParentases(this Assert assert,
 			[AssertionCondition(AssertionConditionType.IS_NOT_NULL)] Token token, char expectedOpeningChar)
 		{
