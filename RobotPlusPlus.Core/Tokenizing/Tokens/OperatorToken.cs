@@ -242,6 +242,30 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
+		public static OperatorToken ConvertPostPrefixToAssignment(OperatorToken token)
+		{
+			// Fabricate tokens
+			TokenSource opSource = token.source;
+
+			opSource.code = opSource.code.Substring(0, 1);
+			var op = new OperatorToken(opSource);
+			opSource.code = "=";
+			var ass = new OperatorToken(opSource);
+			opSource.code = "1";
+			var one = new LiteralNumberToken(opSource);
+
+			Token id = token.UnaryValue as IdentifierToken
+				?? throw new ParseUnexpectedTokenException(token.UnaryValue);
+
+			// Fabricate & parse environment
+			Parser.Parse(new[]
+			{
+				id, ass, id, op, one
+			});
+
+			return ass;
+		}
+
 		public enum Type
 		{
 			///<summary>x++, x--</summary>

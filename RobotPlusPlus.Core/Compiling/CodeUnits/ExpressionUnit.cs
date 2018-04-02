@@ -25,7 +25,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PostUnits = new FlexibleList<CodeUnit>();
 
 			Token = RemoveParentases(token);
-			Token = RemoveUnaries(token);
+			Token = RemoveUnaries(Token);
 			Token = ExtractInnerAssignments(Token);
 		}
 
@@ -153,6 +153,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				token = temp;
 			}
 
+			// Convert prefix expressions
+			if (token is OperatorToken pre && pre.OperatorType == OperatorToken.Type.PreExpression)
+			{
+				PreUnits.Add(CompileParsedToken(pre, this));
+				token = pre.UnaryValue;
+			}
+
+			// Convert postfix expressions
+			if (token is OperatorToken post && post.OperatorType == OperatorToken.Type.PostExpression)
+			{
+				PostUnits.Add(CompileParsedToken(post, this));
+				token = post.UnaryValue;
+			}
+
 			// Convert assignment to expression
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
@@ -185,26 +199,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				token = token[0];
 				goto Repeat;
-			}
-
-			if (token is OperatorToken op
-			    && op.OperatorType == OperatorToken.Type.Unary)
-			{
-				// Remove + unary
-				if (op.SourceCode == "+")
-				{
-					token = op.UnaryValue;
-					goto Repeat;
-				}
-
-				// Remove double unary -(-x), !!x, ~~x
-				if (op.UnaryValue is OperatorToken op2
-				    && op.OperatorType == op2.OperatorType
-				    && op.SourceCode == op2.SourceCode)
-				{
-					token = op2.UnaryValue;
-					goto Repeat;
-				}
 			}
 
 			for (var i = 0; i < token.Count; i++)

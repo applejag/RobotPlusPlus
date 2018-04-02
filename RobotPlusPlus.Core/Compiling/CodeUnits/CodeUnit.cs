@@ -44,6 +44,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 					return new AssignmentUnit(op, parent);
 
+				case OperatorToken op when op.OperatorType == OperatorToken.Type.PreExpression
+					|| op.OperatorType == OperatorToken.Type.PostExpression:
+
+					return new AssignmentUnit(OperatorToken.ConvertPostPrefixToAssignment(op), parent);
+
 				case PunctuatorToken pun when pun.Character == ';':
 					return null;
 
