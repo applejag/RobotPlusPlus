@@ -29,28 +29,33 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public static CodeUnit CompileParsedToken([NotNull] Token token)
 		{
+			return CompileParsedToken(token, null);
+		}
+
+		public static CodeUnit CompileParsedToken([NotNull] Token token, [CanBeNull] CodeUnit parent)
+		{
 			switch (token)
 			{
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment:
 					if (!(op.LHS is IdentifierToken lhs))
 						throw new CompileUnexpectedTokenException(op.LHS);
 					if (op.RHS is FunctionCallToken rhs)
-						return new CommandUnit(rhs, lhs);
+						return new CommandUnit(rhs, lhs, parent);
 
-					return new AssignmentUnit(op);
+					return new AssignmentUnit(op, parent);
 
 				case PunctuatorToken pun when pun.Character == ';':
 					return null;
 
 				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
 					&& pun.Character == '{':
-					return new CodeBlockUnit(token);
+					return new CodeBlockUnit(token, parent);
 
 				case StatementToken st when st.StatementType == StatementToken.Type.If:
-					return new IfUnit(st);
+					return new IfUnit(st, parent);
 
 				case FunctionCallToken func:
-					return new CommandUnit(func);
+					return new CommandUnit(func, null, parent);
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

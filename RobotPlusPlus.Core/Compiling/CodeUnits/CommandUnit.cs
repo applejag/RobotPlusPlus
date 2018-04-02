@@ -26,6 +26,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] IdentifierToken resultToken = null, [CanBeNull] CodeUnit parent = null) : base(token, parent)
 		{
+			if (token.ParentasesGroup is null)
+				throw new CompileException("Function parentases token is null.", token);
+			if (token.LHS is null)
+				throw new CompileException("Function callee token is null.", token);
+
 			Arguments = SplitArguments(token.ParentasesGroup);
 
 			// Add result argument

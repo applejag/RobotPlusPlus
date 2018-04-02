@@ -140,7 +140,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					case null:
 						throw new ParseTokenException($"Unexpected EOF, expected <{GetMatchingParentases(Character)}>!", this);
 
-					case PunctuatorToken open when open.PunctuatorType == Type.OpeningParentases:
+					case PunctuatorToken open when IsOpenParentasesOfChar(open, Character):
 						nestedParentases++;
 						goto default;
 

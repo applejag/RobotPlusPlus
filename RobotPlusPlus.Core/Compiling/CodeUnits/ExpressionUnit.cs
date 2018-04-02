@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PreUnits = new FlexibleList<CodeUnit>();
 			PostUnits = new FlexibleList<CodeUnit>();
 
-			Token = RemoveParentases(token);
+			Token = RemoveParentases(token, null);
 			Token = ExtractInnerAssignments(Token);
 		}
 
@@ -142,7 +142,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Assignment)
 			{
-				PreUnits.Add(new AssignmentUnit(op, this));
+				PreUnits.Add(CompileParsedToken(op));
 				token = op.LHS;
 			}
 
@@ -156,13 +156,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return token;
 		}
 
-		public static Token RemoveParentases(Token token)
+		public static Token RemoveParentases(Token token, Token parent)
 		{
 			Repeat:
 
 			if (token is PunctuatorToken pun
 				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
-				&& pun.Character == '(')
+				&& pun.Character == '('
+			    && !(parent is FunctionCallToken))
 			{
 				if (pun.Count != 1)
 					throw new CompileIncorrectTokenCountException(1, pun);
@@ -173,7 +174,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = RemoveParentases(token[i]);
+				token[i] = RemoveParentases(token[i], token);
 			}
 
 			return token;
