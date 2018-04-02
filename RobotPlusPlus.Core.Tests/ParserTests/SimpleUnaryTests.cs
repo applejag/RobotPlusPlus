@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Assert.That.TokenIsOperator(result[0], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsLiteralInteger(result[0][1], 50);
+			Assert.That.TokenIsLiteralInteger(result[0][0], 50);
 		}
 
 		[TestMethod]
@@ -40,8 +40,8 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Assert.That.TokenIsOperator(result[0], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsOperator(result[0][1], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsLiteralInteger(result[0][1][1], 50);
+			Assert.That.TokenIsOperator(result[0][0], OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsLiteralInteger(result[0][0][0], 50);
 		}
 
 		[TestMethod]
@@ -58,7 +58,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.AreEqual(1, result.Length);
 
 			Assert.That.TokenIsOperator(result[0], OperatorToken.Type.Unary, "+");
-			Assert.That.TokenIsLiteralInteger(result[0][1], 50);
+			Assert.That.TokenIsLiteralInteger(result[0][0], 50);
 		}
 
 		[TestMethod]
@@ -76,7 +76,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Assert.That.TokenIsOperator(result[0], OperatorToken.Type.Unary, "-");
 
-			Token par = result[0][1];
+			Token par = result[0][0];
 			Assert.That.TokenIsParentases(par, '(', 1);
 			Token add = par[0];
 			Assert.That.TokenIsLiteralInteger(add[0], 50);
@@ -101,7 +101,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token unary = add[1];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsLiteralInteger(unary[1], 5);
+			Assert.That.TokenIsLiteralInteger(unary[0], 5);
 		}
 
 		[TestMethod]
@@ -122,10 +122,10 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token chain = add[1];
 			Assert.That.TokenIsOperator(chain, OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsOperator(chain[1], OperatorToken.Type.Unary, "-");
-			Assert.That.TokenIsOperator(chain[1][1], OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsOperator(chain[0], OperatorToken.Type.Unary, "-");
+			Assert.That.TokenIsOperator(chain[0][0], OperatorToken.Type.Unary, "-");
 
-			Assert.That.TokenIsLiteralInteger(chain[1][1][1], 5);
+			Assert.That.TokenIsLiteralInteger(chain[0][0][0], 5);
 		}
 
 		[TestMethod]
@@ -143,7 +143,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token unary = result[0];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "!");
-			Assert.That.TokenIsLiteralKeyword(unary[1], true);
+			Assert.That.TokenIsLiteralKeyword(unary[0], true);
 		}
 
 		[TestMethod]
@@ -161,9 +161,9 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token unary1 = result[0];
 			Assert.That.TokenIsOperator(unary1, OperatorToken.Type.Unary, "!");
-			Token unary2 = unary1[1];
+			Token unary2 = unary1[0];
 			Assert.That.TokenIsOperator(unary2, OperatorToken.Type.Unary, "!");
-			Assert.That.TokenIsLiteralKeyword(unary2[1], true);
+			Assert.That.TokenIsLiteralKeyword(unary2[0], true);
 		}
 
 		[TestMethod]
@@ -215,7 +215,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token exp = result[0];
 			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PreExpression, "++");
-			Assert.That.TokenIsOfType<IdentifierToken>(exp[1], "x");
+			Assert.That.TokenIsOfType<IdentifierToken>(exp[0], "x");
 		}
 
 		[TestMethod]
@@ -251,7 +251,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token unary = result[0];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "-");
-			Token exp = unary[1];
+			Token exp = unary[0];
 			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PostExpression, "++");
 			Assert.That.TokenIsOfType<IdentifierToken>(exp[0], "x");
 		}
@@ -271,9 +271,9 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 			Token unary = result[0];
 			Assert.That.TokenIsOperator(unary, OperatorToken.Type.Unary, "-");
-			Token exp = unary[1];
+			Token exp = unary[0];
 			Assert.That.TokenIsOperator(exp, OperatorToken.Type.PreExpression, "++");
-			Assert.That.TokenIsOfType<IdentifierToken>(exp[1], "x");
+			Assert.That.TokenIsOfType<IdentifierToken>(exp[0], "x");
 		}
 
 		[TestMethod]

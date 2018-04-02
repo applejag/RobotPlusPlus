@@ -120,7 +120,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return $"{StringifyOperatorChildToken(op, op.LHS)}{op.SourceCode}{StringifyOperatorChildToken(op, op.RHS)}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
-					return $"{op.SourceCode}{StringifyToken(op.RHS)}";
+					return $"{op.SourceCode}{StringifyToken(op.UnaryValue)}";
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

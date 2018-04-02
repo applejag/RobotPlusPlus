@@ -27,6 +27,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			set => this[1] = value;
 		}
 
+		public Token UnaryValue
+		{
+			get => this[0];
+			set => this[0] = value;
+		}
+
 		private OperatorToken(TokenSource source, Type operatorType) : base(source)
 		{
 			OperatorType = operatorType;
@@ -125,10 +131,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					return true;
 
 				case OperatorToken op:
-					if (op.OperatorType == Type.Unary || op.OperatorType == Type.PreExpression)
-						return ExpressionHasValue(op.RHS) && op.LHS == null;
-					else if (op.OperatorType == Type.PostExpression)
-						return ExpressionHasValue(op.LHS) && op.RHS == null;
+					if (op.OperatorType == Type.Unary
+					    || op.OperatorType == Type.PreExpression
+					    || op.OperatorType == Type.PostExpression)
+						return ExpressionHasValue(op.UnaryValue);
 					else
 						return ExpressionHasValue(op.LHS) && ExpressionHasValue(op.RHS);
 
@@ -152,7 +158,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 				// Expression
 				case Type.PostExpression:
 					if (parent.Previous is IdentifierToken)
-						LHS = parent.PopPrevious();
+						UnaryValue = parent.PopPrevious();
 					else
 						parent.SwapCurrent(new OperatorToken(source, Type.PreExpression));
 					break;
@@ -161,7 +167,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					if (!(parent.Next is IdentifierToken))
 						throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
 
-					RHS = parent.PopNext();
+					UnaryValue = parent.PopNext();
 					break;
 
 				// Unary
@@ -174,7 +180,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 							parent.ParseNextToken();
 
 						if (ExpressionHasValue(parent.Next))
-							RHS = parent.PopNext();
+							UnaryValue = parent.PopNext();
 						else
 							throw new ParseUnexpectedTrailingTokenException(this, parent.Next);
 					}
