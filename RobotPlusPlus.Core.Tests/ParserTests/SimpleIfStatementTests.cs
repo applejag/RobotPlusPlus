@@ -268,5 +268,118 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsOfType<IdentifierToken>(x[0], "x");
 			Assert.That.TokenIsLiteralInteger(x[1], 2);
 		}
+
+		[TestMethod]
+		public void Compile_IfMultipleNestedBlocks()
+		{
+			// Arrange
+			const string code = "if true { if false { a = 0 } if 99 { b = 98 } }";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(result);
+			Assert.AreEqual(1, result.Length);
+
+			Token _if = result[0];
+			Assert.That.TokenIsOfType<StatementToken>(_if, "if");
+			Assert.That.TokenIsLiteralKeyword(_if[0], true);
+			Assert.That.TokenIsParentases(_if[1], '{', 2);
+
+			Token _if2 = _if[1][0];
+			Assert.That.TokenIsOfType<StatementToken>(_if2, "if");
+			Assert.That.TokenIsLiteralKeyword(_if2[0], false);
+			Assert.That.TokenIsParentases(_if2[1], '{', 1);
+
+			Token a = _if2[1][0];
+			Assert.That.TokenIsOperator(a, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(a[0], "a");
+			Assert.That.TokenIsLiteralInteger(a[1], 0);
+
+			Token _if3 = _if[1][1];
+			Assert.That.TokenIsOfType<StatementToken>(_if3, "if");
+			Assert.That.TokenIsLiteralInteger(_if3[0], 99);
+			Assert.That.TokenIsParentases(_if3[1], '{', 1);
+
+			Token b = _if3[1][0];
+			Assert.That.TokenIsOperator(b, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(b[0], "b");
+			Assert.That.TokenIsLiteralInteger(b[1], 98);
+		}
+
+		[TestMethod]
+		public void Compile_IfMultipleNestedNoBlocks()
+		{
+			// Arrange
+			const string code = "if true if false a = 0 if 99 b = 98";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(result);
+			Assert.AreEqual(2, result.Length);
+
+			Token _if = result[0];
+			Assert.That.TokenIsOfType<StatementToken>(_if, "if");
+			Assert.That.TokenIsLiteralKeyword(_if[0], true);
+
+			Token _if2 = _if[1];
+			Assert.That.TokenIsOfType<StatementToken>(_if2, "if");
+			Assert.That.TokenIsLiteralKeyword(_if2[0], false);
+
+			Token a = _if2[1];
+			Assert.That.TokenIsOperator(a, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(a[0], "a");
+			Assert.That.TokenIsLiteralInteger(a[1], 0);
+
+			Token _if3 = result[1];
+			Assert.That.TokenIsOfType<StatementToken>(_if3, "if");
+			Assert.That.TokenIsLiteralInteger(_if3[0], 99);
+
+			Token b = _if3[1];
+			Assert.That.TokenIsOperator(b, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(b[0], "b");
+			Assert.That.TokenIsLiteralInteger(b[1], 98);
+		}
+
+		[TestMethod]
+		public void Compile_IfMultipleNestedTopBlocks()
+		{
+			// Arrange
+			const string code = "if true { if false a = 0 if 99 b = 98 }";
+
+			// Act
+			Token[] result = Parser.Parse(Tokenizer.Tokenize(code));
+
+			// Assert
+			CollectionAssert.That.TokensAreParsed(result);
+			Assert.AreEqual(1, result.Length);
+
+			Token _if = result[0];
+			Assert.That.TokenIsOfType<StatementToken>(_if, "if");
+			Assert.That.TokenIsLiteralKeyword(_if[0], true);
+			Assert.That.TokenIsParentases(_if[1], '{', 2);
+
+			Token _if2 = _if[1][0];
+			Assert.That.TokenIsOfType<StatementToken>(_if2, "if");
+			Assert.That.TokenIsLiteralKeyword(_if2[0], false);
+
+			Token a = _if2[1];
+			Assert.That.TokenIsOperator(a, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(a[0], "a");
+			Assert.That.TokenIsLiteralInteger(a[1], 0);
+
+			Token _if3 = _if[1][1];
+			Assert.That.TokenIsOfType<StatementToken>(_if3, "if");
+			Assert.That.TokenIsLiteralInteger(_if3[0], 99);
+
+			Token b = _if3[1];
+			Assert.That.TokenIsOperator(b, OperatorToken.Type.Assignment, "=");
+			Assert.That.TokenIsOfType<IdentifierToken>(b[0], "b");
+			Assert.That.TokenIsLiteralInteger(b[1], 98);
+		}
+
 	}
 }
