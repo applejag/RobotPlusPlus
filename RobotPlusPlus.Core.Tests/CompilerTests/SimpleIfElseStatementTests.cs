@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true {} else {}";
-			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂true⊃\n" +
 									"➜ifend";
 
 			// Act
@@ -28,8 +28,24 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if true { } else { x = 1 }";
 			const string expected = "jump label ➜ifend if ⊂true⊃\n" +
-									"♥x=1\n" +
-									"➜ifend";
+			                        "♥x=1\n" +
+			                        "➜ifend";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfElseCodeBlockSingleStatementElseEmpty()
+		{
+			// Arrange
+			const string code = "if true { x = 1 } else { }";
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			                        "♥x=1\n" +
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
