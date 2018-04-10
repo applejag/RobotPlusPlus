@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 		public override void Compile(Compiler compiler)
 		{
-			GeneratedLabel = compiler.Context.RegisterName("noif");
+			GeneratedLabel = compiler.Context.RegisterName("ifend");
 			GeneratedTemporaryVariable = Condition.PostUnits.Count > 0
 				? compiler.Context.RegisterName("tmp") : null;
 
@@ -51,7 +51,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			if (GeneratedTemporaryVariable == null)
 			{
-				rows.AppendLine("jump ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
+				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
 			}
 			else
 			{
@@ -60,7 +60,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 				foreach (CodeUnit post in Condition.PostUnits)
 					rows.AppendLine(post.AssembleIntoString());
 
-				rows.AppendLine("jump ➜{0} if ⊂!♥{1}⊃", GeneratedLabel, GeneratedTemporaryVariable);
+				rows.AppendLine("jump label ➜{0} if ⊂!♥{1}⊃", GeneratedLabel, GeneratedTemporaryVariable);
 			}
 
 			rows.AppendLine(CodeBlock.AssembleIntoString());
