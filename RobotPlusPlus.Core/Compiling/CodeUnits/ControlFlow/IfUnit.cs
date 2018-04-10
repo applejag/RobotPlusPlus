@@ -21,26 +21,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			}
 		}
 
-		public override void PreCompile(Compiler compiler)
-		{
-			compiler.Context.PushLayer();
-			Condition.PreCompile(compiler);
-			CodeBlock.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			Condition.PostCompile(compiler);
-			CodeBlock.PostCompile(compiler);
-			compiler.Context.PopLayer();
-		}
-
 		public override void Compile(Compiler compiler)
 		{
+			compiler.Context.PushLayer();
+
 			GeneratedLabel = compiler.Context.RegisterName("ifend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
+
+			compiler.Context.PopLayer();
 		}
 
 		public override string AssembleIntoString()
@@ -60,8 +50,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
 			}
 
-			rows.AppendLine(CodeBlock.AssembleIntoString());
-			rows.AppendLine("➜{0}", GeneratedLabel);
+			// Echo end label
+			rows.AppendLine("➜{0}", GeneratedLabelEnd);
 
 			return rows.ToString();
 		}

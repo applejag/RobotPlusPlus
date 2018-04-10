@@ -22,8 +22,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token = token;
 		}
 
-		public virtual void PreCompile(Compiler compiler) { }
-		public virtual void PostCompile(Compiler compiler) { }
+		//public virtual void PreCompile(Compiler compiler) { }
+		//public virtual void PostCompile(Compiler compiler) { }
 		public abstract void Compile(Compiler compiler);
 		public abstract string AssembleIntoString();
 

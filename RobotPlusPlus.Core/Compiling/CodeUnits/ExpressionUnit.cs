@@ -29,27 +29,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token = RemoveUnaries(Token);
 			Token = ExtractInnerAssignments(Token);
 		}
-
-		public override void PreCompile(Compiler compiler)
+		
+		public override void Compile(Compiler compiler)
 		{
 			NeedsCSSnippet = false;
 
-			foreach (CodeUnit pre in PreUnits)
-				pre.PreCompile(compiler);
-			foreach (CodeUnit post in PostUnits)
-				post.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			foreach (CodeUnit pre in PreUnits)
-				pre.PostCompile(compiler);
-			foreach (CodeUnit post in PostUnits)
-				post.PostCompile(compiler);
-		}
-
-		public override void Compile(Compiler compiler)
-		{
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 

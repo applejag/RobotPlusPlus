@@ -9,7 +9,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 	{
 		public List<CodeUnit> codeUnits;
 
-		public CodeBlockUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
+		public CodeBlockUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
+			: base(token, parent)
 		{
 			if (token is PunctuatorToken pun
 			    && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
@@ -18,22 +19,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				codeUnits = new List<CodeUnit>(token.Select(CompileParsedToken));
 			else
 				// Add single
-				codeUnits = new List<CodeUnit> {CompileParsedToken(token)};
-		}
-
-		public override void PreCompile(Compiler compiler)
-		{
-			compiler.Context.PushLayer();
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			compiler.Context.PopLayer();
+				codeUnits = new List<CodeUnit> {CompileParsedToken(token, this)};
 		}
 
 		public override void Compile(Compiler compiler)
 		{
+			compiler.Context.PushLayer();
 			Compiler.CompileUnits(codeUnits, compiler);
+			compiler.Context.PopLayer();
 		}
 
 		public override string AssembleIntoString()

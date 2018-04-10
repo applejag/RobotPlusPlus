@@ -51,16 +51,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return (tempUnit, id);
 		}
 
-		public override void PreCompile(Compiler compiler)
-		{
-			Expression.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			Expression.PostCompile(compiler);
-		}
-
 		public override void Compile(Compiler compiler)
 		{
 			Expression.Compile(compiler);

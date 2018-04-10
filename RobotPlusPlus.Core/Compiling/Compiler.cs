@@ -64,9 +64,7 @@ namespace RobotPlusPlus.Core.Compiling
 		{
 			foreach (CodeUnit unit in codeUnits)
 			{
-				unit.PreCompile(compiler);
 				unit.Compile(compiler);
-				unit.PostCompile(compiler);
 			}
 		}
 
