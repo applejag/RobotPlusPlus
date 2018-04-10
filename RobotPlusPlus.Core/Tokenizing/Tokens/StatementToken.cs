@@ -24,6 +24,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			set => this[1] = value;
 		}
 
+		public Token ElseBlock
+		{
+			get => this[2];
+			set => this[2] = value;
+		}
+
 		public Type StatementType { get; }
 
 		public StatementToken(TokenSource source) : base(source)
@@ -36,11 +42,20 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override void ParseToken(IteratedList<Token> parent)
 		{
-			ParseTokenCondition(parent);
-			ParseTokenCodeBlock(parent);
+			if (StatementType == Type.Else)
+				throw new ParseUnexpectedTokenException(this);
+
+			Condition = ParseTokenCondition(parent);
+			CodeBlock = ParseTokenCodeBlock(parent);
+
+			if (parent.Next is StatementToken st && st.StatementType == Type.Else)
+			{
+				parent.PopNext();
+				ElseBlock = ParseTokenCodeBlock(parent);
+			}
 		}
 
-		private void ParseTokenCondition(IteratedList<Token> parent)
+		private Token ParseTokenCondition(IteratedList<Token> parent)
 		{
 			Token next = parent.Next;
 
@@ -48,54 +63,45 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			{
 				case Type.If:
 					if (OperatorToken.ExpressionHasValue(next))
-					{
-						Condition = parent.PopNext();
-					}
+						return parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
-					break;
+
+				default:
+					throw new InvalidOperationException("Unknown statement type!");
 			}
 		}
 
-		private void ParseTokenCodeBlock(IteratedList<Token> parent)
+		private Token ParseTokenCodeBlock(IteratedList<Token> parent)
 		{
 			Token next = parent.Next;
 
 			switch (StatementType)
 			{
 				case Type.If:
-					if (next is StatementToken)
+					if (next is StatementToken st)
+					{
+						if (st.StatementType != Type.If)
+							throw new ParseUnexpectedTrailingTokenException(this, st);
 						parent.ParseNextToken();
+					}
 
 					if ((next is PunctuatorToken pun && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '{')
-						|| (next is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
+					    || (next is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
 					    || (next is StatementToken))
-						CodeBlock = parent.PopNext();
+						return parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
-					break;
+
+				default:
+					throw new InvalidOperationException("Unknown statement type!");
 			}
 		}
-
-		//public override string CompileToken(Compiler compiler)
-		//{
-		//	var rows = new List<string>();
-
-		//	string label = compiler.RegisterLabel("noif");
-
-		//	compiler.assignmentNeedsCSSnipper = true;
-		//	rows.Add($"jump ➜{label} if ⊂!({Condition.CompileToken(compiler)})⊃");
-		//	compiler.assignmentNeedsCSSnipper = false;
-		//	rows.Add(CodeBlock.CompileToken(compiler));
-
-		//	rows.Add($"➜{label}");
-
-		//	return string.Join('\n', rows.Where(r => !string.IsNullOrEmpty(r)));
-		//}
 
 		public enum Type
 		{
 			If,
+			Else,
 			Unknown,
 		}
 	}

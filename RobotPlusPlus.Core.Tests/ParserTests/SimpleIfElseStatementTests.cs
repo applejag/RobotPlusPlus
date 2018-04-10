@@ -62,8 +62,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 0);
+			Assert.That.TokenIsParentases(_else, '{', 0);
 		}
 
 		[TestMethod]
@@ -90,8 +89,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsLiteralInteger(x[1], 1);
 
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 0);
+			Assert.That.TokenIsParentases(_else, '{', 0);
 		}
 
 		[TestMethod]
@@ -113,10 +111,9 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 1);
+			Assert.That.TokenIsParentases(_else, '{', 1);
 
-			Token x = _else[0][0];
+			Token x = _else[0];
 			Assert.That.TokenIsOperator(x, OperatorToken.Type.Assignment, "=");
 			Assert.That.TokenIsOfType<IdentifierToken>(x[0], "x");
 			Assert.That.TokenIsLiteralInteger(x[1], 1);
@@ -141,15 +138,14 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 			
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 2);
+			Assert.That.TokenIsParentases(_else, '{', 2);
 
-			Token x = _else[0][0];
+			Token x = _else[0];
 			Assert.That.TokenIsOperator(x, OperatorToken.Type.Assignment, "=");
 			Assert.That.TokenIsOfType<IdentifierToken>(x[0], "x");
 			Assert.That.TokenIsLiteralInteger(x[1], 1);
 			
-			Token z = _else[0][1];
+			Token z = _else[1];
 			Assert.That.TokenIsOperator(z, OperatorToken.Type.Assignment, "=");
 			Assert.That.TokenIsOfType<IdentifierToken>(z[0], "z");
 			Assert.That.TokenIsOfType<IdentifierToken>(z[1], "x");
@@ -173,10 +169,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsLiteralKeyword(_if[0], true);
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
-			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-
-			Token x = _else[0];
+			Token x = _if[2];
 			Assert.That.TokenIsOperator(x, OperatorToken.Type.Assignment, "=");
 			Assert.That.TokenIsOfType<IdentifierToken>(x[0], "x");
 			Assert.That.TokenIsLiteralInteger(x[1], 2);
@@ -200,10 +193,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsLiteralKeyword(_if[0], true);
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
-			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-
-			Token x = _else[0];
+			Token x = _if[2];
 			Assert.That.TokenIsOperator(x, OperatorToken.Type.Assignment, "=");
 			Assert.That.TokenIsOfType<IdentifierToken>(x[0], "x");
 			Assert.That.TokenIsLiteralInteger(x[1], 2);
@@ -233,10 +223,9 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 1);
+			Assert.That.TokenIsParentases(_else, '{', 1);
 
-			Token _if2 = _else[0][0];
+			Token _if2 = _else[0];
 			Assert.That.TokenIsOfType<StatementToken>(_if2, "if");
 			Assert.That.TokenIsLiteralKeyword(_if2[0], false);
 			Assert.That.TokenIsParentases(_if2[1], '{', 1);
@@ -266,10 +255,9 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 			Assert.That.TokenIsParentases(_if[1], '{', 0);
 
 			Token _else = _if[2];
-			Assert.That.TokenIsOfType<StatementToken>(_else, "else");
-			Assert.That.TokenIsParentases(_else[0], '{', 1);
+			Assert.That.TokenIsParentases(_else, '{', 1);
 
-			Token _if2 = _else[0][0];
+			Token _if2 = _else[0];
 			Assert.That.TokenIsOfType<StatementToken>(_if2, "if");
 			Assert.That.TokenIsLiteralKeyword(_if2[0], false);
 
