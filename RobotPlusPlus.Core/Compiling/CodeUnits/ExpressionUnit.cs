@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Exceptions;
@@ -72,7 +73,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				variableLookup[id] = compiler.Context.GetGenerated(id);
 
 				if (id is IdentifierTempToken tmp
-					&& string.IsNullOrEmpty(tmp.GeneratedName))
+					&& String.IsNullOrEmpty(tmp.GeneratedName))
 					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
@@ -90,6 +91,29 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
+
+		#region Public utility
+		
+		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
+		{
+			(CodeUnit tempAssignment, IdentifierTempToken id)
+				= AssignmentUnit.CreateTemporaryAssignment(Token, Parent);
+
+			var exp = new ExpressionUnit(id, Parent);
+
+			// Old preunits
+			foreach (CodeUnit pre in PreUnits)
+				exp.PreUnits.Add(pre);
+			// Temp assignment
+			exp.PreUnits.Add(tempAssignment);
+			// Old postunits
+			foreach (CodeUnit post in PostUnits)
+				exp.PreUnits.Add(post);
+
+			return (exp, id);
+		}
+
+		#endregion
 
 		#region Stringify expression tokens
 

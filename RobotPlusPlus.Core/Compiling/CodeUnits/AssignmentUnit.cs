@@ -51,24 +51,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return (tempUnit, id);
 		}
 
-		public static (ExpressionUnit, IdentifierTempToken) CreateTemporaryExpression([NotNull] ExpressionUnit expression)
-		{
-			(CodeUnit preUnit, IdentifierTempToken id) = CreateTemporaryAssignment(expression.Token, expression.Parent);
-
-			var exp = new ExpressionUnit(id, expression.Parent);
-
-			// Old preunits
-			foreach (CodeUnit pre in expression.PreUnits)
-				exp.PreUnits.Add(pre);
-			// Temp assignment
-			exp.PreUnits.Add(preUnit);
-			// Old postunits
-			foreach (CodeUnit post in expression.PostUnits)
-				exp.PreUnits.Add(post);
-
-			return (exp, id);
-		}
-
 		public override void PreCompile(Compiler compiler)
 		{
 			Expression.PreCompile(compiler);

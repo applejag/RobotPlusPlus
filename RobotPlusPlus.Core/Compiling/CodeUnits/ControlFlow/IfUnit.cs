@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
@@ -18,8 +17,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			if (Condition.PostUnits.Count > 0)
 			{
-				(Condition, _)
-					= AssignmentUnit.CreateTemporaryExpression(Condition);
+				(Condition, _) = Condition.ExtractIntoTempAssignment();
 			}
 		}
 
