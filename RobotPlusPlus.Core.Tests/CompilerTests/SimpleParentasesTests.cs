@@ -32,8 +32,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			string output = Compiler.Compile("if (1 > 0) {}");
-			const string expected = "jump ➜noif if ⊂!(1>0)⊃\n" +
-			                        "➜noif";
+			const string expected = "jump label ➜ifend if ⊂!(1>0)⊃\n" +
+			                        "➜ifend";
 
 			// Assert
 			Assert.AreEqual(expected, output);
@@ -44,8 +44,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			string output = Compiler.Compile("if ((1 > 0)) {}");
-			const string expected = "jump ➜noif if ⊂!(1>0)⊃\n" +
-			                        "➜noif";
+			const string expected = "jump label ➜ifend if ⊂!(1>0)⊃\n" +
+			                        "➜ifend";
 
 			// Assert
 			Assert.AreEqual(expected, output);

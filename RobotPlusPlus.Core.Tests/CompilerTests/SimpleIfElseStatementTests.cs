@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true {} else {}";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 									"➜ifend";
 
 			// Act
