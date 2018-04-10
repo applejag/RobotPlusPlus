@@ -9,7 +9,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException))]
-		public void Parse_NullInput()
+		public void Compile_NullInput()
 		{
 			// Arrange
 			const string input = null;
@@ -22,7 +22,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_EmptyInput()
+		public void Compile_EmptyInput()
 		{
 			// Arrange
 			const string input = "";

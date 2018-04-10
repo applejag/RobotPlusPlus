@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
-		public void Compile_IfElseNoCondition()
+		public void Parse_IfElseNoCondition()
 		{
 			// Arrange
 			const string code = "if {} else {}";
@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
-		public void Compile_IfElseNoBlock()
+		public void Parse_IfElseNoBlock()
 		{
 			// Arrange
 			const string code = "if 1 > 0 else {}";
@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
-		public void Compile_IfElseElseNoBlock()
+		public void Parse_IfElseElseNoBlock()
 		{
 			// Arrange
 			const string code = "if 1 > 0 {} else";
@@ -44,7 +44,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseCodeBlockEmpty()
+		public void Parse_IfElseCodeBlockEmpty()
 		{
 			// Arrange
 			const string code = "if true {} else {}";
@@ -66,7 +66,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseCodeBlockIfSingleStatement()
+		public void Parse_IfElseCodeBlockIfSingleStatement()
 		{
 			// Arrange
 			const string code = "if true { x = 1 } else {}";
@@ -93,7 +93,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseCodeBlockElseSingleStatement()
+		public void Parse_IfElseCodeBlockElseSingleStatement()
 		{
 			// Arrange
 			const string code = "if true { } else { x = 1 }";
@@ -120,7 +120,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseCodeBlockMultipleStatements()
+		public void Parse_IfElseCodeBlockMultipleStatements()
 		{
 			// Arrange
 			const string code = "if true { } else { x = 1 z = x }";
@@ -152,7 +152,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseSingleStatement()
+		public void Parse_IfElseSingleStatement()
 		{
 			// Arrange
 			const string code = "if true {} else x = 2";
@@ -176,7 +176,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseOneStatementInsideOneOutside()
+		public void Parse_IfElseOneStatementInsideOneOutside()
 		{
 			// Arrange
 			const string code = "if true {} else x = 2 z = 10";
@@ -205,7 +205,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseNestedBlocks()
+		public void Parse_IfElseNestedBlocks()
 		{
 			// Arrange
 			const string code = "if true {} else { if false { a = 0 } }";
@@ -237,7 +237,7 @@ namespace RobotPlusPlus.Core.Tests.ParserTests
 		}
 
 		[TestMethod]
-		public void Compile_IfElseNestedFirstHasBlock()
+		public void Parse_IfElseNestedFirstHasBlock()
 		{
 			// Arrange
 			const string code = "if true {} else { if false a = 0 }";
