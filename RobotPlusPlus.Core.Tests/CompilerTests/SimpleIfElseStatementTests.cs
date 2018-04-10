@@ -5,7 +5,7 @@ using RobotPlusPlus.Core.Exceptions;
 namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
 	[TestClass]
-	public class SimpleIfElseStatements
+	public class SimpleIfElseStatementTests
 	{
 		[TestMethod]
 		public void Compile_IfElseCodeBlockEmpty()

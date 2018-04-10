@@ -5,7 +5,7 @@ using RobotPlusPlus.Core.Exceptions;
 namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
 	[TestClass]
-	public class SimpleIfStatements
+	public class SimpleIfStatementTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
