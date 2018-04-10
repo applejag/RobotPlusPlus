@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true {}";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 									"➜ifend";
 
 			// Act
@@ -49,7 +49,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 }";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 			                        "➜ifend";
 
@@ -65,7 +65,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 z = x }";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 									"♥z=♥x\n" +
 									"➜ifend";
@@ -82,7 +82,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 2";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=2\n" +
 			                        "➜ifend";
 
@@ -98,7 +98,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 2 z = 10";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=2\n" +
 			                        "➜ifend\n" +
 			                        "♥z=10";
@@ -115,8 +115,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { if false { a = 0 } }";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
-									"jump label ➜ifend2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+									"jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
 			                        "➜ifend2\n" +
 			                        "➜ifend";
@@ -133,8 +133,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { if false a = 0 }";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
-									"jump label ➜ifend2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+									"jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
 			                        "➜ifend2\n" +
 			                        "➜ifend";
@@ -151,8 +151,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true if false { a = 0 }";
-			const string expected = "jump label ➜ifend if ⊂!(true)⊃\n" +
-			                        "jump label ➜ifend2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			                        "jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
 			                        "➜ifend2\n" +
 			                        "➜ifend";

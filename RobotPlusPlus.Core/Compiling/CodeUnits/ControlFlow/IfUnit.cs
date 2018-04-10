@@ -10,12 +10,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		public ExpressionUnit Condition { get; }
 		public CodeBlockUnit CodeBlock { get; }
 		public string GeneratedLabel { get; private set; }
-		public string GeneratedTemporaryVariable { get; private set; }
 
 		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
 		{
 			Condition = new ExpressionUnit(token.Condition, this);
 			CodeBlock = new CodeBlockUnit(token.CodeBlock);
+
+			if (Condition.PostUnits.Count > 0)
+			{
+				(Condition, _)
+					= AssignmentUnit.CreateTemporaryExpression(Condition);
+			}
 		}
 
 		public override void PreCompile(Compiler compiler)
@@ -35,8 +40,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		public override void Compile(Compiler compiler)
 		{
 			GeneratedLabel = compiler.Context.RegisterName("ifend");
-			GeneratedTemporaryVariable = Condition.PostUnits.Count > 0
-				? compiler.Context.RegisterName("tmp") : null;
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
@@ -49,18 +52,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			foreach (CodeUnit pre in Condition.PreUnits)
 				rows.AppendLine(pre.AssembleIntoString());
 
-			if (GeneratedTemporaryVariable == null)
+			if (Condition.Token is IdentifierToken
+			    || Condition.Token is LiteralToken)
 			{
-				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
+				rows.AppendLine("jump label ➜{0} if ⊂!{1}⊃", GeneratedLabel, Condition.AssembleIntoString());
 			}
 			else
 			{
-				rows.AppendLine("♥{0}={1}", GeneratedTemporaryVariable, Condition.AssembleIntoString());
-
-				foreach (CodeUnit post in Condition.PostUnits)
-					rows.AppendLine(post.AssembleIntoString());
-
-				rows.AppendLine("jump label ➜{0} if ⊂!♥{1}⊃", GeneratedLabel, GeneratedTemporaryVariable);
+				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
 			}
 
 			rows.AppendLine(CodeBlock.AssembleIntoString());

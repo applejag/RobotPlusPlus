@@ -43,7 +43,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 } else { z = 2 }";
-			const string expected = "jump label ➜ifelse if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 			                        "jump label ➜ifend" +
 			                        "➜ifelse\n" +
@@ -62,7 +62,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 } else { x = 2 }";
-			const string expected = "jump label ➜ifelse if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 			                        "jump label ➜ifend" +
 			                        "➜ifelse\n" +
@@ -82,7 +82,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 0 if true { x = 1 } else { x = 2 }";
 			const string expected = "♥x=0\n" +
-			                        "jump label ➜ifelse if ⊂!(true)⊃\n" +
+			                        "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 			                        "jump label ➜ifend" +
 			                        "➜ifelse\n" +
@@ -112,7 +112,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 1 else z = 2";
-			const string expected = "jump label ➜ifelse if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 									"♥x=1\n" +
 									"jump label ➜ifend\n" +
 									"➜ifelse\n" +
@@ -131,7 +131,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 2 else y = 4 z = 10";
-			const string expected = "jump label ➜ifelse if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 									"♥x=1\n" +
 									"jump label ➜ifend\n" +
 									"➜ifelse\n" +
@@ -152,7 +152,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if true { } else { if false a = 0 else b = 2 }";
 			const string expected = "jump label ➜ifend if ⊂true⊃\n" +
-			                        "jump label ➜ifelse if ⊂!(false)⊃\n" +
+			                        "jump label ➜ifelse if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
 			                        "jump label ➜ifend\n" +
 			                        "➜ifelse\n" +

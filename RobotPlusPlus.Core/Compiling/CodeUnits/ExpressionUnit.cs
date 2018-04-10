@@ -142,8 +142,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		private Token ExtractInnerAssignments(Token token, Token parent = null)
 		{
-			// TODO: Add support for x++, x--, ++x, --x, ?:
-
 			// Convert command call to assignment
 			if (token is FunctionCallToken
 			&& parent != null)
