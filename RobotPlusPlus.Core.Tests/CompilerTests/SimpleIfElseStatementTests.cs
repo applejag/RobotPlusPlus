@@ -45,7 +45,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "if true { x = 1 } else { z = 2 }";
 			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
-			                        "jump label ➜ifend" +
+			                        "jump label ➜ifend\n" +
 			                        "➜ifelse\n" +
 			                        "♥z=2\n" +
 			                        "➜ifend";
@@ -64,7 +64,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "if true { x = 1 } else { x = 2 }";
 			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
-			                        "jump label ➜ifend" +
+			                        "jump label ➜ifend\n" +
 			                        "➜ifelse\n" +
 			                        "♥x2=2\n" +
 			                        "➜ifend";
@@ -84,7 +84,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string expected = "♥x=0\n" +
 			                        "jump label ➜ifelse if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
-			                        "jump label ➜ifend" +
+			                        "jump label ➜ifend\n" +
 			                        "➜ifelse\n" +
 			                        "♥x=2\n" +
 			                        "➜ifend";
@@ -132,7 +132,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if true x = 2 else y = 4 z = 10";
 			const string expected = "jump label ➜ifelse if ⊂!true⊃\n" +
-									"♥x=1\n" +
+									"♥x=2\n" +
 									"jump label ➜ifend\n" +
 									"➜ifelse\n" +
 									"♥y=4\n" +

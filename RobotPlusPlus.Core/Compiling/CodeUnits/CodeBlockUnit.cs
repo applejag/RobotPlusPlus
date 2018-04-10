@@ -16,7 +16,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			    && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
 			    && pun.Character == '{')
 				// Add group
-				codeUnits = new List<CodeUnit>(token.Select(CompileParsedToken));
+				codeUnits = new List<CodeUnit>(token.Select(token1
+					=> CompileParsedToken(token1, this)));
 			else
 				// Add single
 				codeUnits = new List<CodeUnit> {CompileParsedToken(token, this)};
