@@ -14,6 +14,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		public string GeneratedLabelEnd { get; private set; }
 		public string GeneratedLabelElse { get; private set; }
 
+		public IfUnit FirstParentIf { get; private set; }
+
 		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
 		{
 			Condition = new ExpressionUnit(token.Condition, this);
@@ -31,9 +33,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			compiler.Context.PushLayer();
 
-			GeneratedLabelEnd = compiler.Context.RegisterTempName("ifend");
-			GeneratedLabelElse = ElseBlock == null
+			FirstParentIf = ParentSearchWhereImLast(Parent);
+
+			GeneratedLabelElse = ElseBlock?.IsEmpty != false || CodeBlock.IsEmpty
 				? null : compiler.Context.RegisterTempName("ifelse");
+
+			GeneratedLabelEnd = FirstParentIf?.GeneratedLabelEnd
+								?? compiler.Context.RegisterTempName("ifend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
@@ -78,9 +84,38 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			}
 
 			// Echo end label
-			rows.AppendLine("➜{0}", GeneratedLabelEnd);
+			if (FirstParentIf == null)
+				rows.AppendLine("➜{0}", GeneratedLabelEnd);
 
 			return rows.ToString();
+		}
+
+		[CanBeNull]
+		private IfUnit ParentSearchWhereImLast([CanBeNull] CodeUnit parent)
+		{
+			CodeUnit child = this;
+
+			while (true)
+			{
+				// Bedrock
+				if (parent is null)
+					return null;
+
+				// Not last?
+				if (parent is CodeBlockUnit block && block.CodeUnits.Last() != child)
+					return null;
+
+				// THIS IS IT
+				if (parent is IfUnit unit)
+				{
+					if (unit.ElseBlock != child)
+						return null;
+					return unit;
+				}
+
+				child = parent;
+				parent = parent.Parent;
+			}
 		}
 	}
 }
