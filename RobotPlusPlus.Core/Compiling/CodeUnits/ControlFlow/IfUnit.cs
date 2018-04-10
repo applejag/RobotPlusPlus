@@ -54,8 +54,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 				throw new CompileUnexpectedTokenException(Condition.PostUnits[0].Token);
 			
 			// Echo condition
-			string label = ElseBlock == null ? GeneratedLabelEnd : GeneratedLabelElse;
-			if (Condition.Token is IdentifierToken || Condition.Token is LiteralToken)
+			string label = ElseBlock?.IsEmpty == false ? GeneratedLabelElse : GeneratedLabelEnd;
+			if (CodeBlock.IsEmpty)
+				rows.AppendLine("jump label ➜{0} if ⊂{1}⊃", GeneratedLabelEnd, Condition.AssembleIntoString());
+			else if (Condition.Token is IdentifierToken || Condition.Token is LiteralToken)
 				rows.AppendLine("jump label ➜{0} if ⊂!{1}⊃", label, Condition.AssembleIntoString());
 			else
 				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", label, Condition.AssembleIntoString());
@@ -64,10 +66,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			rows.AppendLine(CodeBlock.AssembleIntoString());
 
 			// Echo else code block
-			if (ElseBlock != null)
+			if (ElseBlock?.IsEmpty == false)
 			{
-				rows.AppendLine("jump label ➜{0}", GeneratedLabelEnd);
-				rows.AppendLine("➜{0}", GeneratedLabelElse);
+				if (!CodeBlock.IsEmpty)
+				{
+					rows.AppendLine("jump label ➜{0}", GeneratedLabelEnd);
+					rows.AppendLine("➜{0}", GeneratedLabelElse);
+				}
+
 				rows.AppendLine(ElseBlock.AssembleIntoString());
 			}
 

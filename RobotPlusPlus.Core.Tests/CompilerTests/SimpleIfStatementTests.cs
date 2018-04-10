@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true {}";
-			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂true⊃\n" +
 									"➜ifend";
 
 			// Act
@@ -171,7 +171,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if (x = 2) > 1 { }";
 			const string expected = "♥x=2\n" +
-			                        "jump label ➜ifend if ⊂!(♥x>1)⊃\n" +
+			                        "jump label ➜ifend if ⊂♥x>1⊃\n" +
 			                        "➜ifend";
 
 			// Act

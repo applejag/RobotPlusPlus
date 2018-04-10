@@ -7,7 +7,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class CodeBlockUnit : CodeUnit
 	{
-		public List<CodeUnit> codeUnits;
+		public List<CodeUnit> CodeUnits { get; }
+		public bool IsEmpty => CodeUnits.Count == 0;
 
 		public CodeBlockUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -16,23 +17,22 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			    && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
 			    && pun.Character == '{')
 				// Add group
-				codeUnits = new List<CodeUnit>(token.Select(token1
-					=> CompileParsedToken(token1, this)));
+				CodeUnits = new List<CodeUnit>(token.Select(CompileParsedToken));
 			else
 				// Add single
-				codeUnits = new List<CodeUnit> {CompileParsedToken(token, this)};
+				CodeUnits = new List<CodeUnit> {CompileParsedToken(token, this)};
 		}
 
 		public override void Compile(Compiler compiler)
 		{
 			compiler.Context.PushLayer();
-			Compiler.CompileUnits(codeUnits, compiler);
+			Compiler.CompileUnits(CodeUnits, compiler);
 			compiler.Context.PopLayer();
 		}
 
 		public override string AssembleIntoString()
 		{
-			return Compiler.AssembleUnitsIntoString(codeUnits);
+			return Compiler.AssembleUnitsIntoString(CodeUnits);
 		}
 	}
 }

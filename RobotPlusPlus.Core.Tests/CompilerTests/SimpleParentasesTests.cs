@@ -32,7 +32,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			string output = Compiler.Compile("if (1 > 0) {}");
-			const string expected = "jump label ➜ifend if ⊂!(1>0)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂1>0⊃\n" +
 			                        "➜ifend";
 
 			// Assert
@@ -44,7 +44,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			string output = Compiler.Compile("if ((1 > 0)) {}");
-			const string expected = "jump label ➜ifend if ⊂!(1>0)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂1>0⊃\n" +
 			                        "➜ifend";
 
 			// Assert
