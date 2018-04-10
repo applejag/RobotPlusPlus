@@ -232,5 +232,21 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Act
 			Compiler.Compile(code);
 		}
+
+		[TestMethod]
+		public void Compile_ReuseTempVariable()
+		{
+			// Arrange
+			const string code = "x = 'foo' + dialog.ask('bar'); tmp = 1";
+			const string expected = "dialog.ask message ‴bar‴ result ♥tmp\n" +
+									"♥x=⊂\"foo\"+♥tmp⊃\n" +
+									"♥tmp2=1";
+
+			// Act
+			string actual = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, actual);
+		}
 	}
 }
