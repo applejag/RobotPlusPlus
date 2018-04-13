@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Exceptions;
 
 namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
@@ -40,6 +41,87 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			// Assert
 			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfStatementVariableAssignedOutside()
+		{
+			// Arrange
+			const string code = "x = 0; if true { x = 1 } x = 2";
+			const string expected = "♥x=0\n" +
+			                        "jump label ➜ifend if ⊂!true⊃\n" +
+			                        "♥x=1\n" +
+			                        "➜ifend\n" +
+			                        "♥x=2";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfStatementVariableAssignedInside()
+		{
+			// Arrange
+			const string code = "if true { x = 1 } x = 2";
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			                        "♥x=1\n" +
+			                        "➜ifend\n" +
+			                        "♥x2=2";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfStatementVariableEmbeddedUsedInside()
+		{
+			// Arrange
+			const string code = "if (x = 0) > 1 { x = 1 }";
+			const string expected = "♥x=0\n" +
+			                        "jump label ➜ifend if ⊂!(♥x>1)⊃\n" +
+			                        "♥x=1\n" +
+			                        "➜ifend";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_IfStatementVariableEmbeddedAssignedOutside()
+		{
+			// Arrange
+			const string code = "if (x = 0) > 1 { x = 1 } x = 2";
+			const string expected = "♥x=0\n" +
+			                        "jump label ➜ifend if ⊂!(♥x>1)⊃\n" +
+			                        "♥x=1\n" +
+			                        "➜ifend\n" +
+			                        "♥x2=2";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileUnassignedVariableException))]
+		public void Compile_IfStatementVariableEmbeddedUsedOutside()
+		{
+			// Arrange
+			const string code = "if (x = 0) > 1 { x = 1 } x++";
+
+			// Act
+			Compiler.Compile(code);
 		}
 	}
 }
