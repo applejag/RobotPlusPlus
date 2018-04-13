@@ -63,9 +63,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Act
 			Compiler.Compile("x = y");
-
-			// Assert
-			Assert.Fail();
 		}
 
 		[TestMethod]
@@ -74,9 +71,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Act
 			Compiler.Compile("x = x");
-
-			// Assert
-			Assert.Fail();
 		}
 
 
@@ -86,9 +80,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Act
 			Compiler.Compile("x += 10");
-
-			// Assert
-			Assert.Fail();
 		}
 
 		[TestMethod]
@@ -132,7 +123,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥x=10\n♥y=5+♥x", output);
 		}
-		
+
 		[TestMethod]
 		public void Compile_NestedMultipleAssignment()
 		{

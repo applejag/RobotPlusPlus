@@ -79,7 +79,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_NegateNegateBoolean()
+		public void Compile_NegateNegateBoolean()
 		{
 			// Arrange
 			const string code = "x = !!true";
@@ -94,7 +94,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileUnassignedVariableException))]
-		public void Parse_PrefixUnassignedVariable()
+		public void Compile_PrefixUnassignedVariable()
 		{
 			// Arrange
 			const string code = "++x";
@@ -105,7 +105,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileUnassignedVariableException))]
-		public void Parse_PostfixUnassignedVariable()
+		public void Compile_PostfixUnassignedVariable()
 		{
 			// Arrange
 			const string code = "x++";
@@ -115,7 +115,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PrefixVariable()
+		public void Compile_PrefixVariable()
 		{
 			// Arrange
 			const string code = "x = 0; ++x";
@@ -130,7 +130,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PostfixVariable()
+		public void Compile_PostfixVariable()
 		{
 			// Arrange
 			const string code = "x = 0; x++";
@@ -145,7 +145,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PrefixExpressionVariable()
+		public void Compile_PrefixExpressionVariable()
 		{
 			// Arrange
 			const string code = "x = 0; y = ++x";
@@ -161,7 +161,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PostfixExpressionVariable()
+		public void Compile_PostfixExpressionVariable()
 		{
 			// Arrange
 			const string code = "x = 0; y = x++";
@@ -177,7 +177,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PrefixNegativeExpressionVariable()
+		public void Compile_PrefixNegativeExpressionVariable()
 		{
 			// Arrange
 			const string code = "x = 0; y = -++x";
@@ -193,7 +193,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		public void Parse_PostfixNegativeExpressionVariable()
+		public void Compile_PostfixNegativeExpressionVariable()
 		{
 			// Arrange
 			const string code = "x = 0; y = -x++";

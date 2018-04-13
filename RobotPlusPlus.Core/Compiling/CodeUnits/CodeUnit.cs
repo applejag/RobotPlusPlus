@@ -22,8 +22,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token = token;
 		}
 
-		public virtual void PreCompile(Compiler compiler) { }
-		public virtual void PostCompile(Compiler compiler) { }
+		//public virtual void PreCompile(Compiler compiler) { }
+		//public virtual void PostCompile(Compiler compiler) { }
 		public abstract void Compile(Compiler compiler);
 		public abstract string AssembleIntoString();
 
@@ -56,8 +56,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					&& pun.Character == '{':
 					return new CodeBlockUnit(token, parent);
 
-				case StatementToken st when st.StatementType == StatementToken.Type.If:
-					return new IfUnit(st, parent);
+				case StatementToken st:
+					switch (st.StatementType)
+					{
+						case StatementToken.Type.If:
+							return new IfUnit(st, parent);
+						case StatementToken.Type.While:
+							return new WhileUnit(st, parent);
+						case StatementToken.Type.Do:
+							return new DoWhileUnit(st, parent);
+					}
+					throw new CompileUnexpectedTokenException(st);
 
 				case FunctionCallToken func:
 					return new CommandUnit(func, null, parent);

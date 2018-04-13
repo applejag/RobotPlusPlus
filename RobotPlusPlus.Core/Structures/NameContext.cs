@@ -109,11 +109,18 @@ namespace RobotPlusPlus.Core.Structures
 			return generated;
 		}
 
+		public string RegisterTempName([NotNull] string preffered)
+		{
+			string generated = GenerateName(preffered);
+			oldGenerated.Add(generated);
+			return generated;
+		}
+
 		public string GetOrRegisterName([NotNull] IdentifierToken identifier)
 		{
 			if (identifier is IdentifierTempToken temp)
 			{
-				return temp.GeneratedName = RegisterName("tmp");
+				return temp.GeneratedName = RegisterTempName("tmp");
 			}
 
 			return GetOrRegisterName(identifier.SourceCode);

@@ -61,7 +61,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			}
 		}
 
-		public override void PreCompile(Compiler compiler)
+		public override void Compile(Compiler compiler)
 		{
 			// Fetch elements from repo
 			CommandFamilyElement = CommandFamilyName == null
@@ -76,25 +76,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				  ?? throw new CompileFunctionException($"Command <{CommandName}> in family <{CommandFamilyName}> does not exist!", Token);
 
 			CommandArgumentElements = compiler.G1ANTRepository.ListCommandArguments(CommandElement);
-			
+
 			// Alter & validate arguments
 			ConvertArgumentsToNamed();
 			ValidateArguments(compiler);
 
-			// Precompile arguments
-			foreach (Argument argument in Arguments)
-				argument.expression.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			// Postcompile arguments
-			foreach (Argument argument in Arguments)
-				argument.expression.PostCompile(compiler);
-		}
-
-		public override void Compile(Compiler compiler)
-		{
 			foreach (Argument argument in Arguments)
 				argument.expression.Compile(compiler);
 		}

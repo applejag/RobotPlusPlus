@@ -1,72 +1,101 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 {
-	public class IfUnit : CodeUnit
+	public class IfUnit : AbstractFlowUnit
 	{
-		public ExpressionUnit Condition { get; }
-		public CodeBlockUnit CodeBlock { get; }
-		public string GeneratedLabel { get; private set; }
-		public string GeneratedTemporaryVariable { get; private set; }
+		public CodeBlockUnit ElseBlock { get; }
+		public string GeneratedLabelEnd { get; private set; }
+		public string GeneratedLabelElse { get; private set; }
 
-		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
-		{
-			Condition = new ExpressionUnit(token.Condition, this);
-			CodeBlock = new CodeBlockUnit(token.CodeBlock);
-		}
+		public IfUnit FirstParentIf { get; private set; }
 
-		public override void PreCompile(Compiler compiler)
+		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null)
+			: base(token, parent)
 		{
-			compiler.Context.PushLayer();
-			Condition.PreCompile(compiler);
-			CodeBlock.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			Condition.PostCompile(compiler);
-			CodeBlock.PostCompile(compiler);
-			compiler.Context.PopLayer();
+			ElseBlock = token.ElseBlock == null
+				? null : new CodeBlockUnit(token.ElseBlock, this);
 		}
 
 		public override void Compile(Compiler compiler)
 		{
-			GeneratedLabel = compiler.Context.RegisterName("noif");
-			GeneratedTemporaryVariable = Condition.PostUnits.Count > 0
-				? compiler.Context.RegisterName("tmp") : null;
+			compiler.Context.PushLayer();
+
+			FirstParentIf = ParentSearchWhereImLast(Parent);
+
+			GeneratedLabelElse = ElseBlock?.IsEmpty != false || CodeBlock.IsEmpty
+				? null : compiler.Context.RegisterTempName("ifelse");
+
+			GeneratedLabelEnd = FirstParentIf?.GeneratedLabelEnd
+								?? compiler.Context.RegisterTempName("ifend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
+			ElseBlock?.Compile(compiler);
+
+			compiler.Context.PopLayer();
 		}
 
 		public override string AssembleIntoString()
 		{
 			var rows = new RowBuilder();
 
-			foreach (CodeUnit pre in Condition.PreUnits)
-				rows.AppendLine(pre.AssembleIntoString());
+			// Echo condition
+			string label = GeneratedLabelElse ?? GeneratedLabelEnd;
+			rows.AppendLine(AssembleJumpIfCondition(label, !CodeBlock.IsEmpty));
 
-			if (GeneratedTemporaryVariable == null)
-			{
-				rows.AppendLine("jump ➜{0} if ⊂!({1})⊃", GeneratedLabel, Condition.AssembleIntoString());
-			}
-			else
-			{
-				rows.AppendLine("♥{0}={1}", GeneratedTemporaryVariable, Condition.AssembleIntoString());
-
-				foreach (CodeUnit post in Condition.PostUnits)
-					rows.AppendLine(post.AssembleIntoString());
-
-				rows.AppendLine("jump ➜{0} if ⊂!♥{1}⊃", GeneratedLabel, GeneratedTemporaryVariable);
-			}
-
+			// Echo code block
 			rows.AppendLine(CodeBlock.AssembleIntoString());
-			rows.AppendLine("➜{0}", GeneratedLabel);
+
+			// Echo else code block
+			if (ElseBlock?.IsEmpty == false)
+			{
+				if (!CodeBlock.IsEmpty)
+				{
+					rows.AppendLine("jump label ➜{0}", GeneratedLabelEnd);
+					rows.AppendLine("➜{0}", GeneratedLabelElse);
+				}
+
+				rows.AppendLine(ElseBlock.AssembleIntoString());
+			}
+
+			// Echo end label
+			if (FirstParentIf == null)
+				rows.AppendLine("➜{0}", GeneratedLabelEnd);
 
 			return rows.ToString();
+		}
+
+		[CanBeNull]
+		private IfUnit ParentSearchWhereImLast([CanBeNull] CodeUnit parent)
+		{
+			CodeUnit child = this;
+
+			while (true)
+			{
+				switch (parent)
+				{
+					// Bedrock
+					case null:
+						return null;
+
+					// Not last?
+					case CodeBlockUnit block when block.CodeUnits.Last() != child:
+						return null;
+
+					// THIS IS IT
+					case IfUnit unit:
+						if (unit.ElseBlock != child)
+							return null;
+						return unit;
+				}
+
+				child = parent;
+				parent = parent.Parent;
+			}
 		}
 	}
 }

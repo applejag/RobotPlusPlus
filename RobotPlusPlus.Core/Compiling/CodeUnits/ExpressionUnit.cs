@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Exceptions;
@@ -28,27 +29,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token = RemoveUnaries(Token);
 			Token = ExtractInnerAssignments(Token);
 		}
-
-		public override void PreCompile(Compiler compiler)
+		
+		public override void Compile(Compiler compiler)
 		{
 			NeedsCSSnippet = false;
 
-			foreach (CodeUnit pre in PreUnits)
-				pre.PreCompile(compiler);
-			foreach (CodeUnit post in PostUnits)
-				post.PreCompile(compiler);
-		}
-
-		public override void PostCompile(Compiler compiler)
-		{
-			foreach (CodeUnit pre in PreUnits)
-				pre.PostCompile(compiler);
-			foreach (CodeUnit post in PostUnits)
-				post.PostCompile(compiler);
-		}
-
-		public override void Compile(Compiler compiler)
-		{
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 
@@ -72,7 +57,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				variableLookup[id] = compiler.Context.GetGenerated(id);
 
 				if (id is IdentifierTempToken tmp
-					&& string.IsNullOrEmpty(tmp.GeneratedName))
+					&& String.IsNullOrEmpty(tmp.GeneratedName))
 					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
@@ -90,6 +75,29 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
+
+		#region Public utility
+		
+		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
+		{
+			(CodeUnit tempAssignment, IdentifierTempToken id)
+				= AssignmentUnit.CreateTemporaryAssignment(Token, Parent);
+
+			var exp = new ExpressionUnit(id, Parent);
+
+			// Old preunits
+			foreach (CodeUnit pre in PreUnits)
+				exp.PreUnits.Add(pre);
+			// Temp assignment
+			exp.PreUnits.Add(tempAssignment);
+			// Old postunits
+			foreach (CodeUnit post in PostUnits)
+				exp.PreUnits.Add(post);
+
+			return (exp, id);
+		}
+
+		#endregion
 
 		#region Stringify expression tokens
 
@@ -142,8 +150,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		private Token ExtractInnerAssignments(Token token, Token parent = null)
 		{
-			// TODO: Add support for x++, x--, ++x, --x, ?:
-
 			// Convert command call to assignment
 			if (token is FunctionCallToken
 			&& parent != null)

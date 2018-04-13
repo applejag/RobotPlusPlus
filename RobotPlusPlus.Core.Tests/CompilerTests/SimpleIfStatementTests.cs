@@ -5,7 +5,7 @@ using RobotPlusPlus.Core.Exceptions;
 namespace RobotPlusPlus.Core.Tests.CompilerTests
 {
 	[TestClass]
-	public class SimpleIfStatements
+	public class SimpleIfStatementTests
 	{
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
@@ -34,8 +34,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true {}";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-									"➜noif";
+			const string expected = "jump label ➜ifend if ⊂true⊃\n" +
+									"➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -49,9 +49,9 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 }";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
-			                        "➜noif";
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -65,10 +65,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { x = 1 z = x }";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=1\n" +
 									"♥z=♥x\n" +
-									"➜noif";
+									"➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -82,9 +82,9 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 2";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=2\n" +
-			                        "➜noif";
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -98,9 +98,9 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true x = 2 z = 10";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
 			                        "♥x=2\n" +
-			                        "➜noif\n" +
+			                        "➜ifend\n" +
 			                        "♥z=10";
 
 			// Act
@@ -115,11 +115,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { if false { a = 0 } }";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+									"jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
-			                        "➜noif2\n" +
-			                        "➜noif";
+			                        "➜ifend2\n" +
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -133,11 +133,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true { if false a = 0 }";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-									"jump ➜noif2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+									"jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
-			                        "➜noif2\n" +
-			                        "➜noif";
+			                        "➜ifend2\n" +
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -151,11 +151,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "if true if false { a = 0 }";
-			const string expected = "jump ➜noif if ⊂!(true)⊃\n" +
-			                        "jump ➜noif2 if ⊂!(false)⊃\n" +
+			const string expected = "jump label ➜ifend if ⊂!true⊃\n" +
+			                        "jump label ➜ifend2 if ⊂!false⊃\n" +
 			                        "♥a=0\n" +
-			                        "➜noif2\n" +
-			                        "➜noif";
+			                        "➜ifend2\n" +
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -171,8 +171,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if (x = 2) > 1 { }";
 			const string expected = "♥x=2\n" +
-			                        "jump ➜noif if ⊂!(♥x>1)⊃\n" +
-			                        "➜noif";
+			                        "jump label ➜ifend if ⊂♥x>1⊃\n" +
+			                        "➜ifend";
 
 			// Act
 			string compiled = Compiler.Compile(code);
