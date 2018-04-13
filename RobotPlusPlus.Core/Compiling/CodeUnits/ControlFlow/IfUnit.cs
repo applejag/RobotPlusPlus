@@ -1,32 +1,23 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
-using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 {
-	public class IfUnit : CodeUnit
+	public class IfUnit : AbstractFlowUnit
 	{
-		public ExpressionUnit Condition { get; }
-		public CodeBlockUnit CodeBlock { get; }
 		public CodeBlockUnit ElseBlock { get; }
 		public string GeneratedLabelEnd { get; private set; }
 		public string GeneratedLabelElse { get; private set; }
 
 		public IfUnit FirstParentIf { get; private set; }
 
-		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null) : base(token, parent)
+		public IfUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null)
+			: base(token, parent)
 		{
-			Condition = new ExpressionUnit(token.Condition, this);
-			CodeBlock = new CodeBlockUnit(token.CodeBlock, this);
 			ElseBlock = token.ElseBlock == null
 				? null : new CodeBlockUnit(token.ElseBlock, this);
-
-			if (Condition.PostUnits.Count > 0)
-			{
-				(Condition, _) = Condition.ExtractIntoTempAssignment();
-			}
 		}
 
 		public override void Compile(Compiler compiler)
@@ -52,21 +43,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			var rows = new RowBuilder();
 
-			// Condition pre units
-			foreach (CodeUnit pre in Condition.PreUnits)
-				rows.AppendLine(pre.AssembleIntoString());
-
-			if (Condition.PostUnits.Count > 0)
-				throw new CompileUnexpectedTokenException(Condition.PostUnits[0].Token);
-			
 			// Echo condition
-			string label = ElseBlock?.IsEmpty == false ? GeneratedLabelElse : GeneratedLabelEnd;
-			if (CodeBlock.IsEmpty)
-				rows.AppendLine("jump label ➜{0} if ⊂{1}⊃", GeneratedLabelEnd, Condition.AssembleIntoString());
-			else if (Condition.Token is IdentifierToken || Condition.Token is LiteralToken)
-				rows.AppendLine("jump label ➜{0} if ⊂!{1}⊃", label, Condition.AssembleIntoString());
-			else
-				rows.AppendLine("jump label ➜{0} if ⊂!({1})⊃", label, Condition.AssembleIntoString());
+			string label = GeneratedLabelElse ?? GeneratedLabelEnd;
+			rows.AppendLine(AssembleJumpIfCondition(label, !CodeBlock.IsEmpty));
 
 			// Echo code block
 			rows.AppendLine(CodeBlock.AssembleIntoString());
@@ -97,20 +76,21 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			while (true)
 			{
-				// Bedrock
-				if (parent is null)
-					return null;
-
-				// Not last?
-				if (parent is CodeBlockUnit block && block.CodeUnits.Last() != child)
-					return null;
-
-				// THIS IS IT
-				if (parent is IfUnit unit)
+				switch (parent)
 				{
-					if (unit.ElseBlock != child)
+					// Bedrock
+					case null:
 						return null;
-					return unit;
+
+					// Not last?
+					case CodeBlockUnit block when block.CodeUnits.Last() != child:
+						return null;
+
+					// THIS IS IT
+					case IfUnit unit:
+						if (unit.ElseBlock != child)
+							return null;
+						return unit;
 				}
 
 				child = parent;

@@ -47,12 +47,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 			Condition = ParseTokenCondition(parent);
 			CodeBlock = ParseTokenCodeBlock(parent);
-
-			if (parent.Next is StatementToken st && st.StatementType == Type.Else)
-			{
-				parent.PopNext();
-				ElseBlock = ParseTokenCodeBlock(parent);
-			}
+			ElseBlock = ParseTokenElseBlock(parent);
 		}
 
 		private Token ParseTokenCondition(IteratedList<Token> parent)
@@ -61,6 +56,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 			switch (StatementType)
 			{
+				case Type.While:
 				case Type.If:
 					if (OperatorToken.ExpressionHasValue(next))
 						return parent.PopNext();
@@ -78,17 +74,19 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 			switch (StatementType)
 			{
+				case Type.While:
 				case Type.If:
 					if (next is StatementToken st)
 					{
-						if (st.StatementType != Type.If)
+						if (st.StatementType == Type.Else)
 							throw new ParseUnexpectedTrailingTokenException(this, st);
+
 						parent.ParseNextToken();
 					}
 
-					if ((next is PunctuatorToken pun && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases && pun.Character == '{')
+					if (PunctuatorToken.IsOpenParentasesOfChar(next, '{')
 					    || (next is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
-					    || (next is StatementToken))
+					    || next is StatementToken)
 						return parent.PopNext();
 					else
 						throw new ParseUnexpectedTrailingTokenException(this, next);
@@ -98,10 +96,27 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			}
 		}
 
+		private Token ParseTokenElseBlock(IteratedList<Token> parent)
+		{
+			switch (StatementType)
+			{
+				case Type.If:
+					if (!(parent.Next is StatementToken next)) return null;
+					if (next.StatementType != Type.Else) return null;
+
+					parent.PopNext();
+					return ParseTokenCodeBlock(parent);
+
+				default:
+					return null;
+			}
+		}
+
 		public enum Type
 		{
 			If,
 			Else,
+			While,
 			Unknown,
 		}
 	}

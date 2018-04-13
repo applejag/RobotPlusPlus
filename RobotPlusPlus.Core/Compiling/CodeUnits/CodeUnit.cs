@@ -59,6 +59,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case StatementToken st when st.StatementType == StatementToken.Type.If:
 					return new IfUnit(st, parent);
 
+				case StatementToken st when st.StatementType == StatementToken.Type.While:
+					return new WhileUnit(st, parent);
+
 				case FunctionCallToken func:
 					return new CommandUnit(func, null, parent);
 
