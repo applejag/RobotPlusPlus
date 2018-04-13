@@ -18,7 +18,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			compiler.Context.PushLayer();
 			
 			GeneratedLabelStart = compiler.Context.RegisterTempName("while");
-			GeneratedLabelEnd = compiler.Context.RegisterTempName("whileend");
+			GeneratedLabelEnd = CodeBlock.IsEmpty
+				? null : compiler.Context.RegisterTempName("whileend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
