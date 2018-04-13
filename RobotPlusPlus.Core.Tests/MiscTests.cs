@@ -32,6 +32,17 @@ namespace RobotPlusPlus.Core.Tests
 		}
 
 		[TestMethod]
+		public void IdentifierEscaping()
+		{
+			const string input = "Ｌöʀｅｍ➃➁";
+			const string expected = "Lorem42";
+
+			string actual = input.EscapeIdentifier();
+
+			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
 		public void G1ANTRepositoryLoading()
 		{
 			G1ANTRepository repo = G1ANTRepository.FromEmbeddedXML();

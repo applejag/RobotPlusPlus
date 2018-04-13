@@ -16,17 +16,22 @@ namespace RobotPlusPlus.Core.Structures
 
 		public readonly IEqualityComparer<string> generatedComparer;
 		public readonly IEqualityComparer<string> prefferedComparer;
+		public readonly Converter<string, string> prefferedTransformer;
 
 		public NameContext(IEqualityComparer<string> prefferedComparer,
-			IEqualityComparer<string> generatedComparer)
+			IEqualityComparer<string> generatedComparer,
+			Converter<string, string> prefferedTransformer)
 		{
 			this.prefferedComparer = prefferedComparer;
 			this.generatedComparer = generatedComparer;
+			this.prefferedTransformer = prefferedTransformer;
 			occupied.Push(new Dictionary<string, string>());
 		}
 
 		public NameContext()
-			: this (StringComparer.InvariantCulture, StringComparer.CurrentCultureIgnoreCase)
+			: this (StringComparer.InvariantCulture,
+				StringComparer.CurrentCultureIgnoreCase,
+				StringUtilities.EscapeIdentifier)
 		{}
 
 		public void PushLayer()
@@ -77,13 +82,14 @@ namespace RobotPlusPlus.Core.Structures
 		}
 
 		public string GetOrRegisterName([NotNull] string preffered)
-		{
+		{	
 			return GetGenerated(preffered)
 			       ?? RegisterName(preffered);
 		}
 		
 		private string GenerateName(string preffered)
 		{
+			preffered = prefferedTransformer(preffered);
 			string generated = preffered;
 			var iter = 1;
 

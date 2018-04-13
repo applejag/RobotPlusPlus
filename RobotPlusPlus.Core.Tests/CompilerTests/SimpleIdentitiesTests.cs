@@ -55,5 +55,25 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥x=10\n♥y=2\n♥x2=15\n♥y2=8", output);
 		}
+
+		[TestMethod]
+		public void Compile_VariableSpecialÅÄÖ()
+		{
+			const string code = "å=1";
+
+			string output = Compiler.Compile(code);
+
+			Assert.AreEqual("♥a=1", output);
+		}
+
+		[TestMethod]
+		public void Compile_VariableSpecialConflict()
+		{
+			const string code = "å=1; a=5";
+
+			string output = Compiler.Compile(code);
+
+			Assert.AreEqual("♥a=1\n♥a2=5", output);
+		}
 	}
 }
