@@ -27,7 +27,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 
 		private static readonly IReadOnlyCollection<string> statements = new[]
 		{
-			"if", "else", "while"
+			"if", "else", "while", "do"
 		};
 
 		private static readonly IReadOnlyCollection<char> strings = new[]
