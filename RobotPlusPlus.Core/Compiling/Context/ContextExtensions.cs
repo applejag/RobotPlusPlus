@@ -11,12 +11,12 @@ namespace RobotPlusPlus.Core.Compiling.Context
 	{
 		#region Variables
 
-		[NotNull, Pure]
+		[NotNull]
 		public static string GenerateVariableName([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return token is IdentifierTempToken
-				? context.GenerateName("tmp")
+			return token is IdentifierTempToken tmp
+				? tmp.GeneratedName = context.GenerateName("tmp")
 				: context.GenerateName(token.Identifier);
 		}
 

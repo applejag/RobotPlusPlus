@@ -121,9 +121,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return key.Value?.GetType();
 
 				case OperatorToken op:
+					Type result;
 					if (op.OperatorType == OperatorToken.Type.Unary)
-						return op.EvaluateType(EvalTokenType(op.UnaryValue, compiler));
-					return op.EvaluateType(EvalTokenType(op.LHS, compiler), EvalTokenType(op.RHS, compiler));
+						result = op.EvaluateType(EvalTokenType(op.UnaryValue, compiler));
+					else
+						result = op.EvaluateType(EvalTokenType(op.LHS, compiler), EvalTokenType(op.RHS, compiler));
+					// TODO: Give better error message
+					return result ?? throw new CompileException("ERR", op);
 			}
 
 			throw new CompileUnexpectedTokenException(token);

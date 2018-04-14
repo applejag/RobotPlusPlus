@@ -80,11 +80,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			// Alter & validate arguments
 			ConvertArgumentsToNamed();
+			ValidateArguments(compiler);
 
 			foreach (Argument argument in Arguments)
 				argument.expression.Compile(compiler);
 
-			ValidateArguments(compiler);
 		}
 
 		private void ConvertArgumentsToNamed()
