@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Compiling.Context.Types;
+using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
@@ -37,6 +38,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
 			ElseBlock?.Compile(compiler);
+
+			// Validate condition
+			if (!TypeChecking.CanImplicitlyConvert(Condition.OutputType, typeof(bool)))
+				throw new CompileExpressionTypeConflictException(Condition.Token, typeof(bool), Condition.OutputType);
 
 			compiler.Context.PopLayer();
 		}

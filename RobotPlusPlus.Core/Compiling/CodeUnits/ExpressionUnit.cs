@@ -17,7 +17,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public FlexibleList<CodeUnit> PreUnits { get; }
 		public FlexibleList<CodeUnit> PostUnits { get; }
 
-		public Type OutputType => throw new NotImplementedException();
+		public Type OutputType { get; private set; }
 		public bool NeedsCSSnippet { get; set; }
 
 		private Dictionary<IdentifierToken, Variable> variableLookup;
@@ -32,7 +32,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token = RemoveUnaries(Token);
 			Token = ExtractInnerAssignments(Token);
 		}
-		
+
 		public override void Compile(Compiler compiler)
 		{
 			NeedsCSSnippet = false;
@@ -60,16 +60,18 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				variableLookup[id] = compiler.Context.FindVariable(id);
 
 				if (id is IdentifierTempToken tmp
-					&& string.IsNullOrEmpty(tmp.GeneratedName))
+				    && string.IsNullOrEmpty(tmp.GeneratedName))
 					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
 				if (!compiler.Context.VariableExists(id))
 					throw new CompileVariableUnassignedException(id);
 			}, includeTop: true);
-			
+
 			foreach (CodeUnit post in PostUnits)
 				post.Compile(compiler);
+
+			OutputType = EvalTokenType(Token, compiler);
 		}
 
 		public override string AssembleIntoString()
@@ -80,7 +82,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		#region Public utility
-		
+
 		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
 		{
 			(CodeUnit tempAssignment, IdentifierTempToken id)
@@ -98,6 +100,33 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				exp.PreUnits.Add(post);
 
 			return (exp, id);
+		}
+
+		[CanBeNull, Pure]
+		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler)
+		{
+			switch (token)
+			{
+				case IdentifierToken id:
+					return compiler.Context.FindVariable(id)?.Type
+						?? throw new CompileVariableUnassignedException(id);
+
+				case LiteralNumberToken num:
+					return num.Value.GetType();
+
+				case LiteralStringToken _:
+					return typeof(string);
+
+				case LiteralKeywordToken key:
+					return key.Value?.GetType();
+
+				case OperatorToken op:
+					if (op.OperatorType == OperatorToken.Type.Unary)
+						return op.EvaluateType(EvalTokenType(op.UnaryValue, compiler));
+					return op.EvaluateType(EvalTokenType(op.LHS, compiler), EvalTokenType(op.RHS, compiler));
+			}
+
+			throw new CompileUnexpectedTokenException(token);
 		}
 
 		#endregion
@@ -120,7 +149,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return token.SourceCode;
 
 				case IdentifierToken id:
-					return $"♥{variableLookup[id]}";
+					return $"♥{variableLookup[id].Generated}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment
 					|| op.SourceCode == "++"
@@ -199,9 +228,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Repeat:
 
 			if (token is PunctuatorToken pun
-			    && pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
-			    && pun.Character == '('
-			    && !(parent is FunctionCallToken))
+				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
+				&& pun.Character == '('
+				&& !(parent is FunctionCallToken))
 			{
 				if (pun.Count != 1)
 					throw new CompileIncorrectTokenCountException(1, pun);
@@ -221,9 +250,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public static Token RemoveUnaries(Token token, Token parent = null)
 		{
 			Repeat:
-			
+
 			if (token is OperatorToken op
-			    && op.OperatorType == OperatorToken.Type.Unary)
+				&& op.OperatorType == OperatorToken.Type.Unary)
 			{
 				// Remove + unary
 				if (op.SourceCode == "+")
@@ -234,8 +263,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				// Remove double unary -(-x), !!x, ~~x
 				if (op.UnaryValue is OperatorToken op2
-				    && op.OperatorType == op2.OperatorType
-				    && op.SourceCode == op2.SourceCode)
+					&& op.OperatorType == op2.OperatorType
+					&& op.SourceCode == op2.SourceCode)
 				{
 					token = op2.UnaryValue;
 					goto Repeat;

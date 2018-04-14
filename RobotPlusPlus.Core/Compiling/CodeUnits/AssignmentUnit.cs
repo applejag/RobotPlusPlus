@@ -61,8 +61,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			VariableGenerated = compiler.Context.FindVariable(VariableOriginalToken)
 				?? compiler.Context.RegisterVariable(VariableOriginalToken, Expression.OutputType);
 
-			if (VariableGenerated.Type != Expression.OutputType)
-				throw new CompileVariableTypeConflictException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
+			if (!TypeChecking.CanImplicitlyConvert(Expression.OutputType, VariableGenerated.Type))
+				throw new CompileAssignmentTypeConflictException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
 		}
 
 		public override string AssembleIntoString()

@@ -241,7 +241,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					throw new ParseUnexpectedTokenException(this);
 			}
 		}
-
+		
 		public static OperatorToken ConvertPostPrefixToAssignment(OperatorToken token)
 		{
 			// Fabricate tokens
