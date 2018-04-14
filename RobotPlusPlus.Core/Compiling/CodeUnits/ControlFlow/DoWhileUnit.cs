@@ -20,8 +20,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			GeneratedLabelStart = compiler.Context.RegisterLabelDecayed("dowhile");
 
-			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
+			Condition.Compile(compiler);
+
+			ValidateCondition();
 
 			compiler.Context.PopLayer();
 		}

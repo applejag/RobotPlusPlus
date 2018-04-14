@@ -26,6 +26,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
 
+			ValidateCondition();
+
 			compiler.Context.PopLayer();
 		}
 

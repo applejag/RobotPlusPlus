@@ -43,5 +43,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			rows.AppendLine("jump label ➜{0} if ⊂{1}{2}⊃", label.Generated, inverted ? "!" : "", condition);
 			return rows.ToString();
 		}
+
+		protected void ValidateCondition()
+		{
+			// Validate condition
+			if (!TypeChecking.CanImplicitlyConvert(Condition.OutputType, typeof(bool)))
+				throw new CompileExpressionTypeConflictException(Condition.Token, typeof(bool), Condition.OutputType);
+		}
 	}
 }

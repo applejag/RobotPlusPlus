@@ -39,9 +39,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			CodeBlock.Compile(compiler);
 			ElseBlock?.Compile(compiler);
 
-			// Validate condition
-			if (!TypeChecking.CanImplicitlyConvert(Condition.OutputType, typeof(bool)))
-				throw new CompileExpressionTypeConflictException(Condition.Token, typeof(bool), Condition.OutputType);
+			ValidateCondition();
 
 			compiler.Context.PopLayer();
 		}
