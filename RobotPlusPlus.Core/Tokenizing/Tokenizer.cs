@@ -78,7 +78,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 
 			// Incomplete block comment
 			if (MatchingRegex(@"\/\*(\*(?!\/)|[^*])*\z") != null)
-				throw new ParseException("Nonterminated block comment.", CurrentRow);
+				throw new ParseException("Nonterminated block comment.", CurrentRow, CurrentColumn);
 			
 			// Singleline comment
 			if ((source.code = MatchingRegex(@"\/\/.*")) != null)
@@ -109,7 +109,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 				
 				// Incomplete '' strings
 				if (MatchingRegex($@"{s}([^{s}\\]|\\.)*\z") != null)
-					throw new ParseException("Nonterminated string literal.", CurrentRow);
+					throw new ParseException("Nonterminated string literal.", CurrentRow, CurrentColumn);
 			}
 
 			// Numbers
@@ -117,7 +117,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 			{
 				// Ending with invalid char?
 				if (MatchingRegex(@"(\d+\.?\d*[fF]|\d+\.?(?![\p{L}_])\d*[fF]?|\d*\.\d+[fF]?)[\p{L}_]*") != source.code)
-					throw new ParseException($"Unexpected character(s) after number <{source.code}>.", CurrentRow);
+					throw new ParseException($"Unexpected character(s) after number <{source.code}>.", CurrentRow, CurrentColumn);
 				
 				return new LiteralNumberToken(source);
 			}
@@ -134,7 +134,9 @@ namespace RobotPlusPlus.Core.Tokenizing
 				return new OperatorToken(source);
 
 			// Unknown
-			throw new ParseException($"Unable to parse next token. Next {Math.Min(remainingCode.Length, 32)} characters: <{remainingCode.Substring(0, Math.Min(remainingCode.Length, 32))}>", CurrentRow);
+			throw new ParseException(
+				$"Unable to parse next token. Next {Math.Min(remainingCode.Length, 32)} characters: <{remainingCode.Substring(0, Math.Min(remainingCode.Length, 32))}>",
+				CurrentRow, CurrentColumn);
 		}
 		
 		public void Iterate()
@@ -169,7 +171,7 @@ namespace RobotPlusPlus.Core.Tokenizing
 			}
 			catch (Exception e)
 			{
-				ParseException = new ParseException("Unkown exception during parsing!", CurrentRow, e);
+				ParseException = new ParseException("Unkown exception during parsing!", CurrentRow, CurrentColumn, e);
 				throw ParseException;
 			}
 		}
