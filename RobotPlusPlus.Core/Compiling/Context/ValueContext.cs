@@ -5,9 +5,9 @@ using JetBrains.Annotations;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
-namespace RobotPlusPlus.Core.Structures
+namespace RobotPlusPlus.Core.Compiling.Context
 {
-	public class NameContext
+	public class ValueContext
 	{
 		private readonly Stack<Dictionary<string,string>> occupied = new Stack<Dictionary<string,string>>();
 		private readonly List<string> oldGenerated = new List<string>();
@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Structures
 		public readonly IEqualityComparer<string> prefferedComparer;
 		public readonly Converter<string, string> prefferedTransformer;
 
-		public NameContext(IEqualityComparer<string> prefferedComparer,
+		public ValueContext(IEqualityComparer<string> prefferedComparer,
 			IEqualityComparer<string> generatedComparer,
 			Converter<string, string> prefferedTransformer)
 		{
@@ -28,7 +28,7 @@ namespace RobotPlusPlus.Core.Structures
 			occupied.Push(new Dictionary<string, string>());
 		}
 
-		public NameContext()
+		public ValueContext()
 			: this (StringComparer.InvariantCulture,
 				StringComparer.CurrentCultureIgnoreCase,
 				StringUtilities.EscapeIdentifier)
