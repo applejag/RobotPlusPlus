@@ -163,7 +163,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
 
 					// Register variable if needed
-					compiler.Context.RegisterVariable(id, named.expression.OutputType);
+					if (!compiler.Context.VariableExists(id))
+					{
+						Type varType = G1ANTRepository.ArgumentElement.EvaluateType(argElem.VariableType);
+						compiler.Context.RegisterVariable(id, varType);
+					}
 				}
 			}
 		}

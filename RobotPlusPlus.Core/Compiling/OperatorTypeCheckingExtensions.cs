@@ -1,11 +1,17 @@
 ﻿using System;
+using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Compiling
 {
 	public static class OperatorTypeCheckingExtensions
 	{
-		public static Type EvaluateType(this OperatorToken token, Type RHS)
+		public static Type EvaluateType(this OperatorToken token, Type unary)
+		{
+			return TryEvaluateType(token, unary)
+			       ?? throw new CompileInvalidOperationException(token, unary);
+		}
+		public static Type TryEvaluateType(this OperatorToken token, Type RHS)
 		{
 			switch (token.SourceCode)
 			{
@@ -20,6 +26,11 @@ namespace RobotPlusPlus.Core.Compiling
 		}
 
 		public static Type EvaluateType(this OperatorToken token, Type LHS, Type RHS)
+		{
+			return TryEvaluateType(token, LHS, RHS)
+			       ?? throw new CompileInvalidOperationException(token, LHS, RHS);
+		}
+		public static Type TryEvaluateType(this OperatorToken token, Type LHS, Type RHS)
 		{
 			switch (token.SourceCode)
 			{
