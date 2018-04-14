@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
@@ -9,127 +10,133 @@ namespace RobotPlusPlus.Core.Compiling.Context
 {
 	public class ValueContext
 	{
-		private readonly Stack<Dictionary<string,string>> occupied = new Stack<Dictionary<string,string>>();
-		private readonly List<string> oldGenerated = new List<string>();
+		private readonly Stack<HashSet<AbstractValue>> layers = new Stack<HashSet<AbstractValue>>();
+		private readonly HashSet<AbstractValue> decayed = new HashSet<AbstractValue>();
 
-		public int Layers => occupied.Count;
+		public int Layers => layers.Count;
+		public IReadOnlyCollection<AbstractValue> DecayedValues => decayed;
 
-		public readonly IEqualityComparer<string> generatedComparer;
-		public readonly IEqualityComparer<string> prefferedComparer;
-		public readonly Converter<string, string> prefferedTransformer;
-
-		public ValueContext(IEqualityComparer<string> prefferedComparer,
-			IEqualityComparer<string> generatedComparer,
-			Converter<string, string> prefferedTransformer)
-		{
-			this.prefferedComparer = prefferedComparer;
-			this.generatedComparer = generatedComparer;
-			this.prefferedTransformer = prefferedTransformer;
-			occupied.Push(new Dictionary<string, string>());
-		}
+		public IEqualityComparer<string> generatedComparer = StringComparer.CurrentCultureIgnoreCase;
+		public IEqualityComparer<string> prefferedComparer = StringComparer.InvariantCulture;
+		public Converter<string, string> identifierTransformer = StringUtilities.EscapeIdentifier;
 
 		public ValueContext()
-			: this (StringComparer.InvariantCulture,
-				StringComparer.CurrentCultureIgnoreCase,
-				StringUtilities.EscapeIdentifier)
-		{}
+		{
+			layers.Push(new HashSet<AbstractValue>());
+		}
 
 		public void PushLayer()
 		{
-			occupied.Push(new Dictionary<string, string>());
+			layers.Push(new HashSet<AbstractValue>());
 		}
 
 		public void PopLayer()
 		{
-			if (occupied.Count <= 1)
+			if (layers.Count <= 1)
 				throw new InvalidOperationException("You can't pop the top layer.");
-			
-			oldGenerated.AddRange(occupied.Pop().Values);
+
+			foreach (AbstractValue poppedValue in layers.Pop())
+			{
+				decayed.Add(poppedValue);
+			}
 		}
 
-		public bool PrefferedExists([NotNull] string preffered)
+		[Pure]
+		public bool IdentifierExists([NotNull] string identifier)
 		{
-			return occupied.Any(layer => layer.Keys.Contains(preffered, prefferedComparer));
+			return layers.Any(layer => layer.ContainsIdentifier(identifier, prefferedComparer));
 		}
 
-		public bool PrefferedExists([NotNull] IdentifierToken identifier)
-		{
-			return identifier is IdentifierTempToken || PrefferedExists(identifier.Identifier);
-		}
-
+		[Pure]
 		public bool GeneratedExists([NotNull] string generated)
 		{
-			return oldGenerated.Contains(generated, generatedComparer)
-			       || occupied.Any(layer => layer.Values.Contains(generated, generatedComparer));
+			return decayed.ContainsGenerated(generated, generatedComparer)
+				   || layers.Any(layer => layer.ContainsGenerated(generated, generatedComparer));
 		}
 
-		public string GetGenerated([NotNull] string preffered)
+		[CanBeNull, Pure]
+		public AbstractValue FindValue([NotNull] string identifier)
 		{
-			foreach (Dictionary<string, string> layer in occupied)
+			foreach (HashSet<AbstractValue> layer in layers)
 			{
-				if (layer.Keys.TryFirst(k => prefferedComparer.Equals(k, preffered), out string key))
-					return layer[key];
+				if (layer.TryFirst(k => prefferedComparer.Equals(k.Identifier, identifier), out AbstractValue key))
+					return key;
 			}
 
 			return null;
 		}
 
-		public string GetGenerated([NotNull] IdentifierToken identifier)
+		[NotNull, Pure]
+		public string GenerateName([NotNull] string identifier)
 		{
-			if (identifier is IdentifierTempToken temp)
-				return temp.GeneratedName;
-			return GetGenerated(identifier.Identifier);
-		}
-
-		public string GetOrRegisterName([NotNull] string preffered)
-		{	
-			return GetGenerated(preffered)
-			       ?? RegisterName(preffered);
-		}
-		
-		private string GenerateName(string preffered)
-		{
-			preffered = prefferedTransformer(preffered);
-			string generated = preffered;
+			identifier = identifierTransformer(identifier);
+			string generated = identifier;
 			var iter = 1;
 
 			while (GeneratedExists(generated))
 			{
-				generated = preffered + ++iter;
-			}
-			
-			return generated;
-		}
-
-		public string RegisterName([NotNull] string preffered)
-		{
-			string generated = GenerateName(preffered);
-			occupied.Peek()[preffered] = generated;
-			return generated;
-		}
-
-		public string RegisterGlobalName([NotNull] string preffered)
-		{
-			string generated = GenerateName(preffered);
-			occupied.Last()[preffered] = generated;
-			return generated;
-		}
-
-		public string RegisterTempName([NotNull] string preffered)
-		{
-			string generated = GenerateName(preffered);
-			oldGenerated.Add(generated);
-			return generated;
-		}
-
-		public string GetOrRegisterName([NotNull] IdentifierToken identifier)
-		{
-			if (identifier is IdentifierTempToken temp)
-			{
-				return temp.GeneratedName = RegisterTempName("tmp");
+				generated = identifier + ++iter;
 			}
 
-			return GetOrRegisterName(identifier.SourceCode);
+			return generated;
 		}
+
+		[NotNull]
+		public TValue RegisterValue<TValue>([NotNull] TValue value)
+			where TValue : AbstractValue
+		{
+			if (value is null) throw new ArgumentNullException(nameof(value));
+			layers.Peek().Add(value);
+			return value;
+		}
+
+		[NotNull]
+		public TValue RegisterValueGlobally<TValue>([NotNull] TValue value)
+			where TValue : AbstractValue
+		{
+			if (value is null) throw new ArgumentNullException(nameof(value));
+			layers.Last().Add(value);
+			return value;
+		}
+
+		[NotNull]
+		public TValue RegisterValueDecayed<TValue>([NotNull] TValue value)
+			where TValue : AbstractValue
+		{
+			if (value is null) throw new ArgumentNullException(nameof(value));
+			decayed.Add(value);
+			return value;
+		}
+
+		//public string RegisterName([NotNull] string identifier)
+		//{
+		//	string generated = GenerateName(identifier);
+		//	layers.Peek()[identifier] = generated;
+		//	return generated;
+		//}
+
+		//public string RegisterGlobalName([NotNull] string identifier)
+		//{
+		//	string generated = GenerateName(identifier);
+		//	layers.Last()[identifier] = generated;
+		//	return generated;
+		//}
+
+		//public string RegisterTempName([NotNull] string identifier)
+		//{
+		//	string generated = GenerateName(identifier);
+		//	oldGenerated.Add(generated);
+		//	return generated;
+		//}
+
+		//public string GetOrRegisterName([NotNull] IdentifierToken identifier)
+		//{
+		//	if (identifier is IdentifierTempToken temp)
+		//	{
+		//		return temp.GeneratedName = RegisterTempName("tmp");
+		//	}
+
+		//	return GetOrRegisterName(identifier.SourceCode);
+		//}
 	}
 }
