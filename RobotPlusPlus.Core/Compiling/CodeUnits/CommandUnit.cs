@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Structures.G1ANT;
@@ -79,10 +80,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			// Alter & validate arguments
 			ConvertArgumentsToNamed();
-			ValidateArguments(compiler);
 
 			foreach (Argument argument in Arguments)
 				argument.expression.Compile(compiler);
+
+			ValidateArguments(compiler);
 		}
 
 		private void ConvertArgumentsToNamed()
@@ -161,7 +163,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
 
 					// Register variable if needed
-					compiler.Context.GetOrRegisterName(id);
+					compiler.Context.RegisterVariable(id, named.expression.OutputType);
 				}
 			}
 		}

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -15,9 +17,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public FlexibleList<CodeUnit> PreUnits { get; }
 		public FlexibleList<CodeUnit> PostUnits { get; }
 
+		public Type OutputType => throw new NotImplementedException();
 		public bool NeedsCSSnippet { get; set; }
 
-		private Dictionary<IdentifierToken, string> variableLookup;
+		private Dictionary<IdentifierToken, Variable> variableLookup;
 
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -47,22 +50,22 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				&& str.Value.EscapeString() != str.Value, true))
 				NeedsCSSnippet = true;
 
-			variableLookup = new Dictionary<IdentifierToken, string>();
+			variableLookup = new Dictionary<IdentifierToken, Variable>();
 
 			// Loop variables
 			Token.ForEachRecursive(t =>
 			{
 				if (!(t is IdentifierToken id)) return;
 
-				variableLookup[id] = compiler.Context.GetGenerated(id);
+				variableLookup[id] = compiler.Context.FindVariable(id);
 
 				if (id is IdentifierTempToken tmp
-					&& String.IsNullOrEmpty(tmp.GeneratedName))
+					&& string.IsNullOrEmpty(tmp.GeneratedName))
 					throw new CompileException("Name not generated for temporary variable.", tmp);
 
 				// Check variables for registration
-				if (!compiler.Context.PrefferedExists(id))
-					throw new CompileUnassignedVariableException(id);
+				if (!compiler.Context.VariableExists(id))
+					throw new CompileVariableUnassignedException(id);
 			}, includeTop: true);
 			
 			foreach (CodeUnit post in PostUnits)

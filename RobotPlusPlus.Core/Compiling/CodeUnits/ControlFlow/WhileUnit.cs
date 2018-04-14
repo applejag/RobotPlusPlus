@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
@@ -6,8 +8,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 {
 	public class WhileUnit : AbstractFlowUnit
 	{
-		public string GeneratedLabelStart { get; private set; }
-		public string GeneratedLabelEnd { get; private set; }
+		public Label GeneratedLabelStart { get; private set; }
+		public Label GeneratedLabelEnd { get; private set; }
 
 		public WhileUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -17,9 +19,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			compiler.Context.PushLayer();
 			
-			GeneratedLabelStart = compiler.Context.RegisterTempName("while");
+			GeneratedLabelStart = compiler.Context.RegisterLabelDecayed("while");
 			GeneratedLabelEnd = CodeBlock.IsEmpty
-				? null : compiler.Context.RegisterTempName("whileend");
+				? null : compiler.Context.RegisterLabelDecayed("whileend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
@@ -33,10 +35,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			bool isEmpty = !CodeBlock.IsEmpty;
 
 			if (isEmpty) rows.AppendLine(AssembleJumpIfCondition(GeneratedLabelEnd, true));
-			rows.AppendLine("➜{0}", GeneratedLabelStart);
+			rows.AppendLine("➜{0}", GeneratedLabelStart.Generated);
 			if (isEmpty) rows.AppendLine(CodeBlock.AssembleIntoString());
 			rows.AppendLine(AssembleJumpIfCondition(GeneratedLabelStart));
-			if (isEmpty) rows.AppendLine("➜{0}", GeneratedLabelEnd);
+			if (isEmpty) rows.AppendLine("➜{0}", GeneratedLabelEnd.Generated);
 
 			return rows.ToString();
 		}

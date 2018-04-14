@@ -114,7 +114,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileUnassignedVariableException))]
+		[ExpectedException(typeof(CompileVariableUnassignedException))]
 		public void Compile_IfStatementVariableEmbeddedUsedOutside()
 		{
 			// Arrange

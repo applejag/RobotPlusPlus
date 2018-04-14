@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Structures;
@@ -11,14 +13,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 	{
 		public ExpressionUnit Expression { get; }
 		public IdentifierToken VariableOriginalToken { get; }
-		public string VariableGeneratedName { get; private set; }
+		public Variable VariableGenerated { get; private set; }
 
 		public AssignmentUnit([NotNull] OperatorToken token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
 		{
 			if (token.OperatorType != OperatorToken.Type.Assignment)
 				throw new CompileUnexpectedTokenException(token);
-			
+
 			if (!(token.LHS is IdentifierToken id))
 				throw new CompileUnexpectedTokenException(token);
 
@@ -54,9 +56,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public override void Compile(Compiler compiler)
 		{
 			Expression.Compile(compiler);
-
+			
 			// Register variable, or use already registered
-			VariableGeneratedName = compiler.Context.GetOrRegisterName(VariableOriginalToken);
+			VariableGenerated = compiler.Context.FindVariable(VariableOriginalToken)
+				?? compiler.Context.RegisterVariable(VariableOriginalToken, Expression.OutputType);
+
+			if (VariableGenerated.Type != Expression.OutputType)
+				throw new CompileVariableTypeConflictException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
 		}
 
 		public override string AssembleIntoString()
@@ -68,7 +74,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				rows.AppendLine(pre.AssembleIntoString());
 			}
 
-			rows.AppendLine("♥{0}={1}", VariableGeneratedName, Expression.AssembleIntoString());
+			rows.AppendLine("♥{0}={1}", VariableGenerated.Generated, Expression.AssembleIntoString());
 
 			foreach (CodeUnit post in Expression.PostUnits)
 			{
