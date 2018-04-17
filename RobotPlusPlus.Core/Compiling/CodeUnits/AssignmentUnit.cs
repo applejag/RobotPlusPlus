@@ -62,7 +62,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				?? compiler.Context.RegisterVariable(VariableOriginalToken, Expression.OutputType);
 
 			if (!TypeChecking.CanImplicitlyConvert(Expression.OutputType, VariableGenerated.Type))
-				throw new CompileAssignmentTypeConflictException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
+				throw new CompileTypeConvertImplicitAssignmentException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
 		}
 
 		public override string AssembleIntoString()

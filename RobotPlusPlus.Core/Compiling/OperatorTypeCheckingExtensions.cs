@@ -9,7 +9,7 @@ namespace RobotPlusPlus.Core.Compiling
 		public static Type EvaluateType(this OperatorToken token, Type unary)
 		{
 			return TryEvaluateType(token, unary)
-			       ?? throw new CompileInvalidOperationException(token, unary);
+			       ?? throw new CompileTypeInvalidOperationException(token, unary);
 		}
 		public static Type TryEvaluateType(this OperatorToken token, Type RHS)
 		{
@@ -28,7 +28,7 @@ namespace RobotPlusPlus.Core.Compiling
 		public static Type EvaluateType(this OperatorToken token, Type LHS, Type RHS)
 		{
 			return TryEvaluateType(token, LHS, RHS)
-			       ?? throw new CompileInvalidOperationException(token, LHS, RHS);
+			       ?? throw new CompileTypeInvalidOperationException(token, LHS, RHS);
 		}
 		public static Type TryEvaluateType(this OperatorToken token, Type LHS, Type RHS)
 		{
