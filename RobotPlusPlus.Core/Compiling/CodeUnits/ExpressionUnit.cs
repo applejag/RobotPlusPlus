@@ -40,33 +40,50 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 
-			// Check contains string and operator
-			if (Token.AnyRecursive(t => t is LiteralStringToken, true)
-				&& Token.AnyRecursive(t => t is OperatorToken, true))
-				NeedsCSSnippet = true;
-
-			// Check string needing escape chars
-			if (Token.AnyRecursive(t => t is LiteralStringToken str
-				&& str.Value.EscapeString() != str.Value, true))
-				NeedsCSSnippet = true;
-
 			variableLookup = new Dictionary<IdentifierToken, Variable>();
 
-			// Loop variables
+			var containsStr = false;
+			var containsOp = false;
+
+			// Loop tokens
 			Token.ForEachRecursive(t =>
 			{
-				if (!(t is IdentifierToken id)) return;
+				switch (t)
+				{
+					case LiteralStringToken str:
+						containsStr = true;
+						if (str.NeedsEscaping)
+							NeedsCSSnippet = true;
+						break;
 
-				variableLookup[id] = compiler.Context.FindVariable(id);
+					case OperatorToken _:
+						containsOp = true;
+						break;
 
-				if (id is IdentifierTempToken tmp
-				    && string.IsNullOrEmpty(tmp.GeneratedName))
-					throw new CompileException("Name not generated for temporary variable.", tmp);
+					case IdentifierToken id:
+						variableLookup[id] = compiler.Context.FindVariable(id);
 
-				// Check variables for registration
-				if (!compiler.Context.VariableExists(id))
-					throw new CompileVariableUnassignedException(id);
+						// Check temp vars
+						if (id is IdentifierTempToken tmp
+						    && string.IsNullOrEmpty(tmp.GeneratedName))
+							throw new CompileException("Name not generated for temporary variable.", tmp);
+
+						// Check variables for registration
+						Variable value = compiler.Context.FindVariable(id);
+						if (value == null)
+							throw new CompileVariableUnassignedException(id);
+
+						if (value.Type == typeof(string))
+							containsStr = true;
+						break;
+				}
+
+				// Check 
 			}, includeTop: true);
+
+			// Check contains string and operator
+			if (containsStr && containsOp)
+				NeedsCSSnippet = true;
 
 			foreach (CodeUnit post in PostUnits)
 				post.Compile(compiler);
@@ -76,7 +93,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override string AssembleIntoString()
 		{
-			return NeedsCSSnippet && !(Parent is IfUnit)
+			return NeedsCSSnippet && !(Parent is AbstractFlowUnit)
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}

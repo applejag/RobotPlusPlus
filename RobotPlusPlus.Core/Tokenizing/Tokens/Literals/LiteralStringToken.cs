@@ -10,10 +10,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 	public class LiteralStringToken : LiteralToken
 	{
 		public string Value { get; }
+		public string ValueEscaped { get; }
+		public bool NeedsEscaping { get; }
 
 		public LiteralStringToken(TokenSource source) : base(source)
 		{
 			Value = Regex.Unescape(SourceCode.Substring(1, SourceCode.Length - 2));
+			ValueEscaped = Value.EscapeString();
+			NeedsEscaping = Value != ValueEscaped;
 		}
 
 		public override void ParseToken(IteratedList<Token> parent)
