@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
@@ -6,7 +8,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 {
 	public class DoWhileUnit : AbstractFlowUnit
 	{
-		public string GeneratedLabelStart { get; private set; }
+		public Label GeneratedLabelStart { get; private set; }
 
 		public DoWhileUnit([NotNull] StatementToken token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -16,10 +18,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			compiler.Context.PushLayer();
 
-			GeneratedLabelStart = compiler.Context.RegisterTempName("dowhile");
+			GeneratedLabelStart = compiler.Context.RegisterLabelDecayed("dowhile");
 
-			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
+			Condition.Compile(compiler);
+
+			ValidateCondition();
 
 			compiler.Context.PopLayer();
 		}
@@ -28,7 +32,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			var rows = new RowBuilder();
 			
-			rows.AppendLine("➜{0}", GeneratedLabelStart);
+			rows.AppendLine("➜{0}", GeneratedLabelStart.Generated);
 			rows.AppendLine(CodeBlock.AssembleIntoString());
 			rows.AppendLine(AssembleJumpIfCondition(GeneratedLabelStart));
 

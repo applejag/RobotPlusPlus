@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Exceptions
 		{ }
 
 		public ParseTokenException(string message, Token source, Exception innerException)
-			: base(message, source.SourceLine, innerException)
+			: base(message, source.SourceLine, source.SourceColumn, innerException)
 		{
 			Token = source;
 		}

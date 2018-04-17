@@ -99,6 +99,7 @@
 			<!-- Special structures -->
 			<xs:enumeration value="point" />
 			<xs:enumeration value="rectangle" />
+			<xs:enumeration value="size" />
 			<xs:enumeration value="list" />
 			<xs:enumeration value="dictionary" />
 			<!-- Special strings -->

@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -21,7 +22,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			}
 		}
 
-		protected string AssembleJumpIfCondition(string label, bool inverted = false)
+		protected string AssembleJumpIfCondition(Label label, bool inverted = false)
 		{
 			var rows = new RowBuilder();
 
@@ -39,8 +40,15 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 				condition = Condition.AssembleIntoString();
 
 
-			rows.AppendLine("jump label ➜{0} if ⊂{1}{2}⊃", label, inverted ? "!" : "", condition);
+			rows.AppendLine("jump label ➜{0} if ⊂{1}{2}⊃", label.Generated, inverted ? "!" : "", condition);
 			return rows.ToString();
+		}
+
+		protected void ValidateCondition()
+		{
+			// Validate condition
+			if (!TypeChecking.CanImplicitlyConvert(Condition.OutputType, typeof(bool)))
+				throw new CompileTypeConvertImplicitException(Condition.Token, Condition.OutputType, typeof(bool));
 		}
 	}
 }

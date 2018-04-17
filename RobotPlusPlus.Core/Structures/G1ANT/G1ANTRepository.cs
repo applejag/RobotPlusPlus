@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
@@ -152,11 +154,12 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 					case ArgumentType.Boolean: return typeof(bool);
 					case ArgumentType.Point: return typeof(Point);
 					case ArgumentType.Rectangle: return typeof(Rectangle);
+					case ArgumentType.Size: return typeof(Size);
 					case ArgumentType.List: return typeof(List<object>);
-					case ArgumentType.Variable: return typeof(IdentifierToken);
+					case ArgumentType.Variable: return typeof(Variable);
 					case ArgumentType.VariableName: return typeof(string);
+					case ArgumentType.Label: return typeof(Label);
 
-					case ArgumentType.Label:
 					case ArgumentType.Procedure:
 						throw new NotImplementedException();
 
@@ -164,6 +167,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 						throw new FormatException($"Unkown type <{type?.ToString() ?? "null"}>!");
 				}
 			}
+
 			public override string ToString()
 			{
 				var sb = new StringBuilder();
@@ -198,6 +202,8 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			Point,
 			[XmlEnum("rectangle")]
 			Rectangle,
+			[XmlEnum("size")]
+			Size,
 			[XmlEnum("list")]
 			List,
 			[XmlEnum("dictionary")]

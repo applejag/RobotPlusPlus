@@ -29,7 +29,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens.Literals
 					break;
 
 				default:
-					throw new ParseException($"Unkown literal keyword <{SourceCode}>!", SourceLine);
+					throw new ParseTokenException($"Unkown literal keyword <{SourceCode}>!", this);
 			}
 		}
 

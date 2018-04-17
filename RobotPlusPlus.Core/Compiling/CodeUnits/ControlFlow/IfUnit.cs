@@ -1,5 +1,8 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
+using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
@@ -8,8 +11,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 	public class IfUnit : AbstractFlowUnit
 	{
 		public CodeBlockUnit ElseBlock { get; }
-		public string GeneratedLabelEnd { get; private set; }
-		public string GeneratedLabelElse { get; private set; }
+		public Label GeneratedLabelEnd { get; private set; }
+		public Label GeneratedLabelElse { get; private set; }
 
 		public IfUnit FirstParentIf { get; private set; }
 
@@ -27,14 +30,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			FirstParentIf = ParentSearchWhereImLast(Parent);
 
 			GeneratedLabelElse = ElseBlock?.IsEmpty != false || CodeBlock.IsEmpty
-				? null : compiler.Context.RegisterTempName("ifelse");
+				? null : compiler.Context.RegisterLabelDecayed("ifelse");
 
 			GeneratedLabelEnd = FirstParentIf?.GeneratedLabelEnd
-								?? compiler.Context.RegisterTempName("ifend");
+								?? compiler.Context.RegisterLabelDecayed("ifend");
 
 			Condition.Compile(compiler);
 			CodeBlock.Compile(compiler);
 			ElseBlock?.Compile(compiler);
+
+			ValidateCondition();
 
 			compiler.Context.PopLayer();
 		}
@@ -44,7 +49,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			var rows = new RowBuilder();
 
 			// Echo condition
-			string label = GeneratedLabelElse ?? GeneratedLabelEnd;
+			Label label = GeneratedLabelElse ?? GeneratedLabelEnd;
 			rows.AppendLine(AssembleJumpIfCondition(label, !CodeBlock.IsEmpty));
 
 			// Echo code block
@@ -55,8 +60,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 			{
 				if (!CodeBlock.IsEmpty)
 				{
-					rows.AppendLine("jump label ➜{0}", GeneratedLabelEnd);
-					rows.AppendLine("➜{0}", GeneratedLabelElse);
+					rows.AppendLine("jump label ➜{0}", GeneratedLabelEnd.Generated);
+					rows.AppendLine("➜{0}", GeneratedLabelElse.Generated);
 				}
 
 				rows.AppendLine(ElseBlock.AssembleIntoString());
@@ -64,7 +69,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			// Echo end label
 			if (FirstParentIf == null)
-				rows.AppendLine("➜{0}", GeneratedLabelEnd);
+				rows.AppendLine("➜{0}", GeneratedLabelEnd.Generated);
 
 			return rows.ToString();
 		}
