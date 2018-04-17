@@ -48,7 +48,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 		{
 			// Validate condition
 			if (!TypeChecking.CanImplicitlyConvert(Condition.OutputType, typeof(bool)))
-				throw new CompileTypeConvertImplicitException(Condition.Token, typeof(bool), Condition.OutputType);
+				throw new CompileTypeConvertImplicitException(Condition.Token, Condition.OutputType, typeof(bool));
 		}
 	}
 }

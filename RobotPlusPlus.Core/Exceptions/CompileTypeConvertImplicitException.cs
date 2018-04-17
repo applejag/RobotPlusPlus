@@ -5,25 +5,26 @@ namespace RobotPlusPlus.Core.Exceptions
 {
 	public class CompileTypeConvertImplicitException : CompileException
 	{
-		public Type ExpectedType { get; }
-		public Type ActualType { get; }
+		public Type ToType { get; }
+		public Type FromType { get; }
 
-		public CompileTypeConvertImplicitException(Token expression, Type expected, Type actual) : this(expression, expected, actual, null)
+		public CompileTypeConvertImplicitException(Token expression, Type from, Type to)
+			: this(expression, @from, to, null)
 		{ }
 
-		public CompileTypeConvertImplicitException(Token expression, Type expected, Type actual,
+		public CompileTypeConvertImplicitException(Token expression, Type from, Type to,
 			Exception innerException)
 			: this(
-				$"Cannot implicitly convert <{actual.Name}> to <{expected.Name}> in expression.",
-				expression, expected, actual, innerException)
+				$"Cannot implicitly convert <{from.Name}> to <{to.Name}> in expression.",
+				expression, from, to, innerException)
 		{ }
 
-		protected CompileTypeConvertImplicitException(string message, Token expression, Type expected, Type actual,
+		protected CompileTypeConvertImplicitException(string message, Token expression, Type from, Type to,
 			Exception innerException)
 			: base(message, expression, innerException)
 		{
-			ExpectedType = expected;
-			ActualType = actual;
+			ToType = to;
+			FromType = from;
 		}
 	}
 }

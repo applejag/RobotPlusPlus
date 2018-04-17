@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Structures.G1ANT;
@@ -159,15 +160,19 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				// Validate variable types
 				if (argElem?.Type == G1ANTRepository.ArgumentType.Variable)
 				{
+					// Must be identifier
 					if (!(named.expression.Token is IdentifierToken id))
 						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+					
+					Type varType = G1ANTRepository.ArgumentElement.EvaluateType(argElem.VariableType);
 
 					// Register variable if needed
-					if (!compiler.Context.VariableExists(id))
-					{
-						Type varType = G1ANTRepository.ArgumentElement.EvaluateType(argElem.VariableType);
-						compiler.Context.RegisterVariable(id, varType);
-					}
+					Variable variable = compiler.Context.FindVariable(id) ??
+					                    compiler.Context.RegisterVariable(id, varType);
+
+					// Validate type
+					if (!TypeChecking.CanImplicitlyConvert(varType, variable.Type))
+						throw new CompileTypeConvertImplicitAssignmentException(id, varType, variable.Type);
 				}
 			}
 		}
