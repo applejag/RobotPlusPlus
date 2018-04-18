@@ -288,7 +288,7 @@
 			<Command Name="getvalue">
 				<Argument Name="row" Type="integer" Required="true"/>
 				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="integer" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
 				<Argument Name="timeout" Type="integer"/>
 			</Command>

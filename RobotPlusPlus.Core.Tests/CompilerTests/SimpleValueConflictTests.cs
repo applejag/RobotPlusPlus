@@ -121,6 +121,31 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
+		public void Compile_CommandArgumentCorrectType()
+		{
+			// Arrange
+			const string code = "dialog('lorem')";
+			const string expected = "dialog message ‴lorem‴";
+
+			// Act
+			string actual = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileTypeConvertImplicitCommandArgumentException))]
+		public void Compile_CommandArgumentIncorrectType()
+		{
+			// Arrange
+			const string code = "dialog(true)";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
 		public void Compile_IfNonBoolVariable()
 		{

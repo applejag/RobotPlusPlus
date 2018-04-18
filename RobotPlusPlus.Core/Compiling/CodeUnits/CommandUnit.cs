@@ -81,11 +81,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			// Alter & validate arguments
 			ConvertArgumentsToNamed();
-			ValidateArguments(compiler);
+			ValidateArgumentCount();
+			RegisterResultVariables(compiler);
 
 			foreach (Argument argument in Arguments)
 				argument.expression.Compile(compiler);
 
+			ValidateArgumentInputTypes();
 		}
 
 		private void ConvertArgumentsToNamed()
@@ -117,7 +119,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			}
 		}
 
-		private void ValidateArguments(Compiler compiler)
+		private void ValidateArgumentCount()
 		{
 			// Validate duplicate arguments
 			NamedArgument duplicateArg = Arguments.OfType<NamedArgument>()
@@ -150,31 +152,68 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				throw new CompileFunctionException($"Command <{CommandName}> requires argument {missingReqArgs[0]}.", Token);
 			if (missingReqArgs.Count > 1)
 				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join("; ", missingReqArgs)}.", Token);
+		}
 
+		private void RegisterResultVariables(Compiler compiler)
+		{
 			// Validate types
-			foreach (NamedArgument named in Arguments.OfType<NamedArgument>())
+			foreach (var (named, argElem) in GetArgumentEnumerable())
 			{
-				G1ANTRepository.ArgumentElement argElem = CommandArgumentElements
-					.FirstOrDefault(a => a.Name == named.name);
+				// Only validate variable types
+				if (argElem.Type != G1ANTRepository.Structure.Variable) continue;
 
+				// Must be identifier
+				if (!(named.expression.Token is IdentifierToken id))
+					throw new CompileFunctionException(
+						$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+
+				Type varType = argElem.EvaluateVariableType();
+
+				// Register variable if needed
+				Variable variable = compiler.Context.FindVariable(id) ??
+				                    compiler.Context.RegisterVariable(id, varType);
+
+				// Validate type
+				if (!TypeChecking.CanImplicitlyConvert(varType, variable.Type))
+					throw new CompileTypeConvertImplicitAssignmentException(id, varType, variable.Type);
+			}
+		}
+
+		private void ValidateArgumentInputTypes()
+		{
+			// Validate types
+			foreach (var (named, argElem) in GetArgumentEnumerable())
+			{
 				// Validate variable types
-				if (argElem?.Type == G1ANTRepository.Structure.Variable)
+				switch (argElem.Type)
 				{
-					// Must be identifier
-					if (!(named.expression.Token is IdentifierToken id))
-						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+					case G1ANTRepository.Structure.Variable:
+						break;
 
-					Type varType = argElem.EvaluateVariableType();
+					case G1ANTRepository.Structure.VariableName:
+						// Must be identifier
+						if (!(named.expression.Token is IdentifierToken))
+							throw new CompileFunctionException(
+								$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+						break;
 
-					// Register variable if needed
-					Variable variable = compiler.Context.FindVariable(id) ??
-					                    compiler.Context.RegisterVariable(id, varType);
+					default:
+						Type expected = argElem.EvaluateType();
+						Type actual = named.expression.OutputType;
 
-					// Validate type
-					if (!TypeChecking.CanImplicitlyConvert(varType, variable.Type))
-						throw new CompileTypeConvertImplicitAssignmentException(id, varType, variable.Type);
+						// Validate type
+						if (!TypeChecking.CanImplicitlyConvert(actual, expected))
+							throw new CompileTypeConvertImplicitCommandArgumentException(named, expected);
+						break;
 				}
 			}
+		}
+
+		private IEnumerable<(NamedArgument Named, G1ANTRepository.ArgumentElement Element)> GetArgumentEnumerable()
+		{
+			return from arg in Arguments.OfType<NamedArgument>()
+				join argElem in CommandArgumentElements on arg.name equals argElem.Name
+				select (Named: arg, Element: argElem);
 		}
 
 		public override string AssembleIntoString()
@@ -190,9 +229,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			var cmd = new StringBuilder();
 			cmd.Append(CommandFamilyName == null ? CommandName : $"{CommandFamilyName}.{CommandName}");
 
-			foreach (NamedArgument argument in Arguments.OfType<NamedArgument>())
+			foreach (var (named, argElem) in GetArgumentEnumerable())
 			{
-				cmd.AppendFormat(" {0} {1}", argument.name, argument.expression.AssembleIntoString());
+				if (argElem.Type == G1ANTRepository.Structure.VariableName)
+				{
+					Variable variable = named.expression.GetVariable();
+
+					cmd.AppendFormat(" {0} ‴{1}‴", named.name, variable.Generated);
+				}
+				else
+					cmd.AppendFormat(" {0} {1}", named.name, named.expression.AssembleIntoString());
 			}
 
 			row.AppendLine(cmd.ToString());

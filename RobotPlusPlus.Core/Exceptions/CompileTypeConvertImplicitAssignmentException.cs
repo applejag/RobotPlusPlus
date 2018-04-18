@@ -5,14 +5,14 @@ namespace RobotPlusPlus.Core.Exceptions
 {
 	public class CompileTypeConvertImplicitAssignmentException : CompileTypeConvertImplicitException
 	{
-		public CompileTypeConvertImplicitAssignmentException(IdentifierToken variable, Type from, Type to) : this(variable, to, @from, null)
+		public CompileTypeConvertImplicitAssignmentException(IdentifierToken variable, Type from, Type to) : this(variable, from, to, null)
 		{ }
 
 		public CompileTypeConvertImplicitAssignmentException(IdentifierToken variable, Type from, Type to,
 			Exception innerException)
 			: base(
-				$"Cannot implicitly convert <{from.Name}> to <{to.Name}> when assigning value to <{variable.Identifier}>.",
-				variable, to, from, innerException)
+				$"Cannot implicitly convert <{from?.Name ?? "null"}> to <{to?.Name ?? "null"}> when assigning value to <{variable.Identifier}>.",
+				variable, from, to, innerException)
 		{
 		}
 	}
