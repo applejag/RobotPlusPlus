@@ -100,6 +100,19 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Public utility
 
+		public Variable GetVariable()
+		{
+			if (!(Token is IdentifierToken id))
+				throw new CompileUnexpectedTokenException(Token);
+
+			return GetVariable(id);
+		}
+
+		public Variable GetVariable(IdentifierToken id)
+		{
+			return variableLookup.ContainsKey(id) ? variableLookup[id] : null;
+		}
+
 		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
 		{
 			(CodeUnit tempAssignment, IdentifierTempToken id)

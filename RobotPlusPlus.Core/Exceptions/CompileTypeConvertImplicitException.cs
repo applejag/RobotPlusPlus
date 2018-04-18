@@ -9,13 +9,13 @@ namespace RobotPlusPlus.Core.Exceptions
 		public Type FromType { get; }
 
 		public CompileTypeConvertImplicitException(Token expression, Type from, Type to)
-			: this(expression, @from, to, null)
+			: this(expression, from, to, null)
 		{ }
 
 		public CompileTypeConvertImplicitException(Token expression, Type from, Type to,
 			Exception innerException)
 			: this(
-				$"Cannot implicitly convert <{from.Name}> to <{to.Name}> in expression.",
+				$"Cannot implicitly convert <{from?.Name ?? "null"}> to <{to?.Name ?? "null"}> in expression.",
 				expression, from, to, innerException)
 		{ }
 
@@ -23,8 +23,8 @@ namespace RobotPlusPlus.Core.Exceptions
 			Exception innerException)
 			: base(message, expression, innerException)
 		{
-			ToType = to;
 			FromType = from;
+			ToType = to;
 		}
 	}
 }

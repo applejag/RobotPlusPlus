@@ -57,6 +57,15 @@ namespace RobotPlusPlus.Core.Compiling
 			// Load predefined values
 			G1ANTRepository = G1ANTRepository.FromEmbeddedXML();
 
+			var source = new TokenSource("", "_G1ANT", -1, 1);
+			foreach (G1ANTRepository.VariableElement variable in G1ANTRepository.Variables.Variables)
+			{
+				source.code = variable.Name;
+				Type varType = variable.EvaluateType();
+				var token = new IdentifierToken(source) {IsParsed = true};
+				Context.RegisterVariableGlobally(token, varType);
+			}
+
 			// Compile
 			CompileUnits(codeUnits, this);
 		}

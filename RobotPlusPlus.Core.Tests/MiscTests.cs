@@ -48,6 +48,9 @@ namespace RobotPlusPlus.Core.Tests
 			G1ANTRepository repo = G1ANTRepository.FromEmbeddedXML();
 
 			Assert.IsNotNull(repo);
+			Assert.IsNotNull(repo.Variables);
+			Assert.IsNotNull(repo.Variables.Variables);
+			Assert.AreNotEqual(0, repo.Variables.Variables.Count);
 			Assert.IsNotNull(repo.Commands);
 			Assert.IsNotNull(repo.Commands.Commands);
 			Assert.AreNotEqual(0, repo.Commands.Commands.Count);

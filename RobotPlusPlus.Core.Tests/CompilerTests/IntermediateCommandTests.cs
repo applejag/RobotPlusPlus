@@ -239,14 +239,66 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foo' + dialog.ask('bar'); tmp = 1";
 			const string expected = "dialog.ask message ‴bar‴ result ♥tmp\n" +
-									"♥x=⊂\"foo\"+♥tmp⊃\n" +
-									"♥tmp2=1";
+			                        "♥x=⊂\"foo\"+♥tmp⊃\n" +
+			                        "♥tmp2=1";
 
 			// Act
 			string actual = Compiler.Compile(code);
 
 			// Assert
 			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileFunctionException))]
+		public void Compile_VariableNameLiteral()
+		{
+			// Arrange
+			const string code = "debug.trace('bar')";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
+		public void Compile_VariableNameAssigned()
+		{
+			// Arrange
+			const string code = "bar = 'foo'; debug.trace(bar)";
+			const string expected = "♥bar=‴foo‴\n" +
+			                        "debug.trace variablename ‴bar‴";
+
+			// Act
+			string actual = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		public void Compile_VariableNameGeneratedName()
+		{
+			// Arrange
+			const string code = "bäär = 'foo'; debug.trace(bäär)";
+			const string expected = "♥baar=‴foo‴\n" +
+			                        "debug.trace variablename ‴baar‴";
+
+			// Act
+			string actual = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileVariableUnassignedException))]
+		public void Compile_VariableNameUnassigned()
+		{
+			// Arrange
+			const string code = "debug.trace(bar)";
+
+			// Act
+			Compiler.Compile(code);
 		}
 	}
 }
