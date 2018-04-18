@@ -10,7 +10,19 @@
 
 	<xs:element name="G1ANT">
 		<xs:complexType>
-			<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="Variables">
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="Variable" type="Variable" minOccurs="0" maxOccurs="unbounded" />
+						</xs:choice>
+					</xs:complexType>
+
+					<xs:unique name="UniqueVariable">
+						<xs:selector xpath="g1ant:Variable"/>
+						<xs:field xpath="@Name"/>
+					</xs:unique>
+				</xs:element>
 				<xs:element name="Commands">
 					<xs:complexType>
 						<xs:choice maxOccurs="unbounded">
@@ -62,9 +74,14 @@
 						<xs:field xpath="@Name" />
 					</xs:unique>
 				</xs:element>
-			</xs:sequence>
+			</xs:choice>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:complexType name="Variable">
+		<xs:attribute name="Name" type="Identifier" use="required" />
+		<xs:attribute name="Type" type="Structure" use="required" />
+	</xs:complexType>
 
 	<xs:complexType name="Command">
 		<xs:sequence>
@@ -76,8 +93,8 @@
 
 	<xs:complexType name="CommandArgument">
 		<xs:attribute name="Name" type="Identifier" use="required" />
-		<xs:attribute name="Type" type="CommandArgumentType" use="required" />
-		<xs:attribute name="VariableType" type="CommandArgumentType" use="optional" />
+		<xs:attribute name="Type" type="Structure" use="required" />
+		<xs:attribute name="VariableType" type="Structure" use="optional" />
 		<xs:attribute name="Required" type="xs:boolean" default="false" use="optional" />
 		<xs:attribute name="RequiredGroup" type="xs:integer" use="optional" />
 	</xs:complexType>
@@ -89,7 +106,7 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:simpleType name="CommandArgumentType">
+	<xs:simpleType name="Structure">
 		<xs:restriction base="xs:string">
 			<!-- Base C# types -->
 			<xs:enumeration value="string" />
@@ -102,11 +119,17 @@
 			<xs:enumeration value="size" />
 			<xs:enumeration value="list" />
 			<xs:enumeration value="dictionary" />
+			<xs:enumeration value="date" />
+			<xs:enumeration value="datetime" />
+			<xs:enumeration value="time" />
 			<!-- Special strings -->
+			<xs:enumeration value="json" />
+			<xs:enumeration value="html" />
+			<xs:enumeration value="xml" />
 			<xs:enumeration value="label" />
+			<xs:enumeration value="procedure" />
 			<xs:enumeration value="variable" />
 			<xs:enumeration value="variablename" />
-			<xs:enumeration value="procedure" />
 			<!-- Aka dynamic -->
 			<xs:enumeration value="undefined" />
 		</xs:restriction>

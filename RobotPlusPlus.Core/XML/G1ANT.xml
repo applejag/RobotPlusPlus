@@ -3,6 +3,55 @@
 <G1ANT
 	xmlns="my://g1ant">
 
+	<Variables>
+		<Variable Name="clipboard" Type="string"/>
+		<Variable Name="screen" Type="rectangle"/>
+		<Variable Name="environment" Type="list"/>
+		<Variable Name="macronamespaces" Type="string"/>
+		<Variable Name="macrodlls" Type="string"/>
+		<Variable Name="macrondebug" Type="string"/>
+		<Variable Name="keyboardwait" Type="boolean"/>
+		<Variable Name="programwait" Type="boolean"/>
+		<Variable Name="keydelay" Type="integer"/>
+		<Variable Name="mousedelay" Type="integer"/>
+
+		<Variable Name="timeout" Type="integer"/>
+		<Variable Name="timeoutcommand" Type="integer"/>
+		<Variable Name="timeoutprogram" Type="integer"/>
+		<Variable Name="timeoutwindow" Type="integer"/>
+		<Variable Name="timeoutrest" Type="integer"/>
+		<Variable Name="timeoutremotedesktop" Type="integer"/>
+		<Variable Name="timeoutchrome" Type="integer"/>
+		<Variable Name="timeoutdebug" Type="integer"/>
+		<Variable Name="timeoutstep" Type="integer"/>
+		<Variable Name="timeoutslowstep" Type="integer"/>
+		<Variable Name="timeoutclipboard" Type="integer"/>
+		<Variable Name="timeoutfileexists" Type="integer"/>
+		<Variable Name="timeoutconnect" Type="integer"/>
+		<Variable Name="timeoutdownload" Type="integer"/>
+		<Variable Name="timeoutfiledelete" Type="integer"/>
+		<Variable Name="timeoutcolorexpected" Type="integer"/>
+		<Variable Name="timeoutocr" Type="integer"/>
+		<Variable Name="timeoutie" Type="integer"/>
+		<Variable Name="timeoutcrm" Type="integer"/>
+		<Variable Name="timeoutimageexpected" Type="integer"/>
+		<Variable Name="timeoutimagefind" Type="integer"/>
+		<Variable Name="timeoutwatson" Type="integer"/>
+		<Variable Name="timeoutcaptcha" Type="integer"/>
+		<Variable Name="timeoutmailsmtp" Type="integer"/>
+
+		<Variable Name="delayseconds" Type="integer"/>
+		<Variable Name="milliseconds" Type="integer"/>
+		<Variable Name="dateformat" Type="string"/>
+		<Variable Name="date" Type="string"/>
+		<Variable Name="debugkey" Type="string"/>
+		<Variable Name="opengipassword" Type="string"/>
+		<Variable Name="activewindow" Type="string"/>
+		<Variable Name="scrollock" Type="boolean"/>
+		<Variable Name="numlock" Type="boolean"/>
+		<Variable Name="capslock" Type="boolean"/>
+	</Variables>
+
 	<Commands>
 
 		<GlobalArguments>

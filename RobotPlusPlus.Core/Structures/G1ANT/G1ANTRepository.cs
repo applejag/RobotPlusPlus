@@ -16,6 +16,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 	[Serializable]
 	public class G1ANTRepository
 	{
+		[XmlElement("Variables")]
+		public VariablesElement Variables { get; set; }
+
 		[XmlElement("Commands")]
 		public CommandsElement Commands { get; set; }
 
@@ -67,7 +70,29 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		#endregion
 
 		#region Element objects
-		
+
+		[Serializable]
+		public class VariablesElement
+		{
+			[XmlElement("Variable")]
+			public List<VariableElement> Variables { get; set; }
+		}
+
+		[Serializable]
+		public class VariableElement
+		{
+			[XmlAttribute("Name")]
+			public string Name { get; set; }
+
+			[XmlAttribute("Type")]
+			public Structure Type { get; set; }
+
+			public override string ToString()
+			{
+				return $"{Name} ({Type})";
+			}
+		}
+
 		[Serializable]
 		public class CommandsElement
 		{
@@ -132,10 +157,10 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			public string Name { get; set; }
 
 			[XmlAttribute("Type")]
-			public ArgumentType Type { get; set; }
+			public Structure Type { get; set; }
 
 			[XmlAttribute("VariableType")]
-			public ArgumentType VariableType { get; set; }
+			public Structure VariableType { get; set; }
 
 			[XmlAttribute("Required")]
 			public bool Required { get; set; } = false;
@@ -143,24 +168,30 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlAttribute("RequiredGroup")]
 			public int RequiredGroup { get; set; } = -1;
 			
-			public static Type EvaluateType(ArgumentType? type)
+			public static Type EvaluateType(Structure? type)
 			{
 				switch (type)
 				{
-					case ArgumentType.Undefined: return typeof(object);
-					case ArgumentType.String: return typeof(string);
-					case ArgumentType.Integer: return typeof(int);
-					case ArgumentType.Float: return typeof(float);
-					case ArgumentType.Boolean: return typeof(bool);
-					case ArgumentType.Point: return typeof(Point);
-					case ArgumentType.Rectangle: return typeof(Rectangle);
-					case ArgumentType.Size: return typeof(Size);
-					case ArgumentType.List: return typeof(List<object>);
-					case ArgumentType.Variable: return typeof(Variable);
-					case ArgumentType.VariableName: return typeof(string);
-					case ArgumentType.Label: return typeof(Label);
-
-					case ArgumentType.Procedure:
+					case Structure.Undefined: return typeof(object);
+					case Structure.String: return typeof(string);
+					case Structure.Integer: return typeof(int);
+					case Structure.Float: return typeof(float);
+					case Structure.Boolean: return typeof(bool);
+					case Structure.Point: return typeof(Point);
+					case Structure.Rectangle: return typeof(Rectangle);
+					case Structure.Size: return typeof(Size);
+					case Structure.List: return typeof(List<object>);
+					case Structure.Date: return typeof(DateTime);
+					case Structure.Time: return typeof(DateTime);
+					case Structure.DateTime: return typeof(DateTime);
+					case Structure.Variable: return typeof(Variable);
+					case Structure.VariableName: return typeof(string);
+					case Structure.Label: return typeof(Label);
+						
+					case Structure.HTML:
+					case Structure.JSON:
+					case Structure.XML:
+					case Structure.Procedure:
 						throw new NotImplementedException();
 
 					default:
@@ -173,7 +204,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				var sb = new StringBuilder();
 
 				sb.Append(Type);
-				if (Type == ArgumentType.Variable)
+				if (Type == Structure.Variable)
 					sb.AppendFormat("<{0}>",VariableType);
 				if (!Required)
 					sb.Append('?');
@@ -185,7 +216,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		}
 
 		[Serializable]
-		public enum ArgumentType
+		public enum Structure
 		{
 			[XmlEnum("undefined")]
 			Undefined,
@@ -198,6 +229,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			Float,
 			[XmlEnum("boolean")]
 			Boolean,
+
 			[XmlEnum("point")]
 			Point,
 			[XmlEnum("rectangle")]
@@ -208,6 +240,19 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			List,
 			[XmlEnum("dictionary")]
 			Dictionary,
+			[XmlEnum("date")]
+			Date,
+			[XmlEnum("datetime")]
+			DateTime,
+			[XmlEnum("time")]
+			Time,
+
+			[XmlEnum("json")]
+			JSON,
+			[XmlEnum("html")]
+			HTML,
+			[XmlEnum("xml")]
+			XML,
 			[XmlEnum("label")]
 			Label,
 			[XmlEnum("variable")]

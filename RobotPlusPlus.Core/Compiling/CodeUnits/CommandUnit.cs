@@ -158,7 +158,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					.FirstOrDefault(a => a.Name == named.name);
 
 				// Validate variable types
-				if (argElem?.Type == G1ANTRepository.ArgumentType.Variable)
+				if (argElem?.Type == G1ANTRepository.Structure.Variable)
 				{
 					// Must be identifier
 					if (!(named.expression.Token is IdentifierToken id))
