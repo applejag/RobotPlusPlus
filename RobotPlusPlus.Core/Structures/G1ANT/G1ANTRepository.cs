@@ -67,6 +67,37 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			);
 		}
 
+		public static Type EvaluateType(Structure? type)
+		{
+			switch (type)
+			{
+				case Structure.Undefined: return typeof(object);
+				case Structure.String: return typeof(string);
+				case Structure.Integer: return typeof(int);
+				case Structure.Float: return typeof(float);
+				case Structure.Boolean: return typeof(bool);
+				case Structure.Point: return typeof(Point);
+				case Structure.Rectangle: return typeof(Rectangle);
+				case Structure.Size: return typeof(Size);
+				case Structure.List: return typeof(List<object>);
+				case Structure.Date: return typeof(DateTime);
+				case Structure.Time: return typeof(DateTime);
+				case Structure.DateTime: return typeof(DateTime);
+				case Structure.Variable: return typeof(Variable);
+				case Structure.VariableName: return typeof(string);
+				case Structure.Label: return typeof(Label);
+
+				case Structure.HTML:
+				case Structure.JSON:
+				case Structure.XML:
+				case Structure.Procedure:
+					throw new NotImplementedException();
+
+				default:
+					throw new FormatException($"Unkown type <{type?.ToString() ?? "null"}>!");
+			}
+		}
+
 		#endregion
 
 		#region Element objects
@@ -86,6 +117,11 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 			[XmlAttribute("Type")]
 			public Structure Type { get; set; }
+
+			public Type EvaluateType()
+			{
+				return G1ANTRepository.EvaluateType(Type);
+			}
 
 			public override string ToString()
 			{
@@ -167,36 +203,15 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 			[XmlAttribute("RequiredGroup")]
 			public int RequiredGroup { get; set; } = -1;
-			
-			public static Type EvaluateType(Structure? type)
-			{
-				switch (type)
-				{
-					case Structure.Undefined: return typeof(object);
-					case Structure.String: return typeof(string);
-					case Structure.Integer: return typeof(int);
-					case Structure.Float: return typeof(float);
-					case Structure.Boolean: return typeof(bool);
-					case Structure.Point: return typeof(Point);
-					case Structure.Rectangle: return typeof(Rectangle);
-					case Structure.Size: return typeof(Size);
-					case Structure.List: return typeof(List<object>);
-					case Structure.Date: return typeof(DateTime);
-					case Structure.Time: return typeof(DateTime);
-					case Structure.DateTime: return typeof(DateTime);
-					case Structure.Variable: return typeof(Variable);
-					case Structure.VariableName: return typeof(string);
-					case Structure.Label: return typeof(Label);
-						
-					case Structure.HTML:
-					case Structure.JSON:
-					case Structure.XML:
-					case Structure.Procedure:
-						throw new NotImplementedException();
 
-					default:
-						throw new FormatException($"Unkown type <{type?.ToString() ?? "null"}>!");
-				}
+			public Type EvaluateType()
+			{
+				return G1ANTRepository.EvaluateType(Type);
+			}
+
+			public Type EvaluateVariableType()
+			{
+				return G1ANTRepository.EvaluateType(VariableType);
 			}
 
 			public override string ToString()

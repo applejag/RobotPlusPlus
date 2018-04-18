@@ -163,8 +163,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					// Must be identifier
 					if (!(named.expression.Token is IdentifierToken id))
 						throw new CompileFunctionException($"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
-					
-					Type varType = G1ANTRepository.ArgumentElement.EvaluateType(argElem.VariableType);
+
+					Type varType = argElem.EvaluateVariableType();
 
 					// Register variable if needed
 					Variable variable = compiler.Context.FindVariable(id) ??
