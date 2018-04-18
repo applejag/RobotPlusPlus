@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
@@ -8,6 +9,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 	[TestClass]
 	public class SimpleDotInstanceTests
 	{
+		// TODO: CHECK FOR STANDALONE CALL
 		[TestMethod]
 		public void Compile_Property()
 		{
@@ -215,7 +217,21 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foovar'; y = x.EndsWith('var')";
 			const string expected = "♥x=‴foovar‴\n" +
-									"♥y=⊂♥x.EndsWith(\"var\")⊃";
+			                        "♥y=⊂♥x.EndsWith(\"var\")⊃";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		public void Compile_CallOnVariable_2Arg()
+		{
+			// Arrange
+			const string code = "x = screen.Contains(1, 2)";
+			const string expected = "♥x=⊂♥screen.Contains(1,2)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -305,6 +321,31 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "x = screen.Size.ToString()";
 			const string expected = "♥x=⊂♥screen.Size.ToString()⊃";
 
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
+		public void Compile_CallOnVoidMethod()
+		{
+			// Arrange
+			const string code = "x = screen.Inflate(screen.Size)";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
+		public void Compile_StandaloneCallOnVoidMethod()
+		{
+			// Arrange
+			const string code = "screen.Inflate(screen.Size)";
+			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.Inflate(♥screen.Size);return _;})()⊃";
+			
 			// Act
 			string compiled = Compiler.Compile(code);
 
