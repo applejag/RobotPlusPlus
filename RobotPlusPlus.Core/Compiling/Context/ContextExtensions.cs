@@ -15,9 +15,9 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		public static string GenerateVariableName([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return token is IdentifierTempToken tmp
-				? tmp.GeneratedName = context.GenerateName("tmp")
-				: context.GenerateName(token.Identifier);
+			return token.GeneratedName = (token is IdentifierTempToken
+				? context.GenerateName("tmp")
+				: context.GenerateName(token.Identifier));
 		}
 
 		[NotNull]
@@ -46,9 +46,12 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		public static Variable FindVariable([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return token is IdentifierTempToken
+			Variable variable = token is IdentifierTempToken
 				? context.DecayedValues.OfType<Variable>().FirstOrDefault(x => x.Token == token)
 				: context.FindValue(token.Identifier) as Variable;
+
+			if (variable != null) token.GeneratedName = variable.Generated;
+			return variable;
 		}
 
 		[Pure]

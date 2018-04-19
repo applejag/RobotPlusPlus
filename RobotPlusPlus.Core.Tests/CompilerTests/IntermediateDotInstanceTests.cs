@@ -45,5 +45,19 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual(expected, compiled);
 		}
+		
+		[TestMethod]
+		public void Compile_PropertyAssignment()
+		{
+			// Arrange
+			const string code = "screen.Left = 1";
+			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.Left=1;return _;})()⊃";
+
+			// Act
+			string compiled = Compiler.Compile(code);
+
+			// Assert
+			Assert.AreEqual(expected, compiled);
+		}
 	}
 }

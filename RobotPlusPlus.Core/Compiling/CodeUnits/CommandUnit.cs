@@ -171,7 +171,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				// Register variable if needed
 				Variable variable = compiler.Context.FindVariable(id) ??
-				                    compiler.Context.RegisterVariable(id, varType);
+									compiler.Context.RegisterVariable(id, varType);
 
 				// Validate type
 				if (!TypeChecking.CanImplicitlyConvert(varType, variable.Type))
@@ -212,8 +212,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		private IEnumerable<(NamedArgument Named, G1ANTRepository.ArgumentElement Element)> GetArgumentEnumerable()
 		{
 			return from arg in Arguments.OfType<NamedArgument>()
-				join argElem in CommandArgumentElements on arg.name equals argElem.Name
-				select (Named: arg, Element: argElem);
+				   join argElem in CommandArgumentElements on arg.name equals argElem.Name
+				   select (Named: arg, Element: argElem);
 		}
 
 		public override string AssembleIntoString()
@@ -233,9 +233,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (argElem.Type == G1ANTRepository.Structure.VariableName)
 				{
-					Variable variable = named.expression.GetVariable();
+					IdentifierToken variable = named.expression.Token as IdentifierToken
+						?? throw new CompileUnexpectedTokenException(named.expression.Token);
 
-					cmd.AppendFormat(" {0} ‴{1}‴", named.name, variable.Generated);
+					cmd.AppendFormat(" {0} ‴{1}‴", named.name, variable.GeneratedName);
 				}
 				else
 					cmd.AppendFormat(" {0} {1}", named.name, named.expression.AssembleIntoString());

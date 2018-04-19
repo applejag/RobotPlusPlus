@@ -209,7 +209,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					break;
 
 				case Type.Assignment:
-					if (parent.Previous is IdentifierToken)
+					if (parent.Previous is IdentifierToken
+					|| PunctuatorToken.IsPunctuatorOfType(parent.Previous, PunctuatorToken.Type.Dot))
 						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);

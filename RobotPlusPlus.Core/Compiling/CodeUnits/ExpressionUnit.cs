@@ -20,12 +20,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public Type OutputType { get; private set; }
 		public bool NeedsCSSnippet { get; set; }
+		public UsageType Usage { get; }
 
-		private Dictionary<IdentifierToken, Variable> variableLookup;
+		[Flags]
+		public enum UsageType
+		{
+			Read = 0b01,
+			Write = 0b10
+		}
 
-		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null)
+		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null, UsageType usage = UsageType.Read)
 			: base(token, parent)
 		{
+			Usage = usage;
+
 			PreUnits = new FlexibleList<CodeUnit>();
 			PostUnits = new FlexibleList<CodeUnit>();
 
@@ -41,71 +49,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 
-			variableLookup = new Dictionary<IdentifierToken, Variable>();
-
-			var containsStr = false;
-			var containsOp = false;
-
-			ValidateToken(compiler, Token, ref containsStr, ref containsOp);
-
-			// Check contains string and operator
-			if (containsStr && containsOp)
-				NeedsCSSnippet = true;
+			OutputType = EvalTokenType(Token, compiler, Usage, out bool needsCsSnippet);
+			NeedsCSSnippet = needsCsSnippet;
 
 			foreach (CodeUnit post in PostUnits)
 				post.Compile(compiler);
-
-			OutputType = EvalTokenType(Token, compiler);
-		}
-
-		private void ValidateToken(Compiler compiler, Token token, ref bool containsStr, ref bool containsOp)
-		{
-			switch (token)
-			{
-				case LiteralStringToken str:
-					containsStr = true;
-					if (str.NeedsEscaping)
-						NeedsCSSnippet = true;
-					break;
-
-				case OperatorToken op:
-					containsOp = true;
-					if (op.LHS != null) ValidateToken(compiler, op.LHS, ref containsStr, ref containsOp);
-					if (op.RHS != null) ValidateToken(compiler, op.RHS, ref containsStr, ref containsOp);
-					break;
-
-				case PunctuatorToken pun when PunctuatorToken.IsPunctuatorOfType(pun, PunctuatorToken.Type.Dot):
-					ValidateToken(compiler, pun.DotLHS, ref containsStr, ref containsOp);
-					Type LHSType = EvalTokenType(pun.DotLHS, compiler)
-						?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
-					string RHSIdentifier = pun.DotRHS.Identifier;
-
-					PropertyInfo property = LHSType.GetProperty(RHSIdentifier);
-					if (property == null)
-						throw new CompileTypePropertyDoesNotExistException(pun, LHSType, RHSIdentifier);
-					if (!property.CanRead)
-						throw new CompileTypePropertyNoGetterException(pun, LHSType, RHSIdentifier);
-
-					NeedsCSSnippet = true;
-					break;
-
-				case IdentifierToken id:
-					variableLookup[id] = compiler.Context.FindVariable(id);
-
-					// Check temp vars
-					if (id is IdentifierTempToken tmp
-						&& string.IsNullOrEmpty(tmp.GeneratedName))
-						throw new CompileException("Name not generated for temporary variable.", tmp);
-
-					// Check variables for registration
-					Variable value = compiler.Context.FindVariable(id);
-					if (value == null)
-						throw new CompileVariableUnassignedException(id);
-
-					if (value.Type == typeof(string))
-						containsStr = true;
-					break;
-			}
 		}
 
 		public override string AssembleIntoString()
@@ -116,19 +64,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		#region Public utility
-
-		public Variable GetVariable()
-		{
-			if (!(Token is IdentifierToken id))
-				throw new CompileUnexpectedTokenException(Token);
-
-			return GetVariable(id);
-		}
-
-		public Variable GetVariable(IdentifierToken id)
-		{
-			return variableLookup.ContainsKey(id) ? variableLookup[id] : null;
-		}
 
 		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
 		{
@@ -150,37 +85,86 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		[CanBeNull, Pure]
-		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler)
+		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage = UsageType.Read)
 		{
-			switch (token)
+			return EvalTokenType(token, compiler, usage, out bool _);
+		}
+
+		[CanBeNull, Pure]
+		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, out bool needsCSSnippet)
+		{
+			var csSnippet = false;
+			var containsStr = false;
+			var containsOp = false;
+
+			Type type = RecursiveCheck(token);
+
+			needsCSSnippet = csSnippet || (containsStr && containsOp);
+			return type;
+
+			Type RecursiveCheck(Token t)
 			{
-				case IdentifierToken id:
-					return compiler.Context.FindVariable(id)?.Type
-						?? throw new CompileVariableUnassignedException(id);
+				switch (t)
+				{
+					case IdentifierToken id:
+						// Check variables for registration
+						Variable variable = compiler.Context.FindVariable(id);
+						if (variable == null)
+							throw new CompileVariableUnassignedException(id);
 
-				case LiteralNumberToken num:
-					return num.Value.GetType();
+						// Check generated name
+						if (string.IsNullOrEmpty(id.GeneratedName))
+						{
+							if (id is IdentifierTempToken)
+								throw new CompileException("Name not generated for temporary variable.", id);
+							throw new CompileException($"Name not generated for variable <{id.Identifier}>.", id);
+						}
 
-				case LiteralStringToken _:
-					return typeof(string);
+						if (variable.Type == typeof(string))
+							containsStr = true;
 
-				case LiteralKeywordToken key:
-					return key.Value?.GetType();
+						return variable.Type;
 
-				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
-					Type lhs = EvalTokenType(pun.DotLHS, compiler)
-						?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
-					PropertyInfo property = lhs.GetProperty(pun.DotRHS.Identifier)
-						?? throw new CompileTypePropertyDoesNotExistException(pun, lhs, pun.DotRHS.Identifier);
-					return property.PropertyType;
+					case LiteralNumberToken num:
+						return num.Value.GetType();
 
-				case OperatorToken op:
-					if (op.OperatorType == OperatorToken.Type.Unary)
-						return op.EvaluateType(EvalTokenType(op.UnaryValue, compiler));
-					return op.EvaluateType(EvalTokenType(op.LHS, compiler), EvalTokenType(op.RHS, compiler));
+					case LiteralStringToken str:
+						containsStr = true;
+						if (str.NeedsEscaping) csSnippet = true;
+						return typeof(string);
+
+					case LiteralKeywordToken key:
+						return key.Value?.GetType();
+
+					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
+						string identifier = pun.DotRHS.Identifier;
+						Type lhs = RecursiveCheck(pun.DotLHS)
+						           ?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
+						PropertyInfo property = lhs.GetProperty(identifier);
+
+						if (property == null)
+							throw new CompileTypePropertyDoesNotExistException(pun, lhs, identifier);
+						if (usage.HasFlag(UsageType.Read) && !property.CanRead)
+							throw new CompileTypePropertyNoGetterException(pun, lhs, identifier);
+						if (usage.HasFlag(UsageType.Write) && !property.CanWrite)
+							throw new CompileTypePropertyNoSetterException(pun, lhs, identifier);
+
+						csSnippet = true;
+						return property.PropertyType;
+
+					case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
+						containsOp = true;
+						return op.EvaluateType(RecursiveCheck(op.UnaryValue));
+
+					case OperatorToken op:
+						containsOp = true;
+						Type lhsType = RecursiveCheck(op.LHS);
+						Type rhsType = RecursiveCheck(op.RHS);
+						return op.EvaluateType(lhsType, rhsType);
+				}
+
+				throw new CompileUnexpectedTokenException(t);
 			}
-
-			throw new CompileUnexpectedTokenException(token);
 		}
 
 		#endregion
@@ -203,7 +187,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return token.SourceCode;
 
 				case IdentifierToken id:
-					return $"♥{variableLookup[id].Generated}";
+					return $"♥{id.GeneratedName}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment
 					|| op.SourceCode == "++"
@@ -337,5 +321,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		#endregion
+
 	}
 }
