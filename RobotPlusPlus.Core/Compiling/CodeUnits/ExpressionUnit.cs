@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
@@ -19,14 +18,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public FlexibleList<CodeUnit> PostUnits { get; }
 
 		public Type OutputType { get; private set; }
+		public Type InputType { get; internal set; }
 		public bool NeedsCSSnippet { get; set; }
 		public UsageType Usage { get; }
 
-		[Flags]
+		public Token ContainerToken { get; private set; }
+		public Type ContainerType { get; private set; }
+
 		public enum UsageType
 		{
-			Read = 0b01,
-			Write = 0b10
+			Read,
+			Write
 		}
 
 		public ExpressionUnit([NotNull] Token token, [CanBeNull] CodeUnit parent = null, UsageType usage = UsageType.Read)
@@ -49,11 +51,28 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 
-			OutputType = EvalTokenType(Token, compiler, Usage, out bool needsCsSnippet);
+			OutputType = EvalTokenType(Token, compiler, Usage, InputType, out bool needsCsSnippet);
 			NeedsCSSnippet = needsCsSnippet;
+
+			if (Usage == UsageType.Write)
+			{
+				ContainerToken = GetLeftmostToken(Token);
+				ContainerType = EvalTokenReadType(ContainerToken, compiler);
+			}
 
 			foreach (CodeUnit post in PostUnits)
 				post.Compile(compiler);
+		}
+
+		private static Token GetLeftmostToken(Token token)
+		{
+			while (true)
+			{
+				if (!(token is PunctuatorToken pun) || pun.PunctuatorType != PunctuatorToken.Type.Dot)
+					return token;
+
+				token = pun.DotLHS;
+			}
 		}
 
 		public override string AssembleIntoString()
@@ -85,21 +104,25 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		[CanBeNull, Pure]
-		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage = UsageType.Read)
+		public static Type EvalTokenReadType([NotNull] Token token, [NotNull] Compiler compiler)
 		{
-			return EvalTokenType(token, compiler, usage, out bool _);
+			return EvalTokenType(token, compiler, UsageType.Read, null, out bool _);
 		}
 
-		[CanBeNull, Pure]
-		public static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, out bool needsCSSnippet)
+		[CanBeNull]
+		public static Type EvalTokenWriteType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] Type inputType)
 		{
-			var csSnippet = false;
-			var containsStr = false;
-			var containsOp = false;
+			return EvalTokenType(token, compiler, UsageType.Write, inputType, out bool _);
+		}
+
+		[CanBeNull]
+		private static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, Type inputType, out bool needsCSSnippet)
+		{
+			bool csSnippet = false, containsStr = false, containsOp = false;
 
 			Type type = RecursiveCheck(token);
 
-			needsCSSnippet = csSnippet || (containsStr && containsOp);
+			needsCSSnippet = usage == UsageType.Read && (csSnippet || (containsStr && containsOp));
 			return type;
 
 			Type RecursiveCheck(Token t)
@@ -109,8 +132,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					case IdentifierToken id:
 						// Check variables for registration
 						Variable variable = compiler.Context.FindVariable(id);
+
 						if (variable == null)
-							throw new CompileVariableUnassignedException(id);
+						{
+							if (usage == UsageType.Write)
+								variable = compiler.Context.RegisterVariable(id, inputType);
+							else
+								throw new CompileVariableUnassignedException(id);
+						}
 
 						// Check generated name
 						if (string.IsNullOrEmpty(id.GeneratedName))
@@ -126,14 +155,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						return variable.Type;
 
 					case LiteralNumberToken num:
+						if (usage == UsageType.Write)
+							throw new CompileExpressionCannotAssignException(num);
 						return num.Value.GetType();
 
 					case LiteralStringToken str:
+						if (usage == UsageType.Write)
+							throw new CompileExpressionCannotAssignException(str);
 						containsStr = true;
 						if (str.NeedsEscaping) csSnippet = true;
 						return typeof(string);
 
 					case LiteralKeywordToken key:
+						if (usage == UsageType.Write)
+							throw new CompileExpressionCannotAssignException(key);
 						return key.Value?.GetType();
 
 					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
@@ -144,19 +179,23 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 						if (property == null)
 							throw new CompileTypePropertyDoesNotExistException(pun, lhs, identifier);
-						if (usage.HasFlag(UsageType.Read) && !property.CanRead)
+						if (usage == UsageType.Read && !property.CanRead)
 							throw new CompileTypePropertyNoGetterException(pun, lhs, identifier);
-						if (usage.HasFlag(UsageType.Write) && !property.CanWrite)
+						if (usage == UsageType.Write && !property.CanWrite)
 							throw new CompileTypePropertyNoSetterException(pun, lhs, identifier);
 
 						csSnippet = true;
 						return property.PropertyType;
 
 					case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
+						if (usage == UsageType.Write)
+							throw new CompileExpressionCannotAssignException(op);
 						containsOp = true;
 						return op.EvaluateType(RecursiveCheck(op.UnaryValue));
 
 					case OperatorToken op:
+						if (usage == UsageType.Write)
+							throw new CompileExpressionCannotAssignException(op);
 						containsOp = true;
 						Type lhsType = RecursiveCheck(op.LHS);
 						Type rhsType = RecursiveCheck(op.RHS);
@@ -171,7 +210,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Stringify expression tokens
 
-		private string StringifyToken(Token token)
+		public string StringifyToken(Token token)
 		{
 			switch (token)
 			{

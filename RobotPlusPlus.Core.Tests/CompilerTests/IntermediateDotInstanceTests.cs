@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Drawing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 
@@ -50,8 +51,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		public void Compile_PropertyAssignment()
 		{
 			// Arrange
-			const string code = "screen.Left = 1";
-			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.Left=1;return _;})()⊃";
+			const string code = "screen.X = 1";
+			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.X=1;return _;})()⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);

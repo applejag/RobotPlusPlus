@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Compiling.Context.Types;
@@ -11,9 +13,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class AssignmentUnit : CodeUnit
 	{
-		public ExpressionUnit Expression { get; }
-		public IdentifierToken VariableOriginalToken { get; }
-		public Variable VariableGenerated { get; private set; }
+		public ExpressionUnit RHSExpression { get; }
+		public ExpressionUnit LHSExpression { get; }
 
 		public AssignmentUnit([NotNull] OperatorToken token, [CanBeNull] CodeUnit parent = null)
 			: base(token, parent)
@@ -21,11 +22,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			if (token.OperatorType != OperatorToken.Type.Assignment)
 				throw new CompileUnexpectedTokenException(token);
 
-			if (!(token.LHS is IdentifierToken id))
-				throw new CompileUnexpectedTokenException(token);
-
-			Expression = new ExpressionUnit(token.RHS, this);
-			VariableOriginalToken = id;
+			RHSExpression = new ExpressionUnit(token.RHS, this);
+			LHSExpression = new ExpressionUnit(token.LHS, this, ExpressionUnit.UsageType.Write);
 		}
 
 		public static (CodeUnit, IdentifierTempToken) CreateTemporaryAssignment([NotNull] Token RHS, [CanBeNull] CodeUnit parent = null)
@@ -55,33 +53,53 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void Compile(Compiler compiler)
 		{
-			Expression.Compile(compiler);
-			
-			// Register variable, or use already registered
-			VariableGenerated = compiler.Context.FindVariable(VariableOriginalToken)
-				?? compiler.Context.RegisterVariable(VariableOriginalToken, Expression.OutputType);
+			RHSExpression.Compile(compiler);
 
-			if (!TypeChecking.CanImplicitlyConvert(Expression.OutputType, VariableGenerated.Type))
-				throw new CompileTypeConvertImplicitAssignmentException(VariableOriginalToken, Expression.OutputType, VariableGenerated.Type);
+			LHSExpression.InputType = RHSExpression.OutputType;
+			LHSExpression.Compile(compiler);
+
+			if (!TypeChecking.CanImplicitlyConvert(RHSExpression.OutputType, LHSExpression.OutputType))
+				throw new CompileTypeConvertImplicitAssignmentException(LHSExpression.Token, RHSExpression.OutputType, LHSExpression.OutputType);
+
+			if (LHSExpression.Token is PunctuatorToken)
+			{
+				RHSExpression.NeedsCSSnippet =
+				LHSExpression.NeedsCSSnippet = true;
+			}
 		}
 
 		public override string AssembleIntoString()
 		{
 			var rows = new RowBuilder();
 
-			foreach (CodeUnit pre in Expression.PreUnits)
+			foreach (CodeUnit pre in RHSExpression.PreUnits)
 			{
 				rows.AppendLine(pre.AssembleIntoString());
 			}
 
-			rows.AppendLine("♥{0}={1}", VariableGenerated.Generated, Expression.AssembleIntoString());
+			if (LHSExpression.Token is PunctuatorToken dot)
+			{
+				string container = LHSExpression.StringifyToken(LHSExpression.ContainerToken);
+				string containerType = StringifyTypeFullName(LHSExpression.ContainerType);
+				string property = LHSExpression.StringifyToken(LHSExpression.Token).Substring(container.Length);
+				string expression = RHSExpression.StringifyToken(RHSExpression.Token);
+				rows.AppendLine("{0}=⊂new Func<{3}>(()=>{{var _={0};_{1}={2};return _;}})()⊃", container, property, expression, containerType);
+			} else
+				rows.AppendLine("{0}={1}", LHSExpression.AssembleIntoString(), RHSExpression.AssembleIntoString());
 
-			foreach (CodeUnit post in Expression.PostUnits)
+			foreach (CodeUnit post in RHSExpression.PostUnits)
 			{
 				rows.AppendLine(post.AssembleIntoString());
 			}
 
 			return rows.ToString();
+		}
+
+		private static string StringifyTypeFullName(Type type)
+		{
+			return type.ContainsGenericParameters
+				? $"{type.Namespace}.{type.Name}<{string.Join(",", type.GenericTypeArguments.Select(StringifyTypeFullName))}>"
+				: type.FullName;
 		}
 	}
 }
