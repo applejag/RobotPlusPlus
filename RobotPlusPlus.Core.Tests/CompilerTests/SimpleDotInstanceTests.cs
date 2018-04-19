@@ -327,30 +327,5 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual(expected, compiled);
 		}
-
-		[TestMethod]
-		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
-		public void Compile_CallOnVoidMethod()
-		{
-			// Arrange
-			const string code = "x = screen.Inflate(screen.Size)";
-
-			// Act
-			Compiler.Compile(code);
-		}
-
-		[TestMethod]
-		public void Compile_StandaloneCallOnVoidMethod()
-		{
-			// Arrange
-			const string code = "screen.Inflate(screen.Size)";
-			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.Inflate(♥screen.Size);return _;})()⊃";
-			
-			// Act
-			string compiled = Compiler.Compile(code);
-
-			// Assert
-			Assert.AreEqual(expected, compiled);
-		}
 	}
 }
