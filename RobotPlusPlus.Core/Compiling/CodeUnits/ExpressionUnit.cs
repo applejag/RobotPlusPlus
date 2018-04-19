@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
 using RobotPlusPlus.Core.Compiling.Context;
@@ -45,41 +46,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			var containsStr = false;
 			var containsOp = false;
 
-			// Loop tokens
-			Token.ForEachRecursive(t =>
-			{
-				switch (t)
-				{
-					case LiteralStringToken str:
-						containsStr = true;
-						if (str.NeedsEscaping)
-							NeedsCSSnippet = true;
-						break;
-
-					case OperatorToken _:
-						containsOp = true;
-						break;
-
-					case IdentifierToken id:
-						variableLookup[id] = compiler.Context.FindVariable(id);
-
-						// Check temp vars
-						if (id is IdentifierTempToken tmp
-						    && string.IsNullOrEmpty(tmp.GeneratedName))
-							throw new CompileException("Name not generated for temporary variable.", tmp);
-
-						// Check variables for registration
-						Variable value = compiler.Context.FindVariable(id);
-						if (value == null)
-							throw new CompileVariableUnassignedException(id);
-
-						if (value.Type == typeof(string))
-							containsStr = true;
-						break;
-				}
-
-				// Check 
-			}, includeTop: true);
+			ValidateToken(compiler, Token, ref containsStr, ref containsOp);
 
 			// Check contains string and operator
 			if (containsStr && containsOp)
@@ -89,6 +56,56 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				post.Compile(compiler);
 
 			OutputType = EvalTokenType(Token, compiler);
+		}
+
+		private void ValidateToken(Compiler compiler, Token token, ref bool containsStr, ref bool containsOp)
+		{
+			switch (token)
+			{
+				case LiteralStringToken str:
+					containsStr = true;
+					if (str.NeedsEscaping)
+						NeedsCSSnippet = true;
+					break;
+
+				case OperatorToken op:
+					containsOp = true;
+					if (op.LHS != null) ValidateToken(compiler, op.LHS, ref containsStr, ref containsOp);
+					if (op.RHS != null) ValidateToken(compiler, op.RHS, ref containsStr, ref containsOp);
+					break;
+
+				case PunctuatorToken pun when PunctuatorToken.IsPunctuatorOfType(pun, PunctuatorToken.Type.Dot):
+					ValidateToken(compiler, pun.DotLHS, ref containsStr, ref containsOp);
+					Type LHSType = EvalTokenType(pun.DotLHS, compiler)
+						?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
+					string RHSIdentifier = pun.DotRHS.Identifier;
+
+					PropertyInfo property = LHSType.GetProperty(RHSIdentifier);
+					if (property == null)
+						throw new CompileTypePropertyDoesNotExistException(pun, LHSType, RHSIdentifier);
+					if (!property.CanRead)
+						throw new CompileTypePropertyNoGetterException(pun, LHSType, RHSIdentifier);
+
+					NeedsCSSnippet = true;
+					break;
+
+				case IdentifierToken id:
+					variableLookup[id] = compiler.Context.FindVariable(id);
+
+					// Check temp vars
+					if (id is IdentifierTempToken tmp
+						&& string.IsNullOrEmpty(tmp.GeneratedName))
+						throw new CompileException("Name not generated for temporary variable.", tmp);
+
+					// Check variables for registration
+					Variable value = compiler.Context.FindVariable(id);
+					if (value == null)
+						throw new CompileVariableUnassignedException(id);
+
+					if (value.Type == typeof(string))
+						containsStr = true;
+					break;
+			}
 		}
 
 		public override string AssembleIntoString()
@@ -150,6 +167,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				case LiteralKeywordToken key:
 					return key.Value?.GetType();
 
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
+					Type lhs = EvalTokenType(pun.DotLHS, compiler)
+						?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
+					PropertyInfo property = lhs.GetProperty(pun.DotRHS.Identifier)
+						?? throw new CompileTypePropertyDoesNotExistException(pun, lhs, pun.DotRHS.Identifier);
+					return property.PropertyType;
+
 				case OperatorToken op:
 					if (op.OperatorType == OperatorToken.Type.Unary)
 						return op.EvaluateType(EvalTokenType(op.UnaryValue, compiler));
@@ -192,6 +216,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
 					return $"{op.SourceCode}{StringifyOperatorChildToken(op, op.UnaryValue)}";
+
+				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
+					return $"{StringifyToken(pun.DotLHS)}.{pun.DotRHS}";
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

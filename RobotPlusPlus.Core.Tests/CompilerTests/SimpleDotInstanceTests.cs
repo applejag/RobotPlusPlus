@@ -9,7 +9,6 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 	[TestClass]
 	public class SimpleDotInstanceTests
 	{
-		// TODO: CHECK FOR STANDALONE CALL
 		[TestMethod]
 		public void Compile_Property()
 		{
@@ -39,7 +38,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_UndefinedProperty()
 		{
 			// Arrange
@@ -61,7 +60,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_UndefinedPropertyOfProperty()
 		{
 			// Arrange
@@ -72,7 +71,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_PropertyOfUndefinedProperty()
 		{
 			// Arrange
