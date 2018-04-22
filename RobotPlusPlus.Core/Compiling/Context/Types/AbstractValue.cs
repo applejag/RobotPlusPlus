@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		public string Identifier { get; }
 		[NotNull]
 		public string Generated { get; }
-
+		
 		protected AbstractValue(
 			[NotNull] string generated,
 			[NotNull] string identifier)

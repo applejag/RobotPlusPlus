@@ -61,6 +61,17 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
+		public void Compile_PropertyStatic()
+		{
+			// Arrange
+			const string code = "x = 'hello'.Empty";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_UndefinedPropertyOfProperty()
 		{
 			// Arrange

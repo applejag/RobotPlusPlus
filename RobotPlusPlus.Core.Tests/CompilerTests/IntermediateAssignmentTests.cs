@@ -133,6 +133,14 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Assert
 			Assert.AreEqual("♥z=10\n♥x=♥z\n♥y=♥x", output);
 		}
+		
+		[TestMethod]
+		[ExpectedException(typeof(CompileTypeReadOnlyException))]
+		public void Compile_AssignStaticValue()
+		{
+			// Act
+			Compiler.Compile("string = 'foo'");
+		}
 
 	}
 }

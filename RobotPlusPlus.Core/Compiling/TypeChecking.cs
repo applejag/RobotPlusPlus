@@ -10,6 +10,54 @@ namespace RobotPlusPlus.Core.Compiling
 {
 	public static class TypeChecking
 	{
+		[NotNull, Pure]
+		public static Type GetValueType([NotNull] this MemberInfo info)
+		{
+			switch (info)
+			{
+				case FieldInfo field:
+					return field.FieldType;
+
+				case PropertyInfo property:
+					return property.PropertyType;
+
+				default:
+					throw new NotImplementedException();
+			}
+		}
+
+		[Pure]
+		public static bool CanRead([NotNull] this MemberInfo info)
+		{
+			switch (info)
+			{
+				case FieldInfo field:
+					return field.IsPublic;
+
+				case PropertyInfo property:
+					return property.CanRead;
+
+				default:
+					return false;
+			}
+		}
+
+		[Pure]
+		public static bool CanWrite([NotNull] this MemberInfo info)
+		{
+			switch (info)
+			{
+				case FieldInfo field:
+					return !field.IsInitOnly && !field.IsLiteral;
+
+				case PropertyInfo property:
+					return property.CanWrite;
+
+				default:
+					return false;
+			}
+		}
+
 		[Pure]
 		public static bool CanImplicitlyConvert(Type from, Type to)
 		{

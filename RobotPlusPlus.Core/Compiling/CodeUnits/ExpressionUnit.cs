@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
@@ -24,6 +25,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public Token ContainerToken { get; private set; }
 		public Type ContainerType { get; private set; }
+
+		public Dictionary<IdentifierToken, Type> StaticVariables { get; private set; }
+			= new Dictionary<IdentifierToken, Type>();
 
 		public enum UsageType
 		{
@@ -54,11 +58,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			OutputType = EvalTokenType(Token, compiler, Usage, InputType, out bool needsCsSnippet);
 			NeedsCSSnippet = needsCsSnippet;
 
+			// Keep track of static vars
+			StaticVariables.Clear();
+			Token.ForEachRecursive(token =>
+			{
+				if (!(token is IdentifierToken id)) return;
+				Variable variable = compiler.Context.FindVariable(id);
+				if (variable?.IsStaticType == true)
+					StaticVariables[id] = variable.Type;
+			}, true);
+
 			if (Usage == UsageType.Write)
 			{
 				ContainerToken = GetLeftmostToken(Token);
 				ContainerType = EvalTokenReadType(ContainerToken, compiler);
-
 
 				if (!TypeChecking.CanImplicitlyConvert(InputType, OutputType))
 					throw new CompileTypeConvertImplicitAssignmentException(Token, InputType, OutputType);
@@ -145,6 +158,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 								throw new CompileVariableUnassignedException(id);
 						}
 
+						if (usage == UsageType.Write && variable.IsReadOnly)
+							throw new CompileTypeReadOnlyException(variable.Token);
+
+						if (variable.IsStaticType)
+							csSnippet = true;
+
 						// Check generated name
 						if (string.IsNullOrEmpty(id.GeneratedName))
 						{
@@ -178,18 +197,39 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 						string identifier = pun.DotRHS.Identifier;
 						Type lhs = RecursiveCheck(pun.DotLHS)
-						           ?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
-						PropertyInfo property = lhs.GetProperty(identifier);
+								   ?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
 
-						if (property == null)
+						BindingFlags flags = BindingFlags.Instance
+						                     | BindingFlags.Public
+						                     | BindingFlags.FlattenHierarchy;
+
+						// If base is identifier...
+						if (GetLeftmostToken(pun) is IdentifierToken baseType)
+						{
+							// And its static..
+							Variable baseVariable = compiler.Context.FindVariable(baseType);
+							if (baseVariable?.IsStaticType == true)
+							{
+								// Change to search for static fields
+								flags &= ~BindingFlags.Instance;
+								flags |= BindingFlags.Static;
+							}
+						}
+
+						// Do the search
+						MemberInfo memberInfo = (MemberInfo)lhs.GetProperty(identifier, flags)
+							?? lhs.GetField(identifier, flags);
+
+						// Validate
+						if (memberInfo == null)
 							throw new CompileTypePropertyDoesNotExistException(pun, lhs, identifier);
-						if (usage == UsageType.Read && !property.CanRead)
+						if (usage == UsageType.Read && !memberInfo.CanRead())
 							throw new CompileTypePropertyNoGetterException(pun, lhs, identifier);
-						if (usage == UsageType.Write && !property.CanWrite)
+						if (usage == UsageType.Write && !memberInfo.CanWrite())
 							throw new CompileTypePropertyNoSetterException(pun, lhs, identifier);
 
 						csSnippet = true;
-						return property.PropertyType;
+						return memberInfo.GetValueType();
 
 					case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
 						if (usage == UsageType.Write)
@@ -230,7 +270,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					return token.SourceCode;
 
 				case IdentifierToken id:
-					return $"♥{id.GeneratedName}";
+					return StaticVariables.TryGetValue(id, out Type type)
+						? type.FullName
+						: $"♥{id.GeneratedName}";
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment
 					|| op.SourceCode == "++"

@@ -23,11 +23,22 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_PropertyUndefined()
 		{
 			// Arrange
 			const string code = "x = Rectangle.Lorem";
+
+			// Act
+			Compiler.Compile(code);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
+		public void Compile_PropertyInstance()
+		{
+			// Arrange
+			const string code = "x = Rectangle.Width";
 
 			// Act
 			Compiler.Compile(code);

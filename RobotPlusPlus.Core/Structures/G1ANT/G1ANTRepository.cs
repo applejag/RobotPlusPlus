@@ -7,14 +7,13 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.Context.Types;
-using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
 	[XmlRoot("G1ANT", Namespace = "my://g1ant")]
 	[Serializable]
-	public class G1ANTRepository
+	public class G1ANTRepository : IRepository
 	{
 		[XmlElement("Variables")]
 		public VariablesElement Variables { get; set; }
@@ -44,6 +43,23 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			return command.Arguments
 				.Concat(Commands.GlobalArguments.Arguments)
 				.ToList();
+		}
+
+
+		public IEnumerable<(string id, Type type)> RegisterVariables()
+		{
+			return Variables.Variables
+				.Select(v => (v.Name, v.EvaluateType()));
+		}
+
+		public IEnumerable<(string id, Type type)> RegisterReadOnlyVariables()
+		{
+			return new(string, Type)[0];
+		}
+
+		public IEnumerable<(string id, Type type)> RegisterStaticTypes()
+		{
+			return new(string, Type)[0];
 		}
 
 		#region Static creators
