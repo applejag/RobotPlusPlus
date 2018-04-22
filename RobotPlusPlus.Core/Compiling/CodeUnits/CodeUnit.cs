@@ -41,7 +41,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					{
 						if (!(op.LHS is IdentifierToken lhs))
 							throw new CompileUnexpectedTokenException(op.LHS);
-						return new CommandUnit(rhs, lhs, parent);
+						return new CommandUnit(rhs, parent, ("result", lhs));
 					}
 
 					return new AssignmentUnit(op, parent);
@@ -71,7 +71,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					throw new CompileUnexpectedTokenException(st);
 
 				case FunctionCallToken func:
-					return new CommandUnit(func, null, parent);
+					return new CommandUnit(func, parent);
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

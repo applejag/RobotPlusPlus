@@ -58,6 +58,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				ContainerToken = GetLeftmostToken(Token);
 				ContainerType = EvalTokenReadType(ContainerToken, compiler);
+
+
+				if (!TypeChecking.CanImplicitlyConvert(InputType, OutputType))
+					throw new CompileTypeConvertImplicitAssignmentException(Token, InputType, OutputType);
 			}
 
 			foreach (CodeUnit post in PostUnits)

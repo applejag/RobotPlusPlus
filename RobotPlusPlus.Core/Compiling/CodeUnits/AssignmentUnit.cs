@@ -58,9 +58,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			LHSExpression.InputType = RHSExpression.OutputType;
 			LHSExpression.Compile(compiler);
 
-			if (!TypeChecking.CanImplicitlyConvert(RHSExpression.OutputType, LHSExpression.OutputType))
-				throw new CompileTypeConvertImplicitAssignmentException(LHSExpression.Token, RHSExpression.OutputType, LHSExpression.OutputType);
-
 			if (LHSExpression.Token is PunctuatorToken)
 			{
 				RHSExpression.NeedsCSSnippet =

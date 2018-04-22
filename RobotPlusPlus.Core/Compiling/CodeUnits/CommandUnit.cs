@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
-using RobotPlusPlus.Core.Compiling.Context;
-using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Structures.G1ANT;
@@ -15,7 +13,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 {
 	public class CommandUnit : CodeUnit
 	{
-		public List<Argument> Arguments { get; }
+		private readonly List<PositionalArgument> positionalArguments;
+		public List<NamedArgument> Arguments { get; }
 
 		public string CommandName { get; }
 		public string CommandFamilyName { get; }
@@ -24,22 +23,28 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public G1ANTRepository.CommandElement CommandElement { get; private set; }
 		public List<G1ANTRepository.ArgumentElement> CommandArgumentElements { get; private set; }
 
-		public IdentifierToken ResultToken { get; }
-
-		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] IdentifierToken resultToken = null, [CanBeNull] CodeUnit parent = null) : base(token, parent)
+		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] CodeUnit parent = null,
+			[CanBeNull] params (string, Token)[] addedArguments) : base(token, parent)
 		{
+
 			if (token.ParentasesGroup is null)
 				throw new CompileException("Function parentases token is null.", token);
 			if (token.LHS is null)
 				throw new CompileException("Function callee token is null.", token);
 
-			Arguments = SplitArguments(token.ParentasesGroup);
+			// Get arguments from parentases group
+			(Arguments, positionalArguments) = SplitArguments(token.ParentasesGroup);
 
 			// Add result argument
-			ResultToken = resultToken;
-			if (ResultToken != null)
-				Arguments.Add(new NamedArgument("result", new ExpressionUnit(ResultToken, this)));
+			if (addedArguments != null)
+			{
+				foreach (var (name, expr) in addedArguments)
+				{
+					Arguments.Add(new NamedArgument(name, expr));
+				}
+			}
 
+			// Get command and family from LHS
 			switch (token.LHS)
 			{
 				case IdentifierToken id:
@@ -65,6 +70,21 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override void Compile(Compiler compiler)
 		{
+			CollectCommandFromRepo(compiler);
+
+			// Alter & validate arguments
+			ConvertArgumentsToNamed();
+			ValidateArgumentCount();
+			RegisterExpressionsToArguments();
+
+			foreach (NamedArgument argument in Arguments)
+				argument.expression.Compile(compiler);
+
+			ValidateArgumentInputTypes();
+		}
+
+		private void CollectCommandFromRepo(Compiler compiler)
+		{
 			// Fetch elements from repo
 			CommandFamilyElement = CommandFamilyName == null
 				? null
@@ -78,65 +98,54 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				  ?? throw new CompileFunctionException($"Command <{CommandName}> in family <{CommandFamilyName}> does not exist!", Token);
 
 			CommandArgumentElements = compiler.G1ANTRepository.ListCommandArguments(CommandElement);
-
-			// Alter & validate arguments
-			ConvertArgumentsToNamed();
-			ValidateArgumentCount();
-			RegisterResultVariables(compiler);
-
-			foreach (Argument argument in Arguments)
-				argument.expression.Compile(compiler);
-
-			ValidateArgumentInputTypes();
 		}
 
 		private void ConvertArgumentsToNamed()
 		{
-			for (var i = 0; i < Arguments.Count; i++)
+			foreach (PositionalArgument pos in positionalArguments)
 			{
-				// Convert positional to named
-				if (Arguments[i] is PositionalArgument pos)
-				{
-					G1ANTRepository.ArgumentElement arg = CommandArgumentElements.TryGet(pos.index)
-														  ?? throw new CompileFunctionException(
-															  $"Command <{CommandName}> can at max take {CommandArgumentElements.Count} arguments!",
-															  Token);
+				G1ANTRepository.ArgumentElement arg = CommandArgumentElements.TryGet(pos.index)
+					?? throw new CompileFunctionException(
+						$"Command <{CommandName}> can at max take {CommandArgumentElements.Count} arguments!",
+						Token);
 
-					Arguments[i] = new NamedArgument(arg.Name, Arguments[i].expression);
-				}
-
-				if (Arguments[i] is NamedArgument named)
-				{
-					G1ANTRepository.ArgumentElement argElem = CommandArgumentElements
-						.FirstOrDefault(a => a.Name == named.name);
-
-					// Validate it exists
-					if (argElem == null)
-						throw new CompileFunctionException($"Command <{CommandName}> does not have a parameter named <{named.name}>.", Token);
-				}
-				else
-					throw new InvalidOperationException();
+				Arguments.Add(new NamedArgument(arg.Name, pos.expressionToken));
 			}
+			positionalArguments.Clear();
+
+			// Sort by argument index
+			Dictionary<NamedArgument, int> lookup = Arguments
+				.ToDictionary(a => a, a => CommandArgumentElements.FindIndex(elem => elem.Name == a.name));
+			
+			Arguments.Sort((a,b) => lookup[a].CompareTo(lookup[b]));
 		}
 
 		private void ValidateArgumentCount()
 		{
 			// Validate duplicate arguments
-			NamedArgument duplicateArg = Arguments.OfType<NamedArgument>()
+			NamedArgument duplicateArg = Arguments
 				.GroupBy(a => a.name)
 				.FirstOrDefault(g => g.Count() > 1)?.First();
 
 			if (duplicateArg != null)
 			{
-				throw new CompileFunctionException($"Argument <{duplicateArg.name}> cannot be inferred multiple times!", duplicateArg.expression.Token);
+				throw new CompileFunctionException($"Argument <{duplicateArg.name}> cannot be inferred multiple times!", duplicateArg.expressionToken);
 			}
+
+			// Validate arguments existance
+			NamedArgument nonExistingArgument = Arguments
+				.FirstOrDefault(named => CommandArgumentElements.All(argElem => argElem.Name != named.name));
+
+			if (nonExistingArgument != null)
+				throw new CompileFunctionException($"Command <{CommandName}> does not have a parameter named <{nonExistingArgument.name}>.", Token);
 
 			// Validate all required ones
 			var missingReqArgs = new List<string>();
 
 			foreach (List<G1ANTRepository.ArgumentElement> group in CommandElement.RequiredArguments)
 			{
-				int matches = Arguments.OfType<NamedArgument>().Count(a => group.Any(g => g.Name == a.name));
+				// Check for required arguments groups
+				int matches = Arguments.Count(a => group.Any(g => g.Name == a.name));
 
 				string displayName = group.Count == 1
 					? $"<{group[0].Name}>"
@@ -151,31 +160,34 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			if (missingReqArgs.Count == 1)
 				throw new CompileFunctionException($"Command <{CommandName}> requires argument {missingReqArgs[0]}.", Token);
 			if (missingReqArgs.Count > 1)
-				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join("; ", missingReqArgs)}.", Token);
+				throw new CompileFunctionException($"Command <{CommandName}> requires arguments {string.Join(", ", missingReqArgs)}.", Token);
 		}
 
-		private void RegisterResultVariables(Compiler compiler)
+		private void RegisterExpressionsToArguments()
 		{
 			// Validate types
 			foreach (var (named, argElem) in GetArgumentEnumerable())
 			{
 				// Only validate variable types
-				if (argElem.Type != G1ANTRepository.Structure.Variable) continue;
+				switch (argElem.Type)
+				{
+					case G1ANTRepository.Structure.Variable:
+						if (!(named.expressionToken is IdentifierToken))
+							throw new CompileFunctionException(
+								$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expressionToken);
 
-				// Must be identifier
-				if (!(named.expression.Token is IdentifierToken id))
-					throw new CompileFunctionException(
-						$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+						Type varType = argElem.EvaluateVariableType();
 
-				Type varType = argElem.EvaluateVariableType();
+						named.expression = new ExpressionUnit(named.expressionToken, this, ExpressionUnit.UsageType.Write)
+						{
+							InputType = varType
+						};
+						break;
 
-				// Register variable if needed
-				Variable variable = compiler.Context.FindVariable(id) ??
-									compiler.Context.RegisterVariable(id, varType);
-
-				// Validate type
-				if (!TypeChecking.CanImplicitlyConvert(varType, variable.Type))
-					throw new CompileTypeConvertImplicitAssignmentException(id, varType, variable.Type);
+					default:
+						named.expression = new ExpressionUnit(named.expressionToken, this);
+						break;
+				}
 			}
 		}
 
@@ -192,9 +204,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 					case G1ANTRepository.Structure.VariableName:
 						// Must be identifier
-						if (!(named.expression.Token is IdentifierToken))
+						if (!(named.expressionToken is IdentifierToken))
 							throw new CompileFunctionException(
-								$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expression.Token);
+								$"Argument <{named.name}> for command <{CommandName}> must be of type variable.", named.expressionToken);
 						break;
 
 					default:
@@ -211,7 +223,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		private IEnumerable<(NamedArgument Named, G1ANTRepository.ArgumentElement Element)> GetArgumentEnumerable()
 		{
-			return from arg in Arguments.OfType<NamedArgument>()
+			return from arg in Arguments
 				   join argElem in CommandArgumentElements on arg.name equals argElem.Name
 				   select (Named: arg, Element: argElem);
 		}
@@ -221,7 +233,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			var row = new RowBuilder();
 
 			// Pre units
-			foreach (Argument argument in Arguments)
+			foreach (NamedArgument argument in Arguments)
 				foreach (CodeUnit preUnit in argument.expression.PreUnits)
 					row.AppendLine(preUnit.AssembleIntoString());
 
@@ -233,8 +245,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				if (argElem.Type == G1ANTRepository.Structure.VariableName)
 				{
-					IdentifierToken variable = named.expression.Token as IdentifierToken
-						?? throw new CompileUnexpectedTokenException(named.expression.Token);
+					IdentifierToken variable = named.expressionToken as IdentifierToken
+						?? throw new CompileUnexpectedTokenException(named.expressionToken);
 
 					cmd.AppendFormat(" {0} ‴{1}‴", named.name, variable.GeneratedName);
 				}
@@ -245,17 +257,18 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			row.AppendLine(cmd.ToString());
 
 			// Post units
-			foreach (Argument argument in Arguments)
+			foreach (NamedArgument argument in Arguments)
 				foreach (CodeUnit postUnit in argument.expression.PostUnits)
 					row.AppendLine(postUnit.AssembleIntoString());
 
 			return row.ToString();
 		}
 
-		private List<Argument> SplitArguments(PunctuatorToken parentases)
+		private static (List<NamedArgument>, List<PositionalArgument>) SplitArguments(PunctuatorToken parentases)
 		{
 			var named = false;
-			var arguments = new List<Argument>();
+			var namedArgs = new List<NamedArgument>();
+			var posArgs = new List<PositionalArgument>();
 
 			var iterator = new IteratedList<Token>(parentases);
 			foreach (Token token in iterator)
@@ -269,7 +282,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						throw new CompileFunctionException(
 							$"Missing expression for named parameter <{pun.ColonName.SourceCode}>.", token);
 
-					arguments.Add(new NamedArgument(pun.ColonName, new ExpressionUnit(iterator.PopNext(), this)));
+					namedArgs.Add(new NamedArgument(pun.ColonName, iterator.PopNext()));
 					named = true;
 				}
 				else
@@ -277,7 +290,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					if (named)
 						throw new CompileFunctionException("Positional argument cannot precede named argument.", token);
 
-					arguments.Add(new PositionalArgument(arguments.Count, new ExpressionUnit(token, this)));
+					posArgs.Add(new PositionalArgument(namedArgs.Count, token));
 				}
 
 				// Check for comma seperators
@@ -291,18 +304,18 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 			}
 
-			return arguments;
+			return (namedArgs, posArgs);
 		}
 
 		#region Argument classes
 
 		public abstract class Argument
 		{
-			public readonly ExpressionUnit expression;
+			public readonly Token expressionToken;
 
-			protected Argument(ExpressionUnit expression)
+			protected Argument(Token expressionToken)
 			{
-				this.expression = expression;
+				this.expressionToken = expressionToken;
 			}
 		}
 
@@ -310,16 +323,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			public readonly string name;
 			public readonly Token nameToken;
+			public ExpressionUnit expression;
 
-			public NamedArgument(Token nameToken, ExpressionUnit expression)
-				: base(expression)
+			public NamedArgument(Token nameToken, Token expressionToken)
+				: base(expressionToken)
 			{
 				this.nameToken = nameToken;
 				name = nameToken.SourceCode;
 			}
 
-			public NamedArgument(string name, ExpressionUnit expression)
-				: base(expression)
+			public NamedArgument(string name, Token expressionToken)
+				: base(expressionToken)
 			{
 				this.name = name;
 			}
@@ -329,8 +343,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			public readonly int index;
 
-			public PositionalArgument(int index, ExpressionUnit expression)
-				: base(expression)
+			public PositionalArgument(int index, Token expressionToken)
+				: base(expressionToken)
 			{
 				this.index = index;
 			}
