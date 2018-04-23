@@ -51,7 +51,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			Container.Compile(compiler);
 
-			CollectCommandFromRepo(compiler);
+			
 
 			// Alter & validate arguments
 			ConvertArgumentsToNamed();
@@ -66,6 +66,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		
 		private void CollectCommandFromRepo(Compiler compiler)
 		{
+
+
 
 			// Fetch elements from repo
 			CommandFamilyElement = CommandFamilyName == null
