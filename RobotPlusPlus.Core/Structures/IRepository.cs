@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 
 namespace RobotPlusPlus.Core.Structures
@@ -12,5 +13,8 @@ namespace RobotPlusPlus.Core.Structures
 		IEnumerable<(string id, Type type)> RegisterReadOnlyVariables();
 		[NotNull]
 		IEnumerable<(string id, Type type)> RegisterStaticTypes();
+
+		[CanBeNull]
+		MethodInfo LookupMethodInfo([CanBeNull] string family, [NotNull] string method);
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -21,22 +22,6 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[XmlElement("Commands")]
 		public CommandsElement Commands { get; set; }
 
-		[CanBeNull]
-		public CommandElement FindCommand([NotNull] string commandName, [CanBeNull] string familyName = null)
-		{
-			List<CommandElement> pool = familyName != null
-				? FindCommandFamily(familyName)?.Commands
-				: Commands.Commands;
-
-			return pool?.FirstOrDefault(c => c.Name == commandName);
-		}
-
-		[CanBeNull]
-		public CommandFamilyElement FindCommandFamily([NotNull] string familyName)
-		{
-			return Commands.CommandFamilies.FirstOrDefault(fam => fam.Name == familyName);
-		}
-
 		[NotNull, ItemNotNull]
 		public List<ArgumentElement> ListCommandArguments([NotNull] CommandElement command, bool includeGlobal = true)
 		{
@@ -44,7 +29,6 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.Concat(Commands.GlobalArguments.Arguments)
 				.ToList();
 		}
-
 
 		public IEnumerable<(string id, Type type)> RegisterVariables()
 		{
@@ -59,7 +43,26 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 		public IEnumerable<(string id, Type type)> RegisterStaticTypes()
 		{
-			return new(string, Type)[0];
+			return Commands.Commands.Select(c => (c.Name, typeof(CommandElement)))
+				.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
+		}
+
+		public MethodInfo LookupMethodInfo(string family, string method)
+		{
+			if (family == null)
+			{
+				return Commands.Commands.TryFirst(c => c.Name == method, out CommandElement cmd)
+					? new CommandMethodInfo(cmd, Commands.GlobalArguments)
+					: null;
+			}
+			
+			if (Commands.CommandFamilies.TryFirst(f => f.Name == family, out CommandFamilyElement fam))
+			{
+				if (fam.Commands.TryFirst(c => c.Name == method, out CommandElement cmd2))
+					return new CommandMethodInfo(cmd2, Commands.GlobalArguments, fam);
+			}
+
+			return null;
 		}
 
 		#region Static creators

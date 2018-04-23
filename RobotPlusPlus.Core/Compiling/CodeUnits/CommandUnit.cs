@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
@@ -16,17 +17,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		private readonly List<PositionalArgument> positionalArguments;
 		public List<NamedArgument> Arguments { get; }
 
-		public string CommandName { get; }
-		public string CommandFamilyName { get; }
+		public ExpressionUnit Container { get; }
 
-		public G1ANTRepository.CommandFamilyElement CommandFamilyElement { get; private set; }
-		public G1ANTRepository.CommandElement CommandElement { get; private set; }
-		public List<G1ANTRepository.ArgumentElement> CommandArgumentElements { get; private set; }
+		public MethodInfo Command { get; private set; }
 
 		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] CodeUnit parent = null,
 			[CanBeNull] params (string, Token)[] addedArguments) : base(token, parent)
 		{
-
 			if (token.ParentasesGroup is null)
 				throw new CompileException("Function parentases token is null.", token);
 			if (token.LHS is null)
@@ -43,33 +40,17 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					Arguments.Add(new NamedArgument(name, expr));
 				}
 			}
-
-			// Get command and family from LHS
-			switch (token.LHS)
-			{
-				case IdentifierToken id:
-					CommandName = id.SourceCode;
-					CommandFamilyName = null;
-					break;
-
-				case PunctuatorToken dot when dot.PunctuatorType == PunctuatorToken.Type.Dot:
-					if (dot.TryFirstRecursive(t => !(t is IdentifierToken), out Token faulty))
-						throw new CompileException($"Dot operation for non-identifier token <{faulty?.SourceCode.EscapeString() ?? "null"}> are not supported!", faulty);
-
-					if (PunctuatorToken.IsPunctuatorOfType(dot.DotLHS, PunctuatorToken.Type.Dot))
-						throw new CompileException("Multidepth command family names are not supported!", dot.DotLHS);
-
-					CommandFamilyName = dot.DotLHS.SourceCode;
-					CommandName = dot.DotRHS.SourceCode;
-					break;
-
-				default:
-					throw new CompileUnexpectedTokenException(token.LHS);
-			}
+			
+			if (token.LHS is PunctuatorToken dot && dot.PunctuatorType == PunctuatorToken.Type.Dot)
+				Container = new ExpressionUnit(dot.DotLHS, this);
+			else
+				Container = new ExpressionUnit(token.LHS, this);
 		}
 
 		public override void Compile(Compiler compiler)
 		{
+			Container.Compile(compiler);
+
 			CollectCommandFromRepo(compiler);
 
 			// Alter & validate arguments
@@ -82,9 +63,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			ValidateArgumentInputTypes();
 		}
-
+		
 		private void CollectCommandFromRepo(Compiler compiler)
 		{
+
 			// Fetch elements from repo
 			CommandFamilyElement = CommandFamilyName == null
 				? null
