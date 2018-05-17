@@ -25,6 +25,10 @@ namespace RobotPlusPlus.Core.Structures.CSharp
 			["Rectangle"] = typeof(Rectangle),
 			["Point"] = typeof(Point),
 			["Size"] = typeof(Size),
+
+			["Console"] = typeof(Console),
+			["Array"] = typeof(Array),
+			["List"] = typeof(List<object>),
 		};
 
 		public IEnumerable<(string id, Type type)> RegisterVariables()

@@ -31,7 +31,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override string ToString()
 		{
-			return LHS + base.ToString() + ParentasesGroup;
+			return LHS.ToString() + ParentasesGroup;
 		}
 	}
 }

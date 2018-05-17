@@ -19,6 +19,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public ExpressionUnit Container { get; }
 		public string CommandName { get; }
 		public string CommandFullName { get; }
+		public string CommandFamilyName { get; }
 
 		public MethodInfo Command { get; private set; }
 
@@ -42,13 +43,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 			}
 
-			CommandName = token.LHS.SourceCode;
 			CommandFullName = token.LHS.ToString();
 
 			if (token.LHS is PunctuatorToken dot && dot.PunctuatorType == PunctuatorToken.Type.Dot)
+			{
 				Container = new ExpressionUnit(dot.DotLHS, this);
+				CommandFamilyName = dot.DotLHS.ToString();
+				CommandName = dot.DotRHS.ToString();
+			}
 			else
+			{
 				Container = new ExpressionUnit(token.LHS, this);
+				CommandFamilyName = null;
+				CommandName = token.LHS.SourceCode;
+			}
 		}
 
 
@@ -64,13 +72,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		private void FindCommandMethodInfo(Compiler compiler)
 		{
-			string family = Container.Token.ToString();
 			Type[] parameters = Arguments.Select(a => a.expression.OutputType).ToArray();
 
 			Command =
-				compiler.G1ANTRepository.LookupMethodInfo(family, CommandName, parameters)
-				?? compiler.CSharpRepository.LookupMethodInfo(family, CommandName, parameters)
-				?? throw new CompileFunctionException($"Command `{Token}` does not exist (or has invalid parameters)!", Token);
+				compiler.G1ANTRepository.LookupMethodInfo(CommandFamilyName, CommandName, parameters)
+				?? compiler.CSharpRepository.LookupMethodInfo(CommandFamilyName, CommandName, parameters)
+				?? throw new CompileFunctionException($"Command `{CommandFullName}` does not exist (or has invalid parameters)!", Token);
 		}
 
 		public override string AssembleIntoString()
