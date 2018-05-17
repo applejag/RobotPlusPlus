@@ -43,8 +43,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 		public IEnumerable<(string id, Type type)> RegisterStaticTypes()
 		{
-			return Commands.Commands.Select(c => (c.Name, typeof(CommandElement)))
-				.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
+			//return Commands.Commands.Select(c => (c.Name, typeof(CommandElement)))
+			//	.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
+			return new (string id, Type type)[0];
 		}
 
 		public MethodInfo LookupMethodInfo(string family, string method, Type[] parameters)

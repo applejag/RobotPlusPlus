@@ -40,6 +40,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		{
 			if (string.IsNullOrWhiteSpace(Identifier))
 				return string.IsNullOrWhiteSpace(Generated) ? "<null>" : Generated;
+			if (Identifier == Generated) return Identifier;
 			return string.IsNullOrWhiteSpace(Generated) ? Identifier : $"{Identifier}<{Generated}>";
 		}
 
