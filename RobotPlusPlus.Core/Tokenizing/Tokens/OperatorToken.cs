@@ -267,6 +267,15 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			return ass;
 		}
 
+		public override string ToString()
+		{
+			if (OperatorType == Type.PreExpression
+			    || OperatorType == Type.Unary)
+				return UnaryValue + base.ToString();
+
+			return LHS + base.ToString() + RHS;
+		}
+
 		public enum Type
 		{
 			///<summary>x++, x--</summary>

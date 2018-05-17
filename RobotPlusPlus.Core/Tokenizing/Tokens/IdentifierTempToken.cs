@@ -8,5 +8,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public IdentifierTempToken(TokenSource source) : base(source)
 		{ }
+
+		public override string ToString()
+		{
+			return "$tmp";
+		}
 	}
 }

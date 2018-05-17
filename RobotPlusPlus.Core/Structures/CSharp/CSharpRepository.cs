@@ -42,12 +42,13 @@ namespace RobotPlusPlus.Core.Structures.CSharp
 			return families.Select(pair => (pair.Key, pair.Value));
 		}
 
-		public MethodInfo LookupMethodInfo(string family, string method)
+		public MethodInfo LookupMethodInfo(string family, string method, Type[] paramters)
 		{
 			return families.GetValueOrDefault(family)?
 				.GetMethod(method, BindingFlags.Public
 				                   | BindingFlags.Static
-				                   | BindingFlags.Instance);
+				                   | BindingFlags.Instance,
+					null, paramters, null);
 		}
 	}
 }

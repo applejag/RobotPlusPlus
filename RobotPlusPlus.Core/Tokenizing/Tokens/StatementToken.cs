@@ -112,6 +112,11 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			return ParseTokenCodeBlock(parent);
 		}
 
+		public override string ToString()
+		{
+			return $"{base.ToString()} {Condition} {CodeBlock}";
+		}
+
 		public enum Type
 		{
 			If,

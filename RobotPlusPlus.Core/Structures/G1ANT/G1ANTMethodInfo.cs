@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
-	public class CommandMethodInfo : MethodInfo
+	public class G1ANTMethodInfo : MethodInfo
 	{
 		[NotNull]
 		public G1ANTRepository.CommandElement Command { get; }
@@ -17,8 +17,8 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 		public override Type DeclaringType => CommandFamily?.GetType();
 		public override string Name => Command.Name;
-		public CommandParameterInfo[] CommandArguments { get; }
-		public CommandParameterInfo[] GlobalArguments { get; }
+		public G1ANTParameterInfo[] CommandArguments { get; }
+		public G1ANTParameterInfo[] GlobalArguments { get; }
 
 		public override ParameterInfo[] GetParameters()
 		{
@@ -28,7 +28,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.ToArray();
 		}
 
-		internal CommandMethodInfo(
+		internal G1ANTMethodInfo(
 			[NotNull] G1ANTRepository.CommandElement command,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
@@ -37,9 +37,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			CommandFamily = family;
 
 			CommandArguments = command.Arguments
-				.Select((a, i) => new CommandParameterInfo(this, a, i)).ToArray();
+				.Select((a, i) => new G1ANTParameterInfo(this, a, i)).ToArray();
 			GlobalArguments = globalArguments.Arguments
-				.Select((a, i) => new CommandParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
+				.Select((a, i) => new G1ANTParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
 		}
 
 		public override object[] GetCustomAttributes(bool inherit)

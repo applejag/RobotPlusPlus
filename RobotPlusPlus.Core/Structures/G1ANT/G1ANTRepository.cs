@@ -47,19 +47,19 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
 		}
 
-		public MethodInfo LookupMethodInfo(string family, string method)
+		public MethodInfo LookupMethodInfo(string family, string method, Type[] parameters)
 		{
 			if (family == null)
 			{
 				return Commands.Commands.TryFirst(c => c.Name == method, out CommandElement cmd)
-					? new CommandMethodInfo(cmd, Commands.GlobalArguments)
+					? new G1ANTMethodInfo(cmd, Commands.GlobalArguments)
 					: null;
 			}
 			
 			if (Commands.CommandFamilies.TryFirst(f => f.Name == family, out CommandFamilyElement fam))
 			{
 				if (fam.Commands.TryFirst(c => c.Name == method, out CommandElement cmd2))
-					return new CommandMethodInfo(cmd2, Commands.GlobalArguments, fam);
+					return new G1ANTMethodInfo(cmd2, Commands.GlobalArguments, fam);
 			}
 
 			return null;
