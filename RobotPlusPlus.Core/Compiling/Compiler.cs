@@ -98,6 +98,8 @@ namespace RobotPlusPlus.Core.Compiling
 
 				foreach (var (name, type) in repository.RegisterStaticTypes())
 					RegisterVariable(name, type, true, true);
+
+				repository.RegisterOther(context);
 			}
 
 			return context;

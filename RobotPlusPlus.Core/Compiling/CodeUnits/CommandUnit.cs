@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
 using RobotPlusPlus.Core.Structures.G1ANT;
@@ -17,9 +18,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public List<Argument> Arguments { get; }
 
 		public ExpressionUnit Container { get; }
-		public string CommandName { get; }
-		public string CommandFullName { get; }
-		public string CommandFamilyName { get; }
 
 		public MethodInfo Command { get; private set; }
 
@@ -37,47 +35,55 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			// Add result argument
 			if (addedArguments != null)
 			{
-				foreach (var (name, expr) in addedArguments)
+				foreach ((string name, Token expr) in addedArguments)
 				{
 					Arguments.Add(new NamedArgument(Arguments.Count, name, expr, this));
 				}
 			}
 
-			CommandFullName = token.LHS.ToString();
-
-			if (token.LHS is PunctuatorToken dot && dot.PunctuatorType == PunctuatorToken.Type.Dot)
-			{
-				Container = new ExpressionUnit(dot.DotLHS, this);
-				CommandFamilyName = dot.DotLHS.ToString();
-				CommandName = dot.DotRHS.ToString();
-			}
-			else
-			{
-				Container = new ExpressionUnit(token.LHS, this);
-				CommandFamilyName = null;
-				CommandName = token.LHS.SourceCode;
-			}
+			Container = new ExpressionUnit(token.LHS, this);
 		}
-
 
 		public override void Compile(Compiler compiler)
 		{
 			Container.Compile(compiler);
 
 			foreach (Argument argument in Arguments)
+			{
+				// TODO: Hitta funktion som ska köras,
+				// TODO: sen input på dem med Variable som parameter
+				// TODO: SEN kompilera... BIG SIGH
+
+				//if (Container.OutputType is G1ANTCommand cmd)
+				//argument.expression.InputType 
 				argument.expression.Compile(compiler);
+			}
 
 			FindCommandMethodInfo(compiler);
 		}
 
 		private void FindCommandMethodInfo(Compiler compiler)
 		{
-			Type[] parameters = Arguments.Select(a => a.expression.OutputType).ToArray();
+			CSharpType[] parameters = Arguments
+				.Select(a => a.expression.OutputType as CSharpType
+							 ?? throw new CompileFunctionException($"Invalid token type, <{a.expression.OutputType.GetType()}>.", a.expressionToken))
+				.ToArray();
 
-			Command =
-				compiler.G1ANTRepository.GetMethod(CommandFamilyName, CommandName, parameters)
-				?? compiler.CSharpRepository.GetMethod(CommandFamilyName, CommandName, parameters)
-				?? throw new CompileFunctionException($"Command `{CommandFullName}` does not exist (or has invalid parameters)!", Token);
+			switch (Container.OutputType)
+			{
+				case CSharpType cs:
+					//Command = ???
+					throw new NotImplementedException();
+
+				case G1ANTCommand cmd:
+					throw new NotImplementedException();
+
+				case G1ANTFamily fam:
+					throw new NotImplementedException();
+
+				default:
+					throw new CompileFunctionException("Method doesn't exist", Token);
+			}
 		}
 
 		public override string AssembleIntoString()
@@ -91,7 +97,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			// Assemble command with arguments
 			// TODO: Arguments
-			row.AppendLine(CommandFullName);
+			//row.AppendLine(CommandFullName);
 
 			// Post units
 			foreach (Argument argument in Arguments)

@@ -43,22 +43,22 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		}
 
 		[CanBeNull, Pure]
-		public static Variable FindVariable([NotNull] this ValueContext context,
+		public static AbstractValue FindIdentifier([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			Variable variable = token is IdentifierTempToken
+			AbstractValue value = token is IdentifierTempToken
 				? context.DecayedValues.OfType<Variable>().FirstOrDefault(x => x.Token == token)
-				: context.FindValue(token.Identifier) as Variable;
+				: context.FindValue(token.Identifier);
 
-			if (variable != null) token.GeneratedName = variable.Generated;
-			return variable;
+			if (value != null && value.Generated != null) token.GeneratedName = value.Generated;
+			return value;
 		}
 
 		[Pure]
 		public static bool VariableExists([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return FindVariable(context, token) != null;
+			return FindIdentifier(context, token) != null;
 		}
 
 		#endregion

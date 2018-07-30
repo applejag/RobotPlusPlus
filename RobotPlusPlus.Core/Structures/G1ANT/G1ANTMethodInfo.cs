@@ -21,6 +21,22 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		public G1ANTParameterInfo[] CommandArguments { get; }
 		public G1ANTParameterInfo[] GlobalArguments { get; }
 
+		private G1ANTMethodInfo(
+			[NotNull] G1ANTRepository.CommandElement command,
+			[CanBeNull, ItemNotNull] IEnumerable<G1ANTRepository.ArgumentElement> arguments,
+			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
+			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
+		{
+			Command = command;
+			CommandFamily = family;
+
+			CommandArguments = arguments
+				?.Select((a, i) => new G1ANTParameterInfo(this, a, i)).ToArray()
+				?? new G1ANTParameterInfo[0];
+			GlobalArguments = globalArguments.Arguments
+				.Select((a, i) => new G1ANTParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
+		}
+
 		public override ParameterInfo[] GetParameters()
 		{
 			return CommandArguments
@@ -29,7 +45,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.ToArray();
 		}
 
-		internal static G1ANTMethodInfo[] ListFromCommand(
+		private static G1ANTMethodInfo[] ListMethods(
 			[NotNull] G1ANTRepository.CommandElement command,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
@@ -49,20 +65,49 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			return info;
 		}
 
-		private G1ANTMethodInfo(
+		public static G1ANTMethodInfo GetMethod(
 			[NotNull] G1ANTRepository.CommandElement command,
-			[CanBeNull, ItemNotNull] IEnumerable<G1ANTRepository.ArgumentElement> arguments,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
-			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
+			[CanBeNull] G1ANTRepository.CommandFamilyElement family,
+			[NotNull, ItemNotNull] IReadOnlyList<Type> suggested)
 		{
-			Command = command;
-			CommandFamily = family;
+			foreach (G1ANTMethodInfo method in ListMethods(command, globalArguments, family))
+			{
+				var valid = true;
+				ParameterInfo[] actuals = method.GetParameters();
 
-			CommandArguments = arguments
-				?.Select((a, i) => new G1ANTParameterInfo(this, a, i)).ToArray()
-				?? new G1ANTParameterInfo[0];
-			GlobalArguments = globalArguments.Arguments
-				.Select((a, i) => new G1ANTParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
+				// Too many parameters
+				if (suggested.Count > actuals.Length)
+				{
+					//valid = false;
+					continue;
+				}
+
+				foreach (ParameterInfo actual in actuals)
+				{
+					// Too few parameters
+					if (actual.Position >= suggested.Count)
+					{
+						if (!actual.HasDefaultValue)
+						{
+							valid = false;
+						}
+					}
+
+					// Wrong type
+					else if (actual.ParameterType != suggested[actual.Position])
+					{
+						valid = false;
+					}
+				}
+
+				if (valid)
+				{
+					return method;
+				}
+			}
+
+			return null;
 		}
 
 		public override object[] GetCustomAttributes(bool inherit)

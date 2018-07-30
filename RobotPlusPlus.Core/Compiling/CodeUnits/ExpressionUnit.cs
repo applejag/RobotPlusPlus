@@ -18,13 +18,22 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public FlexibleList<CodeUnit> PreUnits { get; }
 		public FlexibleList<CodeUnit> PostUnits { get; }
 
-		public Type OutputType { get; private set; }
-		public Type InputType { get; internal set; }
+		/// <summary>Value type from this expression</summary>
+		public AbstractValue OutputType { get; private set; }
+		/// <summary>Inbound type when this is LHS of an assignment</summary>
+		public AbstractValue InputType { get; internal set; }
 		public bool NeedsCSSnippet { get; set; }
 		public UsageType Usage { get; }
 
+		/// <summary>
+		/// <para>Used upon assigning to structs and classes.</para>
+		///
+		/// Example: rect.width = 10
+		/// where this="width"
+		/// and Container="rect"
+		/// </summary>
 		public Token ContainerToken { get; private set; }
-		public Type ContainerType { get; private set; }
+		public AbstractValue ContainerType { get; private set; }
 
 		public Dictionary<IdentifierToken, Type> StaticVariables { get; private set; }
 			= new Dictionary<IdentifierToken, Type>();
@@ -43,9 +52,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PreUnits = new FlexibleList<CodeUnit>();
 			PostUnits = new FlexibleList<CodeUnit>();
 
-			Token = RemoveParentases(token);
-			Token = RemoveUnaries(Token);
-			Token = ExtractInnerAssignments(Token);
+			token = RemoveParentases(token);
+			token = RemoveUnaries(token);
+			Token = ExtractInnerAssignments(token);
 		}
 
 		public override void Compile(Compiler compiler)
@@ -63,7 +72,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Token.ForEachRecursive(token =>
 			{
 				if (!(token is IdentifierToken id)) return;
-				Variable variable = compiler.Context.FindVariable(id);
+				var variable = compiler.Context.FindIdentifier(id) as Variable;
 				if (variable?.IsStaticType == true)
 					StaticVariables[id] = variable.Type;
 			}, true);
@@ -73,8 +82,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				ContainerToken = GetLeftmostToken(Token);
 				ContainerType = EvalTokenReadType(ContainerToken, compiler);
 
-				if (!TypeChecking.CanImplicitlyConvert(InputType, OutputType))
-					throw new CompileTypeConvertImplicitAssignmentException(Token, InputType, OutputType);
+				if (!(InputType is CSharpType csInput) || !(OutputType is CSharpType csOutput))
+					throw new CompileTypeConvertImplicitAssignmentException(Token, InputType.GetType(), OutputType.GetType());
+
+				if (!TypeChecking.CanImplicitlyConvert(csInput.Type, csOutput.Type))
+					throw new CompileTypeConvertImplicitAssignmentException(Token, csInput.Type, csOutput.Type);
 			}
 
 			foreach (CodeUnit post in PostUnits)
@@ -121,129 +133,149 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		[CanBeNull, Pure]
-		public static Type EvalTokenReadType([NotNull] Token token, [NotNull] Compiler compiler)
+		public static AbstractValue EvalTokenReadType([NotNull] Token token, [NotNull] Compiler compiler)
 		{
 			return EvalTokenType(token, compiler, UsageType.Read, null, out bool _);
 		}
 
 		[CanBeNull]
-		public static Type EvalTokenWriteType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] Type inputType)
+		public static AbstractValue EvalTokenWriteType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] AbstractValue inputType)
 		{
 			return EvalTokenType(token, compiler, UsageType.Write, inputType, out bool _);
 		}
 
-		[CanBeNull]
-		private static Type EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, Type inputType, out bool needsCSSnippet)
+		[NotNull]
+		private static AbstractValue EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, AbstractValue inputType, out bool needsCSSnippet)
 		{
 			bool csSnippet = false, containsStr = false, containsOp = false;
 
-			Type type = RecursiveCheck(token);
+			AbstractValue type = RecursiveCheck(token);
 
 			needsCSSnippet = usage == UsageType.Read && (csSnippet || (containsStr && containsOp));
 			return type;
 
-			Type RecursiveCheck(Token t)
+			AbstractValue RecursiveCheck(Token t)
 			{
 				switch (t)
 				{
 					case IdentifierToken id:
 						// Check variables for registration
-						Variable variable = compiler.Context.FindVariable(id);
-
-						if (variable == null)
+						AbstractValue value = compiler.Context.FindIdentifier(id);
+						
+						if (value == null && inputType is CSharpType csType && csType.Type != null)
 						{
 							if (usage == UsageType.Write)
-								variable = compiler.Context.RegisterVariable(id, inputType);
+								value = compiler.Context.RegisterVariable(id, csType.Type);
 							else
 								throw new CompileVariableUnassignedException(id);
 						}
 
-						if (usage == UsageType.Write && variable.IsReadOnly)
-							throw new CompileTypeReadOnlyException(variable.Token);
-
-						if (variable.IsStaticType)
-							csSnippet = true;
-
-						// Check generated name
-						if (string.IsNullOrEmpty(id.GeneratedName))
+						if (value is Variable variable)
 						{
-							if (id is IdentifierTempToken)
-								throw new CompileException("Name not generated for temporary variable.", id);
-							throw new CompileException($"Name not generated for variable <{id.Identifier}>.", id);
+							if (usage == UsageType.Write && variable.IsReadOnly)
+								throw new CompileTypeReadOnlyException(variable.Token);
+
+							if (variable.IsStaticType)
+								csSnippet = true;
+
+							// Check generated name
+							if (string.IsNullOrEmpty(id.GeneratedName))
+							{
+								if (id is IdentifierTempToken)
+									throw new CompileException("Name not generated for temporary variable.", id);
+								throw new CompileException($"Name not generated for variable <{id.Identifier}>.", id);
+							}
+
+							if (variable.Type == typeof(string))
+								containsStr = true;
 						}
-
-						if (variable.Type == typeof(string))
-							containsStr = true;
-
-						return variable.Type;
+						return value;
 
 					case LiteralNumberToken num:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(num);
-						return num.Value.GetType();
+						return new CSharpType(num.Value.GetType());
 
 					case LiteralStringToken str:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(str);
 						containsStr = true;
 						if (str.NeedsEscaping) csSnippet = true;
-						return typeof(string);
+						return new CSharpType(typeof(string));
 
 					case LiteralKeywordToken key:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(key);
-						return key.Value?.GetType();
+						return new CSharpType(key.Value?.GetType());
 
 					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 						string identifier = pun.DotRHS.Identifier;
-						Type lhs = RecursiveCheck(pun.DotLHS)
+						AbstractValue lhs = RecursiveCheck(pun.DotLHS)
 								   ?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
 
-						BindingFlags flags = BindingFlags.Instance
-						                     | BindingFlags.Public
-						                     | BindingFlags.FlattenHierarchy;
-
-						// If base is identifier...
-						if (GetLeftmostToken(pun) is IdentifierToken baseType)
+						if (lhs is CSharpType lhsCS)
 						{
-							// And its static..
-							Variable baseVariable = compiler.Context.FindVariable(baseType);
-							if (baseVariable?.IsStaticType == true)
+							if (lhsCS.Type == null)
+								return lhsCS;
+
+							BindingFlags flags = BindingFlags.Instance
+							                     | BindingFlags.Public
+							                     | BindingFlags.FlattenHierarchy;
+
+							// If base is identifier...
+							if (GetLeftmostToken(pun) is IdentifierToken baseType)
 							{
-								// Change to search for static fields
-								flags &= ~BindingFlags.Instance;
-								flags |= BindingFlags.Static;
+								// And its static..
+								var baseVariable = compiler.Context.FindIdentifier(baseType) as Variable;
+								if (baseVariable?.IsStaticType == true)
+								{
+									// Change to search for static fields
+									flags &= ~BindingFlags.Instance;
+									flags |= BindingFlags.Static;
+								}
 							}
+
+							// Do the search
+							MemberInfo memberInfo = (MemberInfo) lhsCS.Type.GetProperty(identifier, flags)
+							                        ?? lhsCS.Type.GetField(identifier, flags);
+
+							// Validate
+							if (memberInfo == null)
+								throw new CompileTypePropertyDoesNotExistException(pun, lhsCS.Type, identifier);
+							if (usage == UsageType.Read && !memberInfo.CanRead())
+								throw new CompileTypePropertyNoGetterException(pun, lhsCS.Type, identifier);
+							if (usage == UsageType.Write && !memberInfo.CanWrite())
+								throw new CompileTypePropertyNoSetterException(pun, lhsCS.Type, identifier);
+
+							csSnippet = true;
+							return new CSharpType(memberInfo.GetValueType());
 						}
 
-						// Do the search
-						MemberInfo memberInfo = (MemberInfo)lhs.GetProperty(identifier, flags)
-							?? lhs.GetField(identifier, flags);
-
-						// Validate
-						if (memberInfo == null)
-							throw new CompileTypePropertyDoesNotExistException(pun, lhs, identifier);
-						if (usage == UsageType.Read && !memberInfo.CanRead())
-							throw new CompileTypePropertyNoGetterException(pun, lhs, identifier);
-						if (usage == UsageType.Write && !memberInfo.CanWrite())
-							throw new CompileTypePropertyNoSetterException(pun, lhs, identifier);
-
-						csSnippet = true;
-						return memberInfo.GetValueType();
+						return lhs;
 
 					case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(op);
 						containsOp = true;
-						return op.EvaluateType(RecursiveCheck(op.UnaryValue));
+
+						AbstractValue valType = RecursiveCheck(op.UnaryValue);
+						if (valType is CSharpType valCSharp)
+							return new CSharpType(op.EvaluateType(valCSharp.Type));
+
+						throw new CompileTypeInvalidOperationException(op, valType.GetType());
 
 					case OperatorToken op:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(op);
 						containsOp = true;
-						Type lhsType = RecursiveCheck(op.LHS);
-						Type rhsType = RecursiveCheck(op.RHS);
-						return op.EvaluateType(lhsType, rhsType);
+						AbstractValue lhsType = RecursiveCheck(op.LHS);
+						AbstractValue rhsType = RecursiveCheck(op.RHS);
+
+						if (lhsType is CSharpType lhsCSharp
+						&& rhsType is CSharpType rhsCSharp)
+							return new CSharpType(op.EvaluateType(lhsCSharp.Type, rhsCSharp.Type));
+
+						throw new CompileTypeInvalidOperationException(op, lhsType.GetType(), rhsType.GetType());
 				}
 
 				throw new CompileUnexpectedTokenException(t);

@@ -1,5 +1,6 @@
 ﻿using System;
 using RobotPlusPlus.Core.Compiling.CodeUnits;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 
 namespace RobotPlusPlus.Core.Exceptions
@@ -15,10 +16,16 @@ namespace RobotPlusPlus.Core.Exceptions
 		public CompileTypeConvertImplicitCommandArgumentException(CommandUnit.NamedArgument argument, Type argumentType,
 			Exception innerException)
 			: base(
-				$"Cannot implicitly convert <{argument.expression.OutputType?.Name ?? "null"}> to <{argumentType?.Name ?? "null"}> for argument named <{argument.name}>.",
-				argument.expression.Token, argument.expression.OutputType, argumentType, innerException)
+				$"Cannot implicitly convert <{DoTheTypeThing(argument.expression.OutputType).Name ?? "null"}> to <{argumentType?.Name ?? "null"}> for argument named <{argument.name}>.",
+				argument.expression.Token, DoTheTypeThing(argument.expression.OutputType), argumentType, innerException)
 		{
 			ArgumentName = argument.name;
+		}
+
+		private static Type DoTheTypeThing(AbstractValue val)
+		{
+			if (val is CSharpType cs) return cs.Type;
+			return val?.GetType();
 		}
 	}
 }

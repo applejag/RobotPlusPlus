@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using RobotPlusPlus.Core.Compiling.Context;
 
 namespace RobotPlusPlus.Core.Structures.CSharp
 {
@@ -46,12 +47,17 @@ namespace RobotPlusPlus.Core.Structures.CSharp
 			return families.Select(pair => (pair.Key, pair.Value));
 		}
 
-		public MethodInfo GetMethod(string family, string method, Type[] paramters)
+		public void RegisterOther(ValueContext context)
 		{
-			return families.GetValueOrDefault(family)?
+			//throw new NotImplementedException();
+		}
+
+		public MethodInfo GetMethod(Type type, string method, Type[] paramters)
+		{
+			return type
 				.GetMethod(method, BindingFlags.Public
-				                   | BindingFlags.Static
-				                   | BindingFlags.Instance,
+								   | BindingFlags.Static
+								   | BindingFlags.Instance,
 					null, paramters, null);
 		}
 	}

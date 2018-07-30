@@ -76,8 +76,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			if (LHSExpression.Token is PunctuatorToken dot)
 			{
+				if (!(LHSExpression.ContainerType is CSharpType cs))
+					throw new CompileUnexpectedTokenException(LHSExpression.Token);
+
 				string container = LHSExpression.StringifyToken(LHSExpression.ContainerToken);
-				string containerType = StringifyTypeFullName(LHSExpression.ContainerType);
+				string containerType = StringifyTypeFullName(cs.Type);
 				string property = LHSExpression.StringifyToken(LHSExpression.Token).Substring(container.Length);
 				string expression = RHSExpression.StringifyToken(RHSExpression.Token);
 				rows.AppendLine("{0}=⊂new Func<{3}>(()=>{{var _={0};_{1}={2};return _;}})()⊃", container, property, expression, containerType);

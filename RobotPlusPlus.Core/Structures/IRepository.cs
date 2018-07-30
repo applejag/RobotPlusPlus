@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 
 namespace RobotPlusPlus.Core.Structures
 {
@@ -14,7 +16,6 @@ namespace RobotPlusPlus.Core.Structures
 		[NotNull]
 		IEnumerable<(string id, Type type)> RegisterStaticTypes();
 
-		[CanBeNull, Pure]
-		MethodInfo GetMethod([CanBeNull] string family, [NotNull] string method, [NotNull] Type[] parameters);
+		void RegisterOther(ValueContext context);
 	}
 }

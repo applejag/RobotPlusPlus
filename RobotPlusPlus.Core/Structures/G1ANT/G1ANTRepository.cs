@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Utility;
 
@@ -43,72 +44,20 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 		public IEnumerable<(string id, Type type)> RegisterStaticTypes()
 		{
-			//return Commands.Commands.Select(c => (c.Name, typeof(CommandElement)))
-			//	.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
 			return new(string id, Type type)[0];
 		}
 
-		public MethodInfo GetMethod(string family, string method, Type[] parameters)
+		public void RegisterOther(ValueContext context)
 		{
-			if (family == null)
+			foreach (CommandElement command in Commands.Commands)
 			{
-				return Commands.Commands.TryFirst(c => c.Name == method, out CommandElement cmd)
-					? GetMethodFromParams(
-						G1ANTMethodInfo.ListFromCommand(cmd, Commands.GlobalArguments),
-						parameters)
-					: null;
+				context.RegisterValueGlobally(new G1ANTCommand(command, Commands.GlobalArguments));
 			}
 
-			if (Commands.CommandFamilies.TryFirst(f => f.Name == family, out CommandFamilyElement fam))
+			foreach (CommandFamilyElement family in Commands.CommandFamilies)
 			{
-				if (fam.Commands.TryFirst(c => c.Name == method, out CommandElement cmd2))
-					return GetMethodFromParams(
-						G1ANTMethodInfo.ListFromCommand(cmd2, Commands.GlobalArguments, fam)
-						, parameters);
+				context.RegisterValueGlobally(new G1ANTFamily(family, Commands.GlobalArguments));
 			}
-
-			return null;
-		}
-
-		private static MethodInfo GetMethodFromParams(IEnumerable<G1ANTMethodInfo> methods, IReadOnlyList<Type> suggested)
-		{
-			foreach (G1ANTMethodInfo method in methods)
-			{
-				var valid = true;
-				ParameterInfo[] actuals = method.GetParameters();
-
-				// Too many parameters
-				if (suggested.Count > actuals.Length)
-				{
-					//valid = false;
-					continue;
-				}
-
-				foreach (ParameterInfo actual in actuals)
-				{
-					// Too few parameters
-					if (actual.Position >= suggested.Count)
-					{
-						if (!actual.HasDefaultValue)
-						{
-							valid = false;
-						}
-					}
-
-					// Wrong type
-					else if (actual.ParameterType != suggested[actual.Position])
-					{
-						valid = false;
-					}
-				}
-
-				if (valid)
-				{
-					return method;
-				}
-			}
-
-			return null;
 		}
 
 		#region Static creators
