@@ -45,22 +45,67 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		{
 			//return Commands.Commands.Select(c => (c.Name, typeof(CommandElement)))
 			//	.Concat(Commands.CommandFamilies.Select(f => (f.Name, typeof(CommandFamilyElement))));
-			return new (string id, Type type)[0];
+			return new(string id, Type type)[0];
 		}
 
-		public MethodInfo LookupMethodInfo(string family, string method, Type[] parameters)
+		public MethodInfo GetMethod(string family, string method, Type[] parameters)
 		{
 			if (family == null)
 			{
 				return Commands.Commands.TryFirst(c => c.Name == method, out CommandElement cmd)
-					? new G1ANTMethodInfo(cmd, Commands.GlobalArguments)
+					? GetMethodFromParams(
+						G1ANTMethodInfo.ListFromCommand(cmd, Commands.GlobalArguments),
+						parameters)
 					: null;
 			}
-			
+
 			if (Commands.CommandFamilies.TryFirst(f => f.Name == family, out CommandFamilyElement fam))
 			{
 				if (fam.Commands.TryFirst(c => c.Name == method, out CommandElement cmd2))
-					return new G1ANTMethodInfo(cmd2, Commands.GlobalArguments, fam);
+					return GetMethodFromParams(
+						G1ANTMethodInfo.ListFromCommand(cmd2, Commands.GlobalArguments, fam)
+						, parameters);
+			}
+
+			return null;
+		}
+
+		private static MethodInfo GetMethodFromParams(IEnumerable<G1ANTMethodInfo> methods, IReadOnlyList<Type> suggested)
+		{
+			foreach (G1ANTMethodInfo method in methods)
+			{
+				var valid = true;
+				ParameterInfo[] actuals = method.GetParameters();
+
+				// Too many parameters
+				if (suggested.Count > actuals.Length)
+				{
+					//valid = false;
+					continue;
+				}
+
+				foreach (ParameterInfo actual in actuals)
+				{
+					// Too few parameters
+					if (actual.Position >= suggested.Count)
+					{
+						if (!actual.HasDefaultValue)
+						{
+							valid = false;
+						}
+					}
+
+					// Wrong type
+					else if (actual.ParameterType != suggested[actual.Position])
+					{
+						valid = false;
+					}
+				}
+
+				if (valid)
+				{
+					return method;
+				}
 			}
 
 			return null;
@@ -193,17 +238,20 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlElement("Argument")]
 			public List<ArgumentElement> Arguments { get; set; }
 
-			[XmlIgnore]
-			public List<List<ArgumentElement>> RequiredArguments => 
-				Arguments.Where(a => a.Required)
-					.GroupBy(a => a.RequiredGroup == -1 ? a.Name.GetHashCode() : a.RequiredGroup,
-						(k, elmList) => elmList.ToList())
-					.ToList();
+			[XmlElement("Overload")]
+			public List<ArgumentOverloadElement> Overloads { get; set; }
 
 			public override string ToString()
 			{
 				return $"{Name}({string.Join(", ", Arguments)}";
 			}
+		}
+
+		[Serializable]
+		public class ArgumentOverloadElement
+		{
+			[XmlElement("Argument")]
+			public List<ArgumentElement> Arguments { get; set; }
 		}
 
 		[Serializable]
@@ -221,9 +269,6 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlAttribute("Required")]
 			public bool Required { get; set; } = false;
 
-			[XmlAttribute("RequiredGroup")]
-			public int RequiredGroup { get; set; } = -1;
-
 			public Type EvaluateType()
 			{
 				return G1ANTRepository.EvaluateType(Type);
@@ -240,7 +285,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 				sb.Append(Type);
 				if (Type == Structure.Variable)
-					sb.AppendFormat("<{0}>",VariableType);
+					sb.AppendFormat("<{0}>", VariableType);
 				if (!Required)
 					sb.Append('?');
 				sb.Append(' ');
@@ -297,7 +342,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlEnum("procedure")]
 			Procedure,
 		}
-		
+
 		#endregion
 	}
 }

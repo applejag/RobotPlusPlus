@@ -15,6 +15,6 @@ namespace RobotPlusPlus.Core.Structures
 		IEnumerable<(string id, Type type)> RegisterStaticTypes();
 
 		[CanBeNull, Pure]
-		MethodInfo LookupMethodInfo([CanBeNull] string family, [NotNull] string method, [NotNull] Type[] parameters);
+		MethodInfo GetMethod([CanBeNull] string family, [NotNull] string method, [NotNull] Type[] parameters);
 	}
 }

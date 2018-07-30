@@ -46,7 +46,7 @@ namespace RobotPlusPlus.Core.Structures.CSharp
 			return families.Select(pair => (pair.Key, pair.Value));
 		}
 
-		public MethodInfo LookupMethodInfo(string family, string method, Type[] paramters)
+		public MethodInfo GetMethod(string family, string method, Type[] paramters)
 		{
 			return families.GetValueOrDefault(family)?
 				.GetMethod(method, BindingFlags.Public

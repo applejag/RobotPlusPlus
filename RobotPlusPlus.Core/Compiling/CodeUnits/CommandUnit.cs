@@ -75,8 +75,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Type[] parameters = Arguments.Select(a => a.expression.OutputType).ToArray();
 
 			Command =
-				compiler.G1ANTRepository.LookupMethodInfo(CommandFamilyName, CommandName, parameters)
-				?? compiler.CSharpRepository.LookupMethodInfo(CommandFamilyName, CommandName, parameters)
+				compiler.G1ANTRepository.GetMethod(CommandFamilyName, CommandName, parameters)
+				?? compiler.CSharpRepository.GetMethod(CommandFamilyName, CommandName, parameters)
 				?? throw new CompileFunctionException($"Command `{CommandFullName}` does not exist (or has invalid parameters)!", Token);
 		}
 

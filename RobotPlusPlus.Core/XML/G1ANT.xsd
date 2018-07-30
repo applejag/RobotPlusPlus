@@ -36,10 +36,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="Command" type="Command" minOccurs="1" maxOccurs="unbounded">
-											<xs:unique name="UniqueNameInFamilyCommand">
-												<xs:selector xpath="g1ant:Argument" />
-												<xs:field xpath="@Name" />
-											</xs:unique>
 										</xs:element>
 									</xs:sequence>
 									<xs:attribute name="Name" type="Identifier" use="required" />
@@ -84,10 +80,20 @@
 	</xs:complexType>
 
 	<xs:complexType name="Command">
-		<xs:sequence>
+		<xs:choice maxOccurs="unbounded">
 			<xs:element name="Argument" type="CommandArgument" minOccurs="0" maxOccurs="unbounded">
+				<xs:unique name="UniqueNameInArguments">
+					<xs:selector xpath="g1ant:Argument" />
+					<xs:field xpath="@Name" />
+				</xs:unique>
 			</xs:element>
-		</xs:sequence>
+			<xs:element name="Overload" type="CommandOverload" minOccurs="0" maxOccurs="unbounded">
+				<xs:unique name="UniqueNameInOverloadArguments">
+					<xs:selector xpath="g1ant:Argument" />
+					<xs:field xpath="@Name" />
+				</xs:unique>
+			</xs:element>
+		</xs:choice>
 		<xs:attribute name="Name" type="Identifier" use="required" />
 	</xs:complexType>
 
@@ -96,7 +102,13 @@
 		<xs:attribute name="Type" type="Structure" use="required" />
 		<xs:attribute name="VariableType" type="Structure" use="optional" />
 		<xs:attribute name="Required" type="xs:boolean" default="false" use="optional" />
-		<xs:attribute name="RequiredGroup" type="xs:integer" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="CommandOverload">
+		<xs:sequence>
+			<xs:element name="Argument" type="CommandArgument" minOccurs="0" maxOccurs="unbounded">
+			</xs:element>
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:simpleType name="Identifier">

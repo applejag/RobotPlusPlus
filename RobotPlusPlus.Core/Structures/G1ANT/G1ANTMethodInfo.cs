@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +14,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[CanBeNull]
 		public G1ANTRepository.CommandFamilyElement CommandFamily { get; }
 		[NotNull]
-		public override Type ReflectedType => CommandFamily?.GetType();
+		public override Type ReflectedType => CommandFamily?.GetType() ?? throw new InvalidOperationException();
 
 		public override Type DeclaringType => CommandFamily?.GetType();
 		public override string Name => Command.Name;
@@ -28,16 +29,38 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.ToArray();
 		}
 
-		internal G1ANTMethodInfo(
+		internal static G1ANTMethodInfo[] ListFromCommand(
 			[NotNull] G1ANTRepository.CommandElement command,
+			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
+			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
+		{
+
+			List<G1ANTRepository.ArgumentElement>[] overloads = command.Overloads?.Select(o => o.Arguments).ToArray()
+				?? new List<G1ANTRepository.ArgumentElement>[0];
+
+			var info = new G1ANTMethodInfo[overloads.Length + 1];
+			info[0] = new G1ANTMethodInfo(command, command.Arguments, globalArguments, family);
+
+			for (var i = 1; i < overloads.Length; i++)
+			{
+				info[i] = new G1ANTMethodInfo(command, overloads[i], globalArguments, family);
+			}
+
+			return info;
+		}
+
+		private G1ANTMethodInfo(
+			[NotNull] G1ANTRepository.CommandElement command,
+			[CanBeNull, ItemNotNull] IEnumerable<G1ANTRepository.ArgumentElement> arguments,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
 		{
 			Command = command;
 			CommandFamily = family;
 
-			CommandArguments = command.Arguments
-				.Select((a, i) => new G1ANTParameterInfo(this, a, i)).ToArray();
+			CommandArguments = arguments
+				?.Select((a, i) => new G1ANTParameterInfo(this, a, i)).ToArray()
+				?? new G1ANTParameterInfo[0];
 			GlobalArguments = globalArguments.Arguments
 				.Select((a, i) => new G1ANTParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
 		}
