@@ -163,7 +163,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					case IdentifierToken id:
 						// Check variables for registration
 						AbstractValue value = compiler.Context.FindIdentifier(id);
-						
+
 						if (value is null && inputType is CSharpType csType && csType.Type != null)
 						{
 							if (usage == UsageType.Write)
@@ -191,19 +191,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							if (variable.Type == typeof(string))
 								containsStr = true;
 						}
-						else
-						{
-							// TODO: Embed G1ANTCommands into G1ANTFamilies or vice versa
-							// Maybe g1ant?
-							//if (checkForFam)
-							//{
-							//	var fam = compiler.Context.FindOfType<G1ANTFamily>(id.Identifier);
-							//	if (fam != null) return fam;
-							//}
-
-							//var cmd = compiler.Context.FindOfType<G1ANTCommand>(id.Identifier);
-							//if (cmd != null) return cmd;
-						}
 
 						return value;
 
@@ -230,8 +217,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 						string identifier = pun.DotRHS.Identifier;
 						AbstractValue lhs = RecursiveCheck(pun.DotLHS)
-						                    ?? throw new CompileException(
-							                    $"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
+											?? throw new CompileException(
+												$"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
 
 						if (lhs is CSharpType lhsCS)
 						{
@@ -239,8 +226,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 								return lhsCS;
 
 							BindingFlags flags = BindingFlags.Instance
-							                     | BindingFlags.Public
-							                     | BindingFlags.FlattenHierarchy;
+												 | BindingFlags.Public
+												 | BindingFlags.FlattenHierarchy;
 
 							// If base is identifier...
 							if (GetLeftmostToken(pun) is IdentifierToken baseType)
@@ -269,7 +256,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 								if (methodInfos.Length != memberInfos.Length)
 									throw new CompileTypePropertyException($"Disambigous property identification, <{memberInfos.Length}> options found for <{identifier}> on <{lhsCS.Type}>.", pun, lhsCS.Type, identifier);
-								
+
 								return new CSharpMethod(methodInfos[0].DeclaringType, methodInfos);
 							}
 
@@ -291,7 +278,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 							return cmd;
 						}
-						else if(lhs is G1ANTCommand lhsCmd)
+						else if (lhs is G1ANTCommand lhsCmd)
 						{
 							throw new CompileTypePropertyDoesNotExistException(pun, lhsCmd.GetType(),
 								$"{lhsCmd.Identifier}.{identifier}");
@@ -435,7 +422,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public static Token RemoveParentases(Token token, Token parent = null)
 		{
-			Repeat:
+		Repeat:
 
 			if (token is PunctuatorToken pun
 				&& pun.PunctuatorType == PunctuatorToken.Type.OpeningParentases
@@ -459,7 +446,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public static Token RemoveUnaries(Token token, Token parent = null)
 		{
-			Repeat:
+		Repeat:
 
 			if (token is OperatorToken op
 				&& op.OperatorType == OperatorToken.Type.Unary)

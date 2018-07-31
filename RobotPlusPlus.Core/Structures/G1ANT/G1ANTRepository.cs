@@ -49,14 +49,20 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 		public void RegisterOther(ValueContext context)
 		{
-			foreach (CommandElement command in Commands.Commands)
+			foreach (CommandElement command in Commands.Commands
+				.Where(c => Commands.CommandFamilies.All(f => f.Name != c.Name)))
 			{
 				context.RegisterValueGlobally(new G1ANTCommand(command, Commands.GlobalArguments));
 			}
 
 			foreach (CommandFamilyElement family in Commands.CommandFamilies)
 			{
-				context.RegisterValueGlobally(new G1ANTFamily(family, Commands.GlobalArguments));
+				// Register hybrid family-command elements
+				if (Commands.Commands.TryFirst(c => c.Name == family.Name, out CommandElement cmd))
+					context.RegisterValueGlobally(new G1ANTFamilyCommand(family, Commands.GlobalArguments, cmd));
+				// Register normal family
+				else
+					context.RegisterValueGlobally(new G1ANTFamily(family, Commands.GlobalArguments));
 			}
 		}
 

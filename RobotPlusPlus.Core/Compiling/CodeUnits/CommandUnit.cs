@@ -66,7 +66,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			CSharpType[] parameters = Arguments
 				.Select(a => a.expression.OutputType as CSharpType
-							 ?? throw new CompileFunctionException($"Invalid token type, <{a.expression.OutputType.GetType()}>.", a.expressionToken))
+							 ?? throw new CompileFunctionException(
+					             $"Invalid token type <{a.expression.OutputType?.GetType().Name ?? "null"}> for parameter <{(a is NamedArgument n ? n.name : a.index.ToString())}>.",
+					             a.expressionToken))
 				.ToArray();
 
 			switch (Container.OutputType)
