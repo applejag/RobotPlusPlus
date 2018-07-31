@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
@@ -65,46 +66,47 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			return info;
 		}
 
+		public static bool MethodMatches(MethodInfo method, Type[] types)
+		{
+			ParameterInfo[] actuals = method.GetParameters();
+
+			// Too many parameters
+			if (types.Length > actuals.Length)
+			{
+				return false;
+			}
+
+			foreach (ParameterInfo actual in actuals)
+			{
+				// Too few parameters
+				if (actual.Position >= types.Length)
+				{
+					if (!actual.HasDefaultValue)
+					{
+						return false;
+					}
+				}
+
+				// Wrong type
+				else if (!TypeChecking.CanImplicitlyConvert(types[actual.Position], actual.ParameterType))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		public static G1ANTMethodInfo GetMethod(
 			[NotNull] G1ANTRepository.CommandElement command,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family,
-			[NotNull, ItemNotNull] IReadOnlyList<Type> suggested)
+			[NotNull, ItemNotNull] Type[] suggested)
 		{
 			foreach (G1ANTMethodInfo method in ListMethods(command, globalArguments, family))
 			{
-				var valid = true;
-				ParameterInfo[] actuals = method.GetParameters();
-
-				// Too many parameters
-				if (suggested.Count > actuals.Length)
-				{
-					//valid = false;
-					continue;
-				}
-
-				foreach (ParameterInfo actual in actuals)
-				{
-					// Too few parameters
-					if (actual.Position >= suggested.Count)
-					{
-						if (!actual.HasDefaultValue)
-						{
-							valid = false;
-						}
-					}
-
-					// Wrong type
-					else if (actual.ParameterType != suggested[actual.Position])
-					{
-						valid = false;
-					}
-				}
-
-				if (valid)
-				{
+				if (MethodMatches(method, suggested))
 					return method;
-				}
 			}
 
 			return null;

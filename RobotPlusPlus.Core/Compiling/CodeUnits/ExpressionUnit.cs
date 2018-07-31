@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow;
@@ -7,6 +8,7 @@ using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Structures;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 using RobotPlusPlus.Core.Utility;
@@ -162,7 +164,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						// Check variables for registration
 						AbstractValue value = compiler.Context.FindIdentifier(id);
 						
-						if (value == null && inputType is CSharpType csType && csType.Type != null)
+						if (value is null && inputType is CSharpType csType && csType.Type != null)
 						{
 							if (usage == UsageType.Write)
 								value = compiler.Context.RegisterVariable(id, csType.Type);
@@ -189,6 +191,20 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							if (variable.Type == typeof(string))
 								containsStr = true;
 						}
+						else
+						{
+							// TODO: Embed G1ANTCommands into G1ANTFamilies or vice versa
+							// Maybe g1ant?
+							//if (checkForFam)
+							//{
+							//	var fam = compiler.Context.FindOfType<G1ANTFamily>(id.Identifier);
+							//	if (fam != null) return fam;
+							//}
+
+							//var cmd = compiler.Context.FindOfType<G1ANTCommand>(id.Identifier);
+							//if (cmd != null) return cmd;
+						}
+
 						return value;
 
 					case LiteralNumberToken num:
@@ -208,10 +224,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							throw new CompileExpressionCannotAssignException(key);
 						return new CSharpType(key.Value?.GetType());
 
+					/**
+					 * Dot operation, ex: x.y, "string".ToUpper
+					 */
 					case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 						string identifier = pun.DotRHS.Identifier;
 						AbstractValue lhs = RecursiveCheck(pun.DotLHS)
-								   ?? throw new CompileException($"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
+						                    ?? throw new CompileException(
+							                    $"Unvaluable property from dot LHS, <{pun.DotLHS}>.", pun.DotLHS);
 
 						if (lhs is CSharpType lhsCS)
 						{
@@ -236,12 +256,25 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							}
 
 							// Do the search
-							MemberInfo memberInfo = (MemberInfo) lhsCS.Type.GetProperty(identifier, flags)
-							                        ?? lhsCS.Type.GetField(identifier, flags);
+							MemberInfo[] memberInfos = lhsCS.Type.GetMember(identifier, flags);
 
 							// Validate
-							if (memberInfo == null)
+							if (memberInfos.Length == 0)
 								throw new CompileTypePropertyDoesNotExistException(pun, lhsCS.Type, identifier);
+
+							if (memberInfos.Length > 1)
+							{
+								// Method
+								MethodInfo[] methodInfos = memberInfos.OfType<MethodInfo>().ToArray();
+
+								if (methodInfos.Length != memberInfos.Length)
+									throw new CompileTypePropertyException($"Disambigous property identification, <{memberInfos.Length}> options found for <{identifier}> on <{lhsCS.Type}>.", pun, lhsCS.Type, identifier);
+								
+								return new CSharpMethod(methodInfos[0].DeclaringType, methodInfos);
+							}
+
+							// Property or field
+							MemberInfo memberInfo = memberInfos[0];
 							if (usage == UsageType.Read && !memberInfo.CanRead())
 								throw new CompileTypePropertyNoGetterException(pun, lhsCS.Type, identifier);
 							if (usage == UsageType.Write && !memberInfo.CanWrite())
@@ -250,9 +283,25 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							csSnippet = true;
 							return new CSharpType(memberInfo.GetValueType());
 						}
+						else if (lhs is G1ANTFamily lhsFam)
+						{
+							if (!lhsFam.Commands.TryFirst(c => c.Identifier == identifier, out G1ANTCommand cmd))
+								throw new CompileTypePropertyDoesNotExistException(pun, lhsFam.GetType(),
+									$"{lhsFam.Identifier}.{identifier}");
 
-						return lhs;
+							return cmd;
+						}
+						else if(lhs is G1ANTCommand lhsCmd)
+						{
+							throw new CompileTypePropertyDoesNotExistException(pun, lhsCmd.GetType(),
+								$"{lhsCmd.Identifier}.{identifier}");
+						}
 
+						throw new InvalidOperationException($"Unknown type, <{lhs.GetType()}>");
+
+					/**
+					 * Unary evaluation, ex: -x, -5
+					 */
 					case OperatorToken op when op.OperatorType == OperatorToken.Type.Unary:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(op);
@@ -264,6 +313,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 						throw new CompileTypeInvalidOperationException(op, valType.GetType());
 
+					/**
+					 * Twosided operation, ex: 1+2, x*3, "hi"+5
+					 */
 					case OperatorToken op:
 						if (usage == UsageType.Write)
 							throw new CompileExpressionCannotAssignException(op);
