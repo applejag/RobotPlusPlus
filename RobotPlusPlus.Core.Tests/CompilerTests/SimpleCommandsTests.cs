@@ -178,7 +178,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileParameterNamedDoesntExistException))]
 		public void Compile_WrongArgName()
 		{
 			// Arrange
@@ -190,7 +190,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileVariableUnassignedException))]
 		public void Compile_WrongCmdName()
 		{
 			// Arrange

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Exceptions;
 
@@ -8,7 +9,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 	public class IntermediateCommandTests
 	{
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileParameterRequiredMissingException))]
 		public void Compile_RequiredZeroArgs()
 		{
 			// Arrange
@@ -19,7 +20,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileParameterRequiredMissingException))]
 		public void Compile_RequiredNotAll()
 		{
 			// Arrange
@@ -30,7 +31,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileParameterRequiredMissingException))]
 		public void Compile_RequiredWrongArg()
 		{
 			// Arrange
@@ -134,7 +135,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(NotImplementedException))]
 		public void Compile_ReturnValueNoResult()
 		{
 			// Arrange
@@ -176,7 +177,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileExpressionCannotAssignException))]
 		public void Compile_ResultLiteral()
 		{
 			// Arrange
@@ -187,7 +188,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileExpressionCannotAssignException))]
 		public void Compile_ResultExpression()
 		{
 			// Arrange
@@ -212,7 +213,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(NotImplementedException))]
 		public void Compile_DuplicateNamedArguments()
 		{
 			// Arrange
@@ -223,7 +224,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(NotImplementedException))]
 		public void Compile_DuplicatePositionalArguments()
 		{
 			// Arrange

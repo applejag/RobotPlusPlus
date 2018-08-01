@@ -63,9 +63,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			var info = new G1ANTMethodInfo[overloads.Length + 1];
 			info[0] = new G1ANTMethodInfo(command, command.Arguments, globalArguments, family);
 
-			for (var i = 1; i < overloads.Length; i++)
+			for (var i = 0; i < overloads.Length; i++)
 			{
-				info[i] = new G1ANTMethodInfo(command, overloads[i], globalArguments, family);
+				info[i+1] = new G1ANTMethodInfo(command, overloads[i], globalArguments, family);
 			}
 
 			return info;
@@ -74,6 +74,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		public static bool MethodMatches(FunctionCallToken token, MethodInfo method, CommandUnit.Argument[] args)
 		{
 			/**
+			 * -TODO- Check for duplicate parameters
 			 * + Check if all required parameters are used
 			 * + Check if parameter types matches
 			 * + Check if too many arguments, i.e. non-existing parameters

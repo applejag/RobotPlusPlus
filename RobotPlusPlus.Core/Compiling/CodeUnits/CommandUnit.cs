@@ -54,46 +54,49 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				ParameterInfo[] parameters = methodInfo.GetParameters();
 
-				foreach (Argument argument in Arguments)
-				{
-					// Find parameter
-					ParameterInfo param;
-					if (argument is NamedArgument named)
-					{
-						if (!parameters.TryFirst(p => p.Name == named.name, out param))
-							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have named parameter <{named.name}>", named.expressionToken);
-					}
-					else
-					{
-						if (argument.index < parameters.Length)
-							param = parameters[argument.index];
-						else
-							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have a <{argument.index + 1}> parameter.", argument.expressionToken);
-					}
-
-					// Apply settings from parameter
-					if (param is G1ANTParameterInfo g1 && g1.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
-					{
-						argument.expression.Usage = ExpressionUnit.UsageType.Write;
-						argument.expression.InputType = new CSharpType(g1.ArgumentElement.EvaluateVariableType(), g1.Name);
-					}
-					else
-					{
-						argument.expression.Usage = ExpressionUnit.UsageType.Read;
-						argument.expression.InputType = null;
-					}
-
-
-					// Compile
-					argument.expression.Compile(compiler);
-				}
-
 				// Check if this works, if not check next
 				try
 				{
-					MethodInfo = EvalMethodInfo();
-					if (MethodInfo != null)
+
+					foreach (Argument argument in Arguments)
+					{
+						// Find parameter
+						ParameterInfo param;
+						if (argument is NamedArgument named)
+						{
+							if (!parameters.TryFirst(p => p.Name == named.name, out param))
+								throw new CompileParameterNamedDoesntExistException(methodInfo, named.name, named.expressionToken);
+						}
+						else
+						{
+							if (argument.index < parameters.Length)
+								param = parameters[argument.index];
+							else
+								throw new CompileParameterIndexedDoesntExistException(methodInfo, argument.index, argument.expressionToken);
+						}
+
+						// Apply settings from parameter
+						if (param is G1ANTParameterInfo g1 && g1.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
+						{
+							argument.expression.Usage = ExpressionUnit.UsageType.Write;
+							argument.expression.InputType = new CSharpType(g1.ArgumentElement.EvaluateVariableType(), g1.Name);
+						}
+						else
+						{
+							argument.expression.Usage = ExpressionUnit.UsageType.Read;
+							argument.expression.InputType = null;
+						}
+
+
+						// Compile
+						argument.expression.Compile(compiler);
+					}
+					
+					if (EvalMethodInfo(methodInfo))
+					{
+						MethodInfo = methodInfo;
 						return;
+					}
 				}
 				catch (CompileFunctionException e)
 				{
@@ -109,6 +112,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			throw new CompileFunctionException($"Method <{methodInfos[0].Name}> has no overload matching the parameters!", Token, error);
 		}
 
+		[NotNull, ItemNotNull]
 		private MethodInfo[] GetMethodInfos()
 		{
 			if (Method.OutputType is IMethod met)
@@ -117,7 +121,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			throw new CompileFunctionException($"Invalid method type, <{Method.OutputType?.GetType().Name ?? "null"}>", Token);
 		}
 
-		private MethodInfo EvalMethodInfo()
+		private bool EvalMethodInfo(MethodInfo method)
 		{
 			foreach (Argument argument in Arguments)
 			{
@@ -127,7 +131,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						argument.expressionToken);
 			}
 
-			return G1ANTMethodInfo.GetMethod((FunctionCallToken)Token, GetMethodInfos(), Arguments.ToArray());
+			return G1ANTMethodInfo.MethodMatches((FunctionCallToken)Token, method, Arguments.ToArray());
 		}
 
 		public override string AssembleIntoString()
