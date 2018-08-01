@@ -5,6 +5,9 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling;
+using RobotPlusPlus.Core.Compiling.CodeUnits;
+using RobotPlusPlus.Core.Compiling.Context.Types;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
@@ -46,7 +49,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				.ToArray();
 		}
 
-		private static G1ANTMethodInfo[] ListMethods(
+		internal static G1ANTMethodInfo[] ListMethods(
 			[NotNull] G1ANTRepository.CommandElement command,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)
@@ -66,12 +69,13 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			return info;
 		}
 
-		public static bool MethodMatches(MethodInfo method, Type[] types)
+		public static bool MethodMatches(MethodInfo method, CommandUnit.Argument[] args)
 		{
+			// TODO: Check named arguments, not only indexed
 			ParameterInfo[] actuals = method.GetParameters();
 
 			// Too many parameters
-			if (types.Length > actuals.Length)
+			if (args.Length > actuals.Length)
 			{
 				return false;
 			}
@@ -79,7 +83,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			foreach (ParameterInfo actual in actuals)
 			{
 				// Too few parameters
-				if (actual.Position >= types.Length)
+				if (actual.Position >= args.Length)
 				{
 					if (!actual.HasDefaultValue)
 					{
@@ -88,28 +92,25 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				}
 
 				// Wrong type
-				else if (!TypeChecking.CanImplicitlyConvert(types[actual.Position], actual.ParameterType))
+				else
 				{
-					return false;
+					CSharpType abstractValue = (CSharpType) args[actual.Position].expression.OutputType;
+					if (!TypeChecking.CanImplicitlyConvert(abstractValue.Type, actual.ParameterType))
+					{
+						return false;
+					}
 				}
 			}
 
 			return true;
 		}
 
-		public static G1ANTMethodInfo GetMethod(
-			[NotNull] G1ANTRepository.CommandElement command,
-			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
-			[CanBeNull] G1ANTRepository.CommandFamilyElement family,
-			[NotNull, ItemNotNull] Type[] suggested)
+		[CanBeNull]
+		public static MethodInfo GetMethod(MethodInfo[] methodInfos, params CommandUnit.Argument[] args)
 		{
-			foreach (G1ANTMethodInfo method in ListMethods(command, globalArguments, family))
-			{
-				if (MethodMatches(method, suggested))
-					return method;
-			}
-
-			return null;
+			return methodInfos
+				.TryFirst(m => MethodMatches(m, args), out MethodInfo met)
+				? met : null;
 		}
 
 		public override object[] GetCustomAttributes(bool inherit)

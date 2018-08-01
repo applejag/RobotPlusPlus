@@ -22,7 +22,7 @@ namespace RobotPlusPlus.Core.Compiling.Context
 
 		[NotNull]
 		public static Variable RegisterVariable([NotNull] this ValueContext context,
-			[NotNull] IdentifierToken token, [NotNull] Type type)
+			[NotNull] IdentifierToken token, [CanBeNull] Type type)
 		{
 			var value = new Variable(GenerateVariableName(context, token), token, type);
 
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Compiling.Context
 
 		[NotNull]
 		public static Variable RegisterVariableGlobally([NotNull] this ValueContext context,
-			[NotNull] IdentifierToken token, [NotNull] Type type)
+			[NotNull] IdentifierToken token, [CanBeNull] Type type)
 		{
 			var value = new Variable(GenerateVariableName(context, token), token, type);
 

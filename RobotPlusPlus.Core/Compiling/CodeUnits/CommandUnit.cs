@@ -17,9 +17,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 	{
 		public List<Argument> Arguments { get; }
 
-		public ExpressionUnit Container { get; }
+		public ExpressionUnit Method { get; }
 
-		public MethodInfo Command { get; private set; }
+		public MethodInfo MethodInfo { get; private set; }
 
 		public CommandUnit([NotNull] FunctionCallToken token, [CanBeNull] CodeUnit parent = null,
 			[CanBeNull] params (string, Token)[] addedArguments) : base(token, parent)
@@ -41,51 +41,91 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 			}
 
-			Container = new ExpressionUnit(token.LHS, this);
+			Method = new ExpressionUnit(token.LHS, this);
 		}
 
 		public override void Compile(Compiler compiler)
 		{
-			Container.Compile(compiler);
+			Method.Compile(compiler);
+			Exception error = null;
 
-			foreach (Argument argument in Arguments)
+			foreach (MethodInfo methodInfo in GetMethodInfos())
 			{
-				// TODO: Hitta funktion som ska köras,
-				// TODO: sen input på dem med Variable som parameter
-				// TODO: SEN kompilera... BIG SIGH
+				ParameterInfo[] parameters = methodInfo.GetParameters();
 
-				//if (Container.OutputType is G1ANTCommand cmd)
-				//argument.expression.InputType 
-				argument.expression.Compile(compiler);
+				foreach (Argument argument in Arguments)
+				{
+					// Find parameter
+					ParameterInfo param;
+					if (argument is NamedArgument named)
+					{
+						if (!parameters.TryFirst(p => p.Name == named.name, out param))
+							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have named parameter <{named.name}>", named.expressionToken);
+					}
+					else
+					{
+						if (argument.index < parameters.Length)
+							param = parameters[argument.index];
+						else
+							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have a <{argument.index+1}> parameter.", argument.expressionToken);
+					}
+
+					// Apply settings from parameter
+					if (param is G1ANTParameterInfo g1 && g1.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
+					{
+						argument.expression.Usage = ExpressionUnit.UsageType.Write;
+						argument.expression.InputType = new CSharpType(g1.ArgumentElement.EvaluateVariableType(), g1.Name);
+					}
+					else
+					{
+						argument.expression.Usage = ExpressionUnit.UsageType.Read;
+						argument.expression.InputType = null;
+					}
+
+
+					// Compile
+					argument.expression.Compile(compiler);
+				}
+
+				// Check if this works, if not check next
+				try
+				{
+					MethodInfo = EvalMethodInfo();
+				}
+				catch (CompileFunctionException e)
+				{
+					error = e;
+				}
 			}
 
-			FindCommandMethodInfo(compiler);
+			// Nah it didn't work
+			if (error != null)
+				throw error;
 		}
 
-		private void FindCommandMethodInfo(Compiler compiler)
+		private MethodInfo[] GetMethodInfos()
 		{
-			CSharpType[] parameters = Arguments
-				.Select(a => a.expression.OutputType as CSharpType
-							 ?? throw new CompileFunctionException(
-					             $"Invalid token type <{a.expression.OutputType?.GetType().Name ?? "null"}> for parameter <{(a is NamedArgument n ? n.name : a.index.ToString())}>.",
-					             a.expressionToken))
-				.ToArray();
+			if (Method.OutputType is IMethod met)
+				return met.MethodInfos;
 
-			switch (Container.OutputType)
+			throw new CompileFunctionException($"Invalid method type, <{Method.OutputType?.GetType().Name ?? "null"}>", Token);
+		}
+
+		private MethodInfo EvalMethodInfo()
+		{
+			foreach (Argument argument in Arguments)
 			{
-				case CSharpType cs:
-					//Command = ???
-					throw new NotImplementedException();
-
-				case G1ANTCommand cmd:
-					throw new NotImplementedException();
-
-				case G1ANTFamily fam:
-					throw new NotImplementedException();
-
-				default:
-					throw new CompileFunctionException("Method doesn't exist", Token);
+				if (!(argument.expression.OutputType is CSharpType))
+					throw new CompileFunctionException(
+						$"Invalid token type <{argument.expression.OutputType?.GetType().Name ?? "null"}> for parameter <{(argument is NamedArgument n ? n.name : argument.index.ToString())}>.",
+						argument.expressionToken);
 			}
+
+			//Type[] parameters = Arguments
+			//	.Select(a => ((CSharpType) a.expression.OutputType).Type)
+			//	.ToArray();
+
+			return G1ANTMethodInfo.GetMethod(GetMethodInfos(), Arguments.ToArray());
 		}
 
 		public override string AssembleIntoString()

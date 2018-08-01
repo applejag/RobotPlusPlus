@@ -25,7 +25,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		/// <summary>Inbound type when this is LHS of an assignment</summary>
 		public AbstractValue InputType { get; internal set; }
 		public bool NeedsCSSnippet { get; set; }
-		public UsageType Usage { get; }
+		public UsageType Usage { get; internal set; }
 
 		/// <summary>
 		/// <para>Used upon assigning to structs and classes.</para>
@@ -166,8 +166,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 						if (value is null)
 						{
-							if (usage == UsageType.Write && inputType is CSharpType csType && csType.Type != null)
-								value = compiler.Context.RegisterVariable(id, csType.Type);
+							if (usage == UsageType.Write)
+								value = compiler.Context.RegisterVariable(id, (inputType as CSharpType)?.Type);
 							else
 								throw new CompileVariableUnassignedException(id);
 						}

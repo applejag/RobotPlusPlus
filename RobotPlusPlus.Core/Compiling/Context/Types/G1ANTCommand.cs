@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Structures.G1ANT;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Compiling.Context.Types
 {
-	public class G1ANTCommand : AbstractValue
+	public class G1ANTCommand : AbstractValue, IMethod
 	{
 		[NotNull]
 		public G1ANTRepository.CommandElement Command { get; }
@@ -12,6 +15,8 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		public G1ANTRepository.GlobalArgumentsElement GlobalArguments { get; }
 		[CanBeNull]
 		public G1ANTFamily Family { get; }
+
+		public MethodInfo[] MethodInfos { get; }
 
 		public G1ANTCommand(
 			[NotNull] G1ANTRepository.CommandElement command,
@@ -22,11 +27,9 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 			Command = command;
 			GlobalArguments = globalArguments;
 			Family = family;
-		}
 
-		public G1ANTMethodInfo GetMethod(params Type[] types)
-		{
-			return G1ANTMethodInfo.GetMethod(Command, GlobalArguments, Family?.Family, types);
+			MethodInfos = G1ANTMethodInfo.ListMethods(command, globalArguments, family?.Family)
+				.Cast<MethodInfo>().ToArray();
 		}
 	}
 }

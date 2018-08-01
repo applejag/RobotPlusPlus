@@ -16,7 +16,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		public Variable(
 			[NotNull] string generated,
 			[NotNull] IdentifierToken token,
-			[NotNull] Type type,
+			[CanBeNull] Type type,
 			bool isReadOnly = false,
 			bool isStaticType = false)
 			: base(type, generated, token.Identifier)
