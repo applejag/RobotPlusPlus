@@ -695,7 +695,7 @@
 			</Command>
 		</CommandFamily>
 
-		<CommandFamily Name="string">
+		<!--<CommandFamily Name="string">
 			<Command Name="getsimilarity">
 				<Argument Name="phrase1" Type="string" Required="true" />
 				<Argument Name="phrase2" Type="string" Required="true" />
@@ -703,7 +703,7 @@
 				<Argument Name="normalize" Type="boolean" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="float" Required="true" />
 			</Command>
-		</CommandFamily>
+		</CommandFamily>-->
 
 		<CommandFamily Name="test">
 			<Command Name="equals">
