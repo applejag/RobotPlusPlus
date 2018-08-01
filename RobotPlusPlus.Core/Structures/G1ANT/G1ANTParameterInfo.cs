@@ -11,7 +11,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[NotNull]
 		public G1ANTRepository.ArgumentElement ArgumentElement { get; }
 
-		public override Type ParameterType => ArgumentElement.EvaluateType();
+		public override Type ParameterType => ArgumentElement.EvaluateVariableType();
 		public override bool HasDefaultValue => !ArgumentElement.Required;
 
 		[NotNull]

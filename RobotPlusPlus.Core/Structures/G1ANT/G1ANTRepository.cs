@@ -231,7 +231,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 			public Type EvaluateVariableType()
 			{
-				return G1ANTRepository.EvaluateType(VariableType);
+				if (Type == Structure.Variable)
+					return G1ANTRepository.EvaluateType(VariableType);
+				return EvaluateType();
 			}
 
 			public override string ToString()

@@ -135,7 +135,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileTypeConvertImplicitCommandArgumentException))]
+		[ExpectedException(typeof(CompileParameterTypeConvertImplicitException))]
 		public void Compile_CommandArgumentIncorrectType()
 		{
 			// Arrange

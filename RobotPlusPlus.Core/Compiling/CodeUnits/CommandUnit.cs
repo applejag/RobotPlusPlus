@@ -37,7 +37,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				foreach ((string name, Token expr) in addedArguments)
 				{
-					Arguments.Add(new NamedArgument(Arguments.Count, name, expr, this));
+					Arguments.Add(new NamedArgument(-1, name, expr, this));
 				}
 			}
 
@@ -48,8 +48,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			Method.Compile(compiler);
 			Exception error = null;
+			MethodInfo[] methodInfos = GetMethodInfos();
 
-			foreach (MethodInfo methodInfo in GetMethodInfos())
+			foreach (MethodInfo methodInfo in methodInfos)
 			{
 				ParameterInfo[] parameters = methodInfo.GetParameters();
 
@@ -91,6 +92,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				try
 				{
 					MethodInfo = EvalMethodInfo();
+					if (MethodInfo != null)
+						return;
 				}
 				catch (CompileFunctionException e)
 				{
@@ -98,9 +101,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 			}
 
-			// Nah it didn't work
-			if (error != null)
+			// Tell us what went wrong
+			if (error != null && methodInfos.Length == 1)
 				throw error;
+
+			// Didn't find it amoung multiple overloads...
+			throw new CompileFunctionException($"Method <{methodInfos[0].Name}> has no overload matching the parameters!", Token, error);
 		}
 
 		private MethodInfo[] GetMethodInfos()
@@ -121,11 +127,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						argument.expressionToken);
 			}
 
-			//Type[] parameters = Arguments
-			//	.Select(a => ((CSharpType) a.expression.OutputType).Type)
-			//	.ToArray();
-
-			return G1ANTMethodInfo.GetMethod(GetMethodInfos(), Arguments.ToArray());
+			return G1ANTMethodInfo.GetMethod((FunctionCallToken) Token, GetMethodInfos(), Arguments.ToArray());
 		}
 
 		public override string AssembleIntoString()
@@ -166,7 +168,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						throw new CompileFunctionException(
 							$"Missing expression for named parameter <{pun.ColonName.SourceCode}>.", token);
 
-					args.Add(new NamedArgument(iterator.Index, pun.ColonName, iterator.PopNext(), this));
+					args.Add(new NamedArgument(-1, pun.ColonName, iterator.PopNext(), this));
 					named = true;
 				}
 				else
@@ -196,7 +198,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public class Argument
 		{
 			public readonly Token expressionToken;
-			public readonly int index;
+			public int index;
 
 			public ExpressionUnit expression;
 
@@ -205,6 +207,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				this.expressionToken = expressionToken;
 				expression = new ExpressionUnit(expressionToken, parent);
 				this.index = index;
+			}
+
+			public override string ToString()
+			{
+				string output = (expression?.OutputType as CSharpType)?.Type?.FullName ?? "null";
+				return $"[{index}] {output} {expressionToken}";
 			}
 		}
 
@@ -220,6 +228,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				: base(index, expressionToken, parent)
 			{
 				this.name = name;
+			}
+
+			public override string ToString()
+			{
+				string output = (expression?.OutputType as CSharpType)?.Type?.FullName ?? "null";
+				return index == -1
+					? $@"[""{name}""] {output} {expressionToken}"
+					: $@"[{index}, ""{name}""] {output} {expressionToken}";
 			}
 		}
 

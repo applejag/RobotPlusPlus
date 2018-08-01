@@ -7,6 +7,8 @@ using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Compiling.Context.Types;
+using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
@@ -69,36 +71,52 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			return info;
 		}
 
-		public static bool MethodMatches(MethodInfo method, CommandUnit.Argument[] args)
+		public static bool MethodMatches(FunctionCallToken token, MethodInfo method, CommandUnit.Argument[] args)
 		{
-			// TODO: Check named arguments, not only indexed
-			ParameterInfo[] actuals = method.GetParameters();
+			/**
+			 * + Check if all required parameters are used
+			 * + Check if parameter types matches
+			 * + Check if too many arguments, i.e. non-existing parameters
+			 * + Check if named argument exists
+			 */
 
-			// Too many parameters
-			if (args.Length > actuals.Length)
+			List<ParameterInfo> actuals = method.GetParameters().ToList();
+
+			foreach (CommandUnit.Argument argument in args)
 			{
-				return false;
+				ParameterInfo param;
+
+				if (argument is CommandUnit.NamedArgument named)
+				{
+					// Lookup named
+					if (!actuals.TryFirst(p => p.Name == named.name, out param))
+						throw new CompileParameterNamedDoesntExistException(method, named.name, token);
+
+					// Assign index
+					named.index = param.Position;
+				}
+				else
+				{
+					// Argument index exists?
+					if (!actuals.TryFirst(p => p.Position == argument.index, out param))
+						throw new CompileParameterIndexedDoesntExistException(method, argument.index, token);
+				}
+
+				// Correct type?
+				var abstractValue = (CSharpType) argument.expression.OutputType;
+				if (!TypeChecking.CanImplicitlyConvert(abstractValue.Type, param.ParameterType))
+					throw new CompileParameterTypeConvertImplicitException(method, abstractValue.Type, param, token);
+
+				// Exclude from remaining list
+				actuals.Remove(param);
 			}
 
 			foreach (ParameterInfo actual in actuals)
 			{
-				// Too few parameters
-				if (actual.Position >= args.Length)
+				// Remaining one is required one?
+				if (!actual.HasDefaultValue)
 				{
-					if (!actual.HasDefaultValue)
-					{
-						return false;
-					}
-				}
-
-				// Wrong type
-				else
-				{
-					CSharpType abstractValue = (CSharpType) args[actual.Position].expression.OutputType;
-					if (!TypeChecking.CanImplicitlyConvert(abstractValue.Type, actual.ParameterType))
-					{
-						return false;
-					}
+					throw new CompileParameterRequiredMissingException(method, actual, token);
 				}
 			}
 
@@ -106,10 +124,10 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		}
 
 		[CanBeNull]
-		public static MethodInfo GetMethod(MethodInfo[] methodInfos, params CommandUnit.Argument[] args)
+		public static MethodInfo GetMethod(FunctionCallToken token, MethodInfo[] methodInfos, params CommandUnit.Argument[] args)
 		{
 			return methodInfos
-				.TryFirst(m => MethodMatches(m, args), out MethodInfo met)
+				.TryFirst(m => MethodMatches(token, m, args), out MethodInfo met)
 				? met : null;
 		}
 
