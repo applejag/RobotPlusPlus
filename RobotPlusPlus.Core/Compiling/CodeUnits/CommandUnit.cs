@@ -68,7 +68,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						if (argument.index < parameters.Length)
 							param = parameters[argument.index];
 						else
-							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have a <{argument.index+1}> parameter.", argument.expressionToken);
+							throw new CompileFunctionException($"Method <{methodInfo.Name}> does not have a <{argument.index + 1}> parameter.", argument.expressionToken);
 					}
 
 					// Apply settings from parameter
@@ -127,7 +127,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						argument.expressionToken);
 			}
 
-			return G1ANTMethodInfo.GetMethod((FunctionCallToken) Token, GetMethodInfos(), Arguments.ToArray());
+			return G1ANTMethodInfo.GetMethod((FunctionCallToken)Token, GetMethodInfos(), Arguments.ToArray());
 		}
 
 		public override string AssembleIntoString()
@@ -140,8 +140,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					row.AppendLine(preUnit.AssembleIntoString());
 
 			// Assemble command with arguments
-			// TODO: Arguments
-			//row.AppendLine(CommandFullName);
+			row.AppendLine(AssembleMethodIntoString());
 
 			// Post units
 			foreach (Argument argument in Arguments)
@@ -149,6 +148,37 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					row.AppendLine(postUnit.AssembleIntoString());
 
 			return row.ToString();
+		}
+
+		[Pure, NotNull]
+		private string AssembleMethodIntoString()
+		{
+			switch (MethodInfo)
+			{
+				case G1ANTMethodInfo g1:
+					// G1ANT command assembly
+					var parts = new List<string>
+					{
+						g1.CommandFamily != null
+							? $"{g1.CommandFamily.Name}.{g1.Name}"
+							: g1.Name
+					};
+
+					ParameterInfo[] parameters = g1.GetParameters();
+					foreach (Argument argument in Arguments)
+					{
+						string name = parameters.First(p => p.Position == argument.index).Name;
+						parts.Add($"{name} {argument.expression.AssembleIntoString()}");
+					}
+
+					return string.Join(' ', parts);
+
+				case MethodInfo cs:
+					return "";
+
+				default:
+					throw new InvalidOperationException($"Unknown method type <{Method.OutputType?.GetType().FullName ?? "null"}>.");
+			}
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)

@@ -20,7 +20,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		{
 			Command = command;
 
-			MethodInfos = G1ANTMethodInfo.ListMethods(command, globalArguments, family)
+			MethodInfos = G1ANTMethodInfo.ListMethods(command, globalArguments)
 				.Cast<MethodInfo>().ToArray();
 		}
 
