@@ -164,9 +164,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						// Check variables for registration
 						AbstractValue value = compiler.Context.FindIdentifier(id);
 
-						if (value is null && inputType is CSharpType csType && csType.Type != null)
+						if (value is null)
 						{
-							if (usage == UsageType.Write)
+							if (usage == UsageType.Write && inputType is CSharpType csType && csType.Type != null)
 								value = compiler.Context.RegisterVariable(id, csType.Type);
 							else
 								throw new CompileVariableUnassignedException(id);
