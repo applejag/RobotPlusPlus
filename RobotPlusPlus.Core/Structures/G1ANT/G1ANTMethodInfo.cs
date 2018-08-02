@@ -22,6 +22,11 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[NotNull]
 		public override Type ReflectedType => CommandFamily?.GetType() ?? throw new InvalidOperationException();
 
+		[CanBeNull]
+		public Type ResultType => CommandArguments
+			.FirstOrDefault(c => c.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
+			?.ArgumentElement.EvaluateVariableType();
+		
 		public override Type DeclaringType => CommandFamily?.GetType();
 		public override string Name => Command.Name;
 		public G1ANTParameterInfo[] CommandArguments { get; }

@@ -40,6 +40,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public Dictionary<IdentifierToken, Type> StaticVariables { get; private set; }
 			= new Dictionary<IdentifierToken, Type>();
 
+		public Dictionary<FunctionCallToken, CommandUnit> EmbeddedCommands { get; private set; }
+			= new Dictionary<FunctionCallToken, CommandUnit>();
+
 		public enum UsageType
 		{
 			Read,
@@ -55,34 +58,42 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PostUnits = new FlexibleList<CodeUnit>();
 
 			token = RemoveParentases(token);
-			token = RemoveUnaries(token);
-			Token = ExtractInnerAssignments(token);
+			Token = RemoveUnaries(token);
 		}
 
 		public override void Compile(Compiler compiler)
 		{
 			NeedsCSSnippet = false;
 
+			// Extract function calls
+			Token = ExtractInnerAssignments(compiler, Token);
+
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
 
-			OutputType = EvalTokenType(Token, compiler, Usage, InputType, out bool needsCsSnippet);
+
+			OutputType = EvalTokenType(Token, compiler, EmbeddedCommands, Usage, InputType, out bool needsCsSnippet);
 			NeedsCSSnippet = needsCsSnippet;
 
 			// Keep track of static vars
 			StaticVariables.Clear();
 			Token.ForEachRecursive(token =>
 			{
-				if (!(token is IdentifierToken id)) return;
-				var variable = compiler.Context.FindIdentifier(id) as Variable;
-				if (variable?.IsStaticType == true)
-					StaticVariables[id] = variable.Type;
+				if (token is IdentifierToken id)
+				{
+					var variable = compiler.Context.FindIdentifier(id) as Variable;
+					if (variable?.IsStaticType == true)
+						StaticVariables[id] = variable.Type;
+				}
 			}, true);
+
+			// Keep track of commands
+			EmbeddedCommands.Clear();
 
 			if (Usage == UsageType.Write)
 			{
 				ContainerToken = GetLeftmostToken(Token);
-				ContainerType = EvalTokenReadType(ContainerToken, compiler);
+				ContainerType = EvalTokenReadType(ContainerToken, compiler, EmbeddedCommands);
 
 				Type inputType = (InputType as CSharpType)?.Type ?? InputType.GetType();
 				Type outputType = (OutputType as CSharpType)?.Type ?? OutputType.GetType();
@@ -135,19 +146,19 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		[CanBeNull, Pure]
-		public static AbstractValue EvalTokenReadType([NotNull] Token token, [NotNull] Compiler compiler)
+		public static AbstractValue EvalTokenReadType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] Dictionary<FunctionCallToken, CommandUnit> commandLookup)
 		{
-			return EvalTokenType(token, compiler, UsageType.Read, null, out bool _);
+			return EvalTokenType(token, compiler, commandLookup, UsageType.Read, null, out bool _);
 		}
 
 		[CanBeNull]
-		public static AbstractValue EvalTokenWriteType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] AbstractValue inputType)
+		public static AbstractValue EvalTokenWriteType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] Dictionary<FunctionCallToken, CommandUnit> commandLookup, [NotNull] AbstractValue inputType)
 		{
-			return EvalTokenType(token, compiler, UsageType.Write, inputType, out bool _);
+			return EvalTokenType(token, compiler, commandLookup, UsageType.Write, inputType, out bool _);
 		}
 
 		[NotNull]
-		private static AbstractValue EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, UsageType usage, AbstractValue inputType, out bool needsCSSnippet)
+		private static AbstractValue EvalTokenType([NotNull] Token token, [NotNull] Compiler compiler, [NotNull] Dictionary<FunctionCallToken, CommandUnit> commandLookup, UsageType usage, AbstractValue inputType, out bool needsCSSnippet)
 		{
 			bool csSnippet = false, containsStr = false, containsOp = false;
 
@@ -160,6 +171,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			{
 				switch (t)
 				{
+					case FunctionCallToken func:
+						return new CSharpType(commandLookup[func].MethodInfo.GetReturnTypeG1ANT());
+
 					case IdentifierToken id:
 						// Check variables for registration
 						AbstractValue value = compiler.Context.FindIdentifier(id);
@@ -377,15 +391,24 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Construction alterations
 
-		private Token ExtractInnerAssignments(Token token, Token parent = null)
+		private Token ExtractInnerAssignments(Compiler compiler, Token token, Token parent = null)
 		{
 			// Convert command call to assignment
-			if (token is FunctionCallToken
-			&& parent != null)
+			if (token is FunctionCallToken func
+			&& parent != null && !EmbeddedCommands.ContainsKey(func))
 			{
-				(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
-				PreUnits.Add(unit);
-				token = temp;
+				// Add it to list
+				var cmd = new CommandUnit(func, this);
+				EmbeddedCommands[func] = cmd;
+				cmd.Compile(compiler);
+
+				// Only extract g1ant methods
+				if (cmd.MethodInfo is G1ANTMethodInfo)
+				{
+					(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
+					PreUnits.Add(unit);
+					token = temp;
+				}
 			}
 
 			// Convert prefix expressions
@@ -413,7 +436,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			// Run on childs
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = ExtractInnerAssignments(token[i], token);
+				token[i] = ExtractInnerAssignments(compiler, token[i], token);
 			}
 
 			// Returns altered

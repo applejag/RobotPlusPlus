@@ -49,7 +49,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			Method.Compile(compiler);
 			Exception error = null;
 			MethodInfo[] methodInfos = GetMethodInfos();
-
+			
 			foreach (MethodInfo methodInfo in methodInfos)
 			{
 				ParameterInfo[] parameters = methodInfo.GetParameters();

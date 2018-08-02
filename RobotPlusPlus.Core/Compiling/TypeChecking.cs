@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
@@ -56,6 +57,15 @@ namespace RobotPlusPlus.Core.Compiling
 				default:
 					return false;
 			}
+		}
+
+		[Pure, CanBeNull]
+		public static Type GetReturnTypeG1ANT([NotNull] this MethodInfo info)
+		{
+			if (info is G1ANTMethodInfo g1)
+				return g1.ResultType;
+
+			return info.ReturnType;
 		}
 
 		[Pure]
