@@ -219,6 +219,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				return $"{method.DeclaringType.FullName}.{method.Name}({argsString})";
 			
 			// Instance method stringification
+			Method.NeedsCSSnippet = true;
 			return $"{Method.AssembleIntoString(false)}({argsString})";
 		}
 
