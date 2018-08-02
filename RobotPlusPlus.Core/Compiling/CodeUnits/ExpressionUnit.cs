@@ -65,6 +65,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			NeedsCSSnippet = false;
 
+			// Keep track of commands
+			EmbeddedCommands.Clear();
 			// Extract function calls
 			Token = ExtractInnerAssignments(compiler, Token);
 
@@ -86,9 +88,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 						StaticVariables[id] = variable.Type;
 				}
 			}, true);
-
-			// Keep track of commands
-			EmbeddedCommands.Clear();
 
 			if (Usage == UsageType.Write)
 			{
@@ -172,7 +171,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				switch (t)
 				{
 					case FunctionCallToken func:
-						return new CSharpType(commandLookup[func].MethodInfo.GetReturnTypeG1ANT());
+						return new CSharpType(commandLookup[func].MethodInfo.GetValueType());
 
 					case IdentifierToken id:
 						// Check variables for registration
@@ -243,17 +242,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 												 | BindingFlags.Public
 												 | BindingFlags.FlattenHierarchy;
 
-							// If base is identifier...
-							if (GetLeftmostToken(pun) is IdentifierToken baseType)
+							// If base is static variable
+							if (lhsCS is Variable lhsVar && lhsVar.IsStaticType)
 							{
-								// And its static..
-								var baseVariable = compiler.Context.FindIdentifier(baseType) as Variable;
-								if (baseVariable?.IsStaticType == true)
-								{
-									// Change to search for static fields
-									flags &= ~BindingFlags.Instance;
-									flags |= BindingFlags.Static;
-								}
+								// Change to search for static fields
+								flags &= ~BindingFlags.Instance;
+								flags |= BindingFlags.Static;
 							}
 
 							// Do the search
@@ -263,7 +257,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							if (memberInfos.Length == 0)
 								throw new CompileTypePropertyDoesNotExistException(pun, lhsCS.Type, identifier);
 
-							if (memberInfos.Length > 1)
+							if (memberInfos[0] is MethodInfo)
 							{
 								// Method
 								MethodInfo[] methodInfos = memberInfos.OfType<MethodInfo>().ToArray();
@@ -395,7 +389,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			// Convert command call to assignment
 			if (token is FunctionCallToken func
-			&& parent != null && !EmbeddedCommands.ContainsKey(func))
+			&& !EmbeddedCommands.ContainsKey(func))
 			{
 				// Add it to list
 				var cmd = new CommandUnit(func, this);
@@ -403,7 +397,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				cmd.Compile(compiler);
 
 				// Only extract g1ant methods
-				if (cmd.MethodInfo is G1ANTMethodInfo)
+				if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
 				{
 					(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
 					PreUnits.Add(unit);

@@ -11,7 +11,7 @@ namespace RobotPlusPlus.Core.Compiling
 {
 	public static class TypeChecking
 	{
-		[NotNull, Pure]
+		[CanBeNull, Pure]
 		public static Type GetValueType([NotNull] this MemberInfo info)
 		{
 			switch (info)
@@ -21,6 +21,12 @@ namespace RobotPlusPlus.Core.Compiling
 
 				case PropertyInfo property:
 					return property.PropertyType;
+
+				case G1ANTMethodInfo g1antMethod:
+					return g1antMethod.ResultType;
+
+				case MethodInfo method:
+					return method.ReturnType;
 
 				default:
 					throw new NotImplementedException();
@@ -37,6 +43,9 @@ namespace RobotPlusPlus.Core.Compiling
 
 				case PropertyInfo property:
 					return property.CanRead;
+
+				case MethodInfo method:
+					return method.IsPublic;
 
 				default:
 					return false;
@@ -57,15 +66,6 @@ namespace RobotPlusPlus.Core.Compiling
 				default:
 					return false;
 			}
-		}
-
-		[Pure, CanBeNull]
-		public static Type GetReturnTypeG1ANT([NotNull] this MethodInfo info)
-		{
-			if (info is G1ANTMethodInfo g1)
-				return g1.ResultType;
-
-			return info.ReturnType;
 		}
 
 		[Pure]
