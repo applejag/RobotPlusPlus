@@ -58,7 +58,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			PostUnits = new FlexibleList<CodeUnit>();
 
 			token = RemoveParentases(token);
-			Token = RemoveUnaries(token);
+			token = RemoveUnaries(token);
+			Token = ExtractInnerAssignments(token);
 		}
 
 		public override void Compile(Compiler compiler)
@@ -68,7 +69,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			// Keep track of commands
 			EmbeddedCommands.Clear();
 			// Extract function calls
-			Token = ExtractInnerAssignments(compiler, Token);
+			Token = ExtractInnerCommands(compiler, Token);
 
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
@@ -397,26 +398,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		#region Construction alterations
 
-		private Token ExtractInnerAssignments(Compiler compiler, Token token, Token parent = null)
+		private Token ExtractInnerAssignments(Token token, Token parent = null)
 		{
-			// Convert command call to assignment
-			if (token is FunctionCallToken func
-			&& !EmbeddedCommands.ContainsKey(func))
-			{
-				// Add it to list
-				var cmd = new CommandUnit(func, this);
-				EmbeddedCommands[func] = cmd;
-				cmd.Compile(compiler);
-
-				// Only extract g1ant methods
-				if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
-				{
-					(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
-					PreUnits.Add(unit);
-					token = temp;
-				}
-			}
-
 			// Convert prefix expressions
 			if (token is OperatorToken pre && pre.OperatorType == OperatorToken.Type.PreExpression)
 			{
@@ -442,10 +425,39 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			// Run on childs
 			for (var i = 0; i < token.Count; i++)
 			{
-				token[i] = ExtractInnerAssignments(compiler, token[i], token);
+				token[i] = ExtractInnerAssignments(token[i], token);
 			}
 
 			// Returns altered
+			return token;
+		}
+
+		private Token ExtractInnerCommands(Compiler compiler, Token token, Token parent = null)
+		{
+			// Convert command call to assignment
+			if (token is FunctionCallToken func
+			&& !EmbeddedCommands.ContainsKey(func))
+			{
+				// Add it to list
+				var cmd = new CommandUnit(func, this);
+				EmbeddedCommands[func] = cmd;
+				cmd.Compile(compiler);
+
+				// Only extract g1ant methods
+				if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
+				{
+					(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
+					PreUnits.Add(unit);
+					token = temp;
+				}
+			}
+
+			// Run on childs
+			for (var i = 0; i < token.Count; i++)
+			{
+				token[i] = ExtractInnerCommands(compiler, token[i], token);
+			}
+
 			return token;
 		}
 
