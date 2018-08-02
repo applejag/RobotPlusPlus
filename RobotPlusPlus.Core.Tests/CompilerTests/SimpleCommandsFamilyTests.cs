@@ -150,7 +150,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileParameterNamedDoesntExistException))]
 		public void Compile_Family_WrongArgName()
 		{
 			// Arrange
@@ -161,7 +161,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileVariableUnassignedException))]
 		public void Compile_Family_WrongFamilyName()
 		{
 			// Arrange
@@ -172,7 +172,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_Family_WrongCmdName()
 		{
 			// Arrange
