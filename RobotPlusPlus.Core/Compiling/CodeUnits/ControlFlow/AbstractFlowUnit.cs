@@ -35,9 +35,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits.ControlFlow
 
 			string condition;
 			if (inverted && !(Condition.Token is IdentifierToken || Condition.Token is LiteralToken))
-				condition = $"({Condition.AssembleIntoString()})";
+				condition = $"({Condition.AssembleIntoString(false)})";
 			else
-				condition = Condition.AssembleIntoString();
+				condition = Condition.AssembleIntoString(false);
 
 
 			rows.AppendLine("jump label ➜{0} if ⊂{1}{2}⊃", label.Generated, inverted ? "!" : "", condition);

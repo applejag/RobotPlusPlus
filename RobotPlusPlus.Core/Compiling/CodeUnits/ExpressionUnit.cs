@@ -118,7 +118,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 		public override string AssembleIntoString()
 		{
-			return NeedsCSSnippet && !(Parent is AbstractFlowUnit)
+			return AssembleIntoString(NeedsCSSnippet);
+		}
+
+		public string AssembleIntoString(bool withCSSnipperChars)
+		{
+			return withCSSnipperChars
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
@@ -367,6 +372,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 				case PunctuatorToken pun when pun.PunctuatorType == PunctuatorToken.Type.Dot:
 					return $"{StringifyToken(pun.DotLHS)}.{pun.DotRHS}";
+
+				case FunctionCallToken func:
+					CommandUnit cmd = EmbeddedCommands[func];
+					if (cmd.MethodInfo is G1ANTMethodInfo)
+						throw new CompileException("G1ANT command wasen't extracted!", func);
+
+					return cmd.AssembleIntoString();
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

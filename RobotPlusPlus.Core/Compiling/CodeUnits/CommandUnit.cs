@@ -160,29 +160,64 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			switch (MethodInfo)
 			{
 				case G1ANTMethodInfo g1:
-					// G1ANT command assembly
-					var parts = new List<string>
-					{
-						g1.CommandFamily != null
-							? $"{g1.CommandFamily.Name}.{g1.Name}"
-							: g1.Name
-					};
-
-					ParameterInfo[] parameters = g1.GetParameters();
-					foreach (Argument argument in Arguments)
-					{
-						string name = parameters.First(p => p.Position == argument.index).Name;
-						parts.Add($"{name} {argument.expression.AssembleIntoString()}");
-					}
-
-					return string.Join(' ', parts);
+					return StringifyG1ANTMethod(g1);
 
 				case MethodInfo cs:
-					return "";
+					return StringifyCSMethod(cs);
 
 				default:
 					throw new InvalidOperationException($"Unknown method type <{Method.OutputType?.GetType().FullName ?? "null"}>.");
 			}
+		}
+
+		private string StringifyG1ANTMethod(G1ANTMethodInfo method)
+		{
+			// G1ANT command assembly
+			var parts = new List<string>
+			{
+				method.CommandFamily != null
+					? $"{method.CommandFamily.Name}.{method.Name}"
+					: method.Name
+			};
+
+			ParameterInfo[] parameters = method.GetParameters();
+			foreach (Argument argument in Arguments)
+			{
+				string name = parameters.First(p => p.Position == argument.index).Name;
+				parts.Add($"{name} {argument.expression.AssembleIntoString()}");
+			}
+
+			return string.Join(' ', parts);
+		}
+
+		private string StringifyCSMethod(MethodInfo method)
+		{
+			var args = new List<string>();
+
+			ParameterInfo[] parameters = method.GetParameters();
+			var index = 0;
+			foreach (Argument argument in Arguments)
+			{
+				argument.expression.NeedsCSSnippet = true;
+				ParameterInfo param = parameters.First(p => p.Position == argument.index);
+
+				if (argument.index == index)
+				{
+					// Indexed argument
+					index++;
+					args.Add(argument.expression.AssembleIntoString(false));
+				}
+				else
+					// Named argument
+					args.Add($"{param.Name}: {argument.expression.AssembleIntoString(false)}");
+			}
+
+			string argsString = string.Join(", ", args);
+
+			if (method.IsStatic)
+				return $"{method.DeclaringType.FullName}.{method.Name}({argsString})";
+
+			throw new NotImplementedException();
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)
