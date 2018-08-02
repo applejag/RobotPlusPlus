@@ -214,10 +214,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			string argsString = string.Join(", ", args);
 
+			// Static method stringification
 			if (method.IsStatic)
 				return $"{method.DeclaringType.FullName}.{method.Name}({argsString})";
-
-			throw new NotImplementedException();
+			
+			// Instance method stringification
+			return $"{Method.AssembleIntoString(false)}({argsString})";
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)
