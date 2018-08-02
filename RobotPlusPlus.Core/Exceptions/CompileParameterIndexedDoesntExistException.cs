@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Exceptions
 			int index,
 			[NotNull] Token source,
 			[CanBeNull] Exception innerException)
-			: base($"Method <{method.Name}> does not accept <{index+1}> parameters.",
+			: base($"Method <{StringifyMethod(method)}> does not accept <{index+1}> parameters.",
 				method, source, innerException)
 		{
 			ParameterIndex = index;

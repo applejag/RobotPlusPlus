@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -26,6 +27,13 @@ namespace RobotPlusPlus.Core.Exceptions
 			: base(msg, source, innerException)
 		{
 			Method = method;
+		}
+
+		public static string StringifyMethod(MethodInfo method)
+		{
+			string args = string.Join(", ", method.GetParameters()
+				.Select(p => p.HasDefaultValue ? $"{p.ParameterType.Name}?" : p.ParameterType.Name));
+			return $"{method.Name}({args})";
 		}
 	}
 }

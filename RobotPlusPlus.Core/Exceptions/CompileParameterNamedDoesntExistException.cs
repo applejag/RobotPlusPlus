@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -23,7 +24,7 @@ namespace RobotPlusPlus.Core.Exceptions
 			[NotNull] string name,
 			[NotNull] Token source,
 			[CanBeNull] Exception innerException)
-			: base($"Method <{method.Name}> does not contain a parameter named by <{name}>.",
+			: base($"Method <{StringifyMethod(method)})> does not contain a parameter named by <{name}>.",
 				method, source, innerException)
 		{
 			ParameterName = name;

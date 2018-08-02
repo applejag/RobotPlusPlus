@@ -146,7 +146,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_CallOnString_NonExisting()
 		{
 			// Arrange
@@ -241,7 +241,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "x = screen.Contains(1, 2)";
-			const string expected = "♥x=⊂♥screen.Contains(1,2)⊃";
+			const string expected = "♥x=⊂♥screen.Contains(1, 2)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -251,7 +251,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionNoMatchingOverloadException))]
 		public void Compile_CallOnVariable_WrongArgType()
 		{
 			// Arrange
@@ -262,7 +262,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_CallOnVariable_NonExisting()
 		{
 			// Arrange

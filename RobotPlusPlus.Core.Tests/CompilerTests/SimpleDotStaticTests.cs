@@ -59,7 +59,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileParameterTypeConvertImplicitException))]
 		public void Compile_CallOnString_WrongArgType()
 		{
 			// Arrange
@@ -70,7 +70,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_CallOnString_NonExisting()
 		{
 			// Arrange
@@ -95,7 +95,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionNoMatchingOverloadException))]
 		public void Compile_CallOnNumber_WrongArgType()
 		{
 			// Arrange
@@ -106,7 +106,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_CallOnNumber_NonExisting()
 		{
 			// Arrange

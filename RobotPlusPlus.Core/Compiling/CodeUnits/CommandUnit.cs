@@ -47,7 +47,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public override void Compile(Compiler compiler)
 		{
 			Method.Compile(compiler);
-			Exception error = null;
+			var errors = new List<Exception>();
 			MethodInfo[] methodInfos = GetMethodInfos();
 			
 			foreach (MethodInfo methodInfo in methodInfos)
@@ -100,16 +100,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 				catch (CompileFunctionException e)
 				{
-					error = e;
+					errors.Add(e);
 				}
 			}
 
 			// Tell us what went wrong
-			if (error != null && methodInfos.Length == 1)
-				throw error;
+			if (errors.Count == 1)
+				throw errors[0];
 
 			// Didn't find it amoung multiple overloads...
-			throw new CompileFunctionException($"Method <{methodInfos[0].Name}> has no overload matching the parameters!", Token, error);
+			throw new CompileFunctionNoMatchingOverloadException(methodInfos[0].DeclaringType, methodInfos[0].Name, Token, errors);
 		}
 
 		[NotNull, ItemNotNull]

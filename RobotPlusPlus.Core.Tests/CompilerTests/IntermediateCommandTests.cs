@@ -56,7 +56,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileFunctionNoMatchingOverloadException))]
 		public void Compile_RequiredGroupMissing()
 		{
 			// Arrange
@@ -95,7 +95,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
+		[ExpectedException(typeof(CompileFunctionNoMatchingOverloadException))]
 		public void Compile_RequiredGroupCollision()
 		{
 			// Arrange
@@ -151,7 +151,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'lorem' + dialog.ask('hello world')";
 			const string expected = "dialog.ask message ‴hello world‴ result ♥tmp\n" +
-			                        "♥x=⊂\"lorem\"+♥tmp⊃";
+									"♥x=⊂\"lorem\"+♥tmp⊃";
 
 			// Act
 			string actual = Compiler.Compile(code);
@@ -166,8 +166,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10 +(y= 'lorem' + dialog.ask('hello world'))+'ipsum'";
 			const string expected = "dialog.ask message ‴hello world‴ result ♥tmp\n" +
-			                        "♥y=⊂\"lorem\"+♥tmp⊃\n" +
-			                        "♥x=⊂10+♥y+\"ipsum\"⊃";
+									"♥y=⊂\"lorem\"+♥tmp⊃\n" +
+									"♥x=⊂10+♥y+\"ipsum\"⊃";
 
 			// Act
 			string actual = Compiler.Compile(code);
@@ -213,7 +213,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileParameterNamedDoesntExistException))]
 		public void Compile_DuplicateNamedArguments()
 		{
 			// Arrange
@@ -224,7 +224,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileParameterNamedDoesntExistException))]
 		public void Compile_DuplicatePositionalArguments()
 		{
 			// Arrange
@@ -240,8 +240,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foo' + dialog.ask('bar'); tmp = 1";
 			const string expected = "dialog.ask message ‴bar‴ result ♥tmp\n" +
-			                        "♥x=⊂\"foo\"+♥tmp⊃\n" +
-			                        "♥tmp2=1";
+									"♥x=⊂\"foo\"+♥tmp⊃\n" +
+									"♥tmp2=1";
 
 			// Act
 			string actual = Compiler.Compile(code);
@@ -250,16 +250,17 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			Assert.AreEqual(expected, actual);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(CompileFunctionException))]
-		public void Compile_VariableNameLiteral()
-		{
-			// Arrange
-			const string code = "debug.trace('bar')";
+		//TODO:
+		//[TestMethod]
+		//[ExpectedException(typeof(CompileFunctionException))]
+		//public void Compile_VariableNameLiteral()
+		//{
+		//	// Arrange
+		//	const string code = "debug.trace('bar')";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		//	// Act
+		//	Compiler.Compile(code);
+		//}
 
 		[TestMethod]
 		public void Compile_VariableNameAssigned()
@@ -267,7 +268,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "bar = 'foo'; debug.trace(bar)";
 			const string expected = "♥bar=‴foo‴\n" +
-			                        "debug.trace variablename ‴bar‴";
+									"debug.trace variablename ‴bar‴";
 
 			// Act
 			string actual = Compiler.Compile(code);
@@ -282,7 +283,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "bäär = 'foo'; debug.trace(bäär)";
 			const string expected = "♥baar=‴foo‴\n" +
-			                        "debug.trace variablename ‴baar‴";
+									"debug.trace variablename ‴baar‴";
 
 			// Act
 			string actual = Compiler.Compile(code);
