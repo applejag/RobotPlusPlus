@@ -69,6 +69,8 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			var rows = new RowBuilder();
 
+            /* TODO: Check if G1ANT value, then print as a g1ant cmd with result param */
+
 			foreach (CodeUnit pre in RHSExpression.PreUnits)
 			{
 				rows.AppendLine(pre.AssembleIntoString());
