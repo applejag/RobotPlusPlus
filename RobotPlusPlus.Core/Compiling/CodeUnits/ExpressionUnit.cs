@@ -177,9 +177,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				switch (t)
 				{
 					case FunctionCallToken func:
-						return new CSharpType(commandLookup[func].MethodInfo.GetValueType());
+                        CommandUnit cmdUnit = commandLookup[func];
+					    if (cmdUnit.Method.NeedsCSSnippet)
+					        csSnippet = true;
+			            return new CSharpType(cmdUnit.MethodInfo.GetValueType());
 
-					case IdentifierToken id:
+				    case IdentifierToken id:
 						// Check variables for registration
 						AbstractValue value = compiler.Context.FindIdentifier(id);
 
@@ -244,7 +247,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							if (lhsCS.Type == null)
 								return lhsCS;
 
-							BindingFlags flags = BindingFlags.Instance
+						    csSnippet = true;
+
+                            BindingFlags flags = BindingFlags.Instance
 												 | BindingFlags.Public
 												 | BindingFlags.FlattenHierarchy;
 
@@ -281,7 +286,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 							if (usage == UsageType.Write && !memberInfo.CanWrite())
 								throw new CompileTypePropertyNoSetterException(pun, lhsCS.Type, identifier);
 
-							csSnippet = true;
 							return new CSharpType(memberInfo.GetValueType());
 						}
 						else if (lhs is G1ANTFamily lhsFam)

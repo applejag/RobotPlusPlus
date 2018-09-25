@@ -45,74 +45,78 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		}
 
 		public override void Compile(Compiler compiler)
-		{
-			Method.Compile(compiler);
-			var errors = new List<Exception>();
-			MethodInfo[] methodInfos = GetMethodInfos();
-			
-			foreach (MethodInfo methodInfo in methodInfos)
-			{
-				ParameterInfo[] parameters = methodInfo.GetParameters();
+        {
+            Method.Compile(compiler);
+            FindMethodAndCompileIt(compiler);
+        }
 
-				// Check if this works, if not check next
-				try
-				{
+        private void FindMethodAndCompileIt(Compiler compiler)
+        {
+            var errors = new List<Exception>();
+            MethodInfo[] methodInfos = GetMethodInfos();
 
-					foreach (Argument argument in Arguments)
-					{
-						// Find parameter
-						ParameterInfo param;
-						if (argument is NamedArgument named)
-						{
-							if (!parameters.TryFirst(p => p.Name == named.name, out param))
-								throw new CompileParameterNamedDoesntExistException(methodInfo, named.name, named.expressionToken);
-						}
-						else
-						{
-							if (argument.index < parameters.Length)
-								param = parameters[argument.index];
-							else
-								throw new CompileParameterIndexedDoesntExistException(methodInfo, argument.index, argument.expressionToken);
-						}
+            foreach (MethodInfo methodInfo in methodInfos)
+            {
+                ParameterInfo[] parameters = methodInfo.GetParameters();
 
-						// Apply settings from parameter
-						if (param is G1ANTParameterInfo g1 && g1.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
-						{
-							argument.expression.Usage = ExpressionUnit.UsageType.Write;
-							argument.expression.InputType = new CSharpType(g1.ArgumentElement.EvaluateVariableType(), g1.Name);
-						}
-						else
-						{
-							argument.expression.Usage = ExpressionUnit.UsageType.Read;
-							argument.expression.InputType = null;
-						}
+                // Check if this works, if not check next
+                try
+                {
+                    foreach (Argument argument in Arguments)
+                    {
+                        // Find parameter
+                        ParameterInfo param;
+                        if (argument is NamedArgument named)
+                        {
+                            if (!parameters.TryFirst(p => p.Name == named.name, out param))
+                                throw new CompileParameterNamedDoesntExistException(methodInfo, named.name, named.expressionToken);
+                        }
+                        else
+                        {
+                            if (argument.index < parameters.Length)
+                                param = parameters[argument.index];
+                            else
+                                throw new CompileParameterIndexedDoesntExistException(methodInfo, argument.index, argument.expressionToken);
+                        }
+
+                        // Apply settings from parameter
+                        if (param is G1ANTParameterInfo g1 && g1.ArgumentElement.Type == G1ANTRepository.Structure.Variable)
+                        {
+                            argument.expression.Usage = ExpressionUnit.UsageType.Write;
+                            argument.expression.InputType = new CSharpType(g1.ArgumentElement.EvaluateVariableType(), g1.Name);
+                        }
+                        else
+                        {
+                            argument.expression.Usage = ExpressionUnit.UsageType.Read;
+                            argument.expression.InputType = null;
+                        }
 
 
-						// Compile
-						argument.expression.Compile(compiler);
-					}
-					
-					if (EvalMethodInfo(methodInfo))
-					{
-						MethodInfo = methodInfo;
-						return;
-					}
-				}
-				catch (CompileFunctionException e)
-				{
-					errors.Add(e);
-				}
-			}
+                        // Compile
+                        argument.expression.Compile(compiler);
+                    }
 
-			// Tell us what went wrong
-			if (errors.Count == 1)
-				throw errors[0];
+                    if (EvalMethodInfo(methodInfo))
+                    {
+                        MethodInfo = methodInfo;
+                        return;
+                    }
+                }
+                catch (CompileFunctionException e)
+                {
+                    errors.Add(e);
+                }
+            }
 
-			// Didn't find it amoung multiple overloads...
-			throw new CompileFunctionNoMatchingOverloadException(methodInfos[0].DeclaringType, methodInfos[0].Name, Token, errors);
-		}
+            // Tell us what went wrong
+            if (errors.Count == 1)
+                throw errors[0];
 
-		[NotNull, ItemNotNull]
+            // Didn't find it among multiple overloads...
+            throw new CompileFunctionNoMatchingOverloadException(methodInfos[0].DeclaringType, methodInfos[0].Name, Token, errors);
+        }
+
+        [NotNull, ItemNotNull]
 		private MethodInfo[] GetMethodInfos()
 		{
 			if (Method.OutputType is IMethod met)
