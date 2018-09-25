@@ -85,7 +85,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "x = int.Parse('1')";
-			const string expected = "♥x=⊂System.Int32.Parse('1')⊃";
+			const string expected = "♥x=⊂System.Int32.Parse(\"1\")⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
