@@ -135,7 +135,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileFunctionNoMatchingOverloadException))]
 		public void Compile_CallOnString_WrongArgType()
 		{
 			// Arrange
