@@ -141,9 +141,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foo'.PadLeft(true)";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string output = Compiler.Compile(code);
+
+            // Assert
+		    Assert.Fail("Unexpected result: " + output);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
@@ -185,18 +188,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
-		public void Compile_CallOnNumber_WrongArgType()
-		{
-			// Arrange
-			const string code = "x = 10.CompareTo(true)";
-
-			// Act
-			Compiler.Compile(code);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
+		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
 		public void Compile_CallOnNumber_NonExisting()
 		{
 			// Arrange
@@ -257,9 +249,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foovar'; y = x.PadLeft(true)";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string output = Compiler.Compile(code);
+
+		    Assert.Fail("Unexpected result: " + output);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
