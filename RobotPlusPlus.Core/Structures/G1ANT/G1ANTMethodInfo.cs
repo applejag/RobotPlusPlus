@@ -46,17 +46,24 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 				?? new G1ANTParameterInfo[0];
 			GlobalArguments = globalArguments.Arguments
 				.Select((a, i) => new G1ANTParameterInfo(this, a, i + CommandArguments.Length)).ToArray();
-		}
+	    }
 
-		public override ParameterInfo[] GetParameters()
-		{
-			return CommandArguments
-				.Concat(GlobalArguments)
-				.Cast<ParameterInfo>()
-				.ToArray();
-		}
+	    public override ParameterInfo[] GetParameters()
+	    {
+	        return CommandArguments
+	            .Concat(GlobalArguments)
+	            .Cast<ParameterInfo>()
+	            .ToArray();
+	    }
 
-		internal static G1ANTMethodInfo[] ListMethods(
+	    public G1ANTParameterInfo[] GetG1ANTParameters()
+	    {
+	        return CommandArguments
+	            .Concat(GlobalArguments)
+	            .ToArray();
+	    }
+
+        internal static G1ANTMethodInfo[] ListMethods(
 			[NotNull] G1ANTRepository.CommandElement command,
 			[NotNull] G1ANTRepository.GlobalArgumentsElement globalArguments,
 			[CanBeNull] G1ANTRepository.CommandFamilyElement family = null)

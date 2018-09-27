@@ -158,23 +158,29 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return row.ToString();
 		}
 
-		[Pure, NotNull]
-		private string AssembleMethodIntoString()
+        [Pure, NotNull]
+	    public string AssembleMethodIntoString()
+        {
+            return AssembleMethodIntoString(Arguments);
+        }
+
+        [Pure, NotNull]
+		public string AssembleMethodIntoString(IEnumerable<Argument> allArguments)
 		{
 			switch (MethodInfo)
 			{
 				case G1ANTMethodInfo g1:
-					return StringifyG1ANTMethod(g1);
+					return StringifyG1ANTMethod(g1, allArguments);
 
 				case MethodInfo cs:
-					return StringifyCSMethod(cs);
+					return StringifyCSMethod(Method, cs, allArguments);
 
 				default:
 					throw new InvalidOperationException($"Unknown method type <{Method.OutputType?.GetType().FullName ?? "null"}>.");
 			}
 		}
 
-		private string StringifyG1ANTMethod(G1ANTMethodInfo method)
+		public static string StringifyG1ANTMethod(G1ANTMethodInfo method, IEnumerable<Argument> allArguments)
 		{
 			// G1ANT command assembly
 			var parts = new List<string>
@@ -185,7 +191,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			};
 
 			ParameterInfo[] parameters = method.GetParameters();
-			foreach (Argument argument in Arguments)
+			foreach (Argument argument in allArguments)
 			{
 				string name = parameters.First(p => p.Position == argument.index).Name;
 				parts.Add($"{name} {argument.expression.AssembleIntoString()}");
@@ -194,13 +200,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return string.Join(' ', parts);
 		}
 
-		private string StringifyCSMethod(MethodInfo method)
+		public static string StringifyCSMethod(ExpressionUnit methodExpression, MethodInfo methodInfo, IEnumerable<Argument> allArguments)
 		{
 			var args = new List<string>();
 
-			ParameterInfo[] parameters = method.GetParameters();
+			ParameterInfo[] parameters = methodInfo.GetParameters();
 			var index = 0;
-			foreach (Argument argument in Arguments)
+			foreach (Argument argument in allArguments)
 			{
 				argument.expression.NeedsCSSnippet = true;
 				ParameterInfo param = parameters.First(p => p.Position == argument.index);
@@ -219,12 +225,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			string argsString = string.Join(", ", args);
 
 			// Static method stringification
-			if (method.IsStatic)
-				return $"{method.DeclaringType.FullName}.{method.Name}({argsString})";
+			if (methodInfo.IsStatic)
+				return $"{methodInfo.DeclaringType.FullName}.{methodInfo.Name}({argsString})";
 			
 			// Instance method stringification
-			Method.NeedsCSSnippet = true;
-			return $"{Method.AssembleIntoString(false)}({argsString})";
+			methodExpression.NeedsCSSnippet = true;
+			return $"{methodExpression.AssembleIntoString(false)}({argsString})";
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)

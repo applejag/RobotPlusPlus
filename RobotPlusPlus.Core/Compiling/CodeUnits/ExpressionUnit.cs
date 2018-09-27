@@ -43,7 +43,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		public Dictionary<FunctionCallToken, CommandUnit> EmbeddedCommands { get; private set; }
 			= new Dictionary<FunctionCallToken, CommandUnit>();
 
-		public enum UsageType
+        public enum UsageType
 		{
 			Read,
 			Write
@@ -129,9 +129,16 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				: StringifyToken(Token);
 		}
 
-		#region Public utility
+        #region Public utility
 
-		public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
+	    public CommandUnit GetAsG1ANTCommandUnit()
+	    {
+	        if (!(Token is FunctionCallToken func)) return null;
+	        CommandUnit cmd = EmbeddedCommands.GetValueOrDefault(func);
+	        return cmd.MethodInfo is G1ANTMethodInfo ? cmd : null;
+	    }
+
+        public (ExpressionUnit, IdentifierTempToken) ExtractIntoTempAssignment()
 		{
 			(CodeUnit tempAssignment, IdentifierTempToken id)
 				= AssignmentUnit.CreateTemporaryAssignment(Token, Parent);
@@ -450,9 +457,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				// Only extract g1ant methods
 				if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
 				{
-					(CodeUnit unit, IdentifierTempToken temp) = AssignmentUnit.CreateTemporaryAssignment(token, this);
-					PreUnits.Add(unit);
-					token = temp;
+				    (CodeUnit unit, IdentifierTempToken temp) =
+				        AssignmentUnit.CreateTemporaryAssignment(token, this);
+				    PreUnits.Add(unit);
+				    token = temp;
 				}
 			}
 
