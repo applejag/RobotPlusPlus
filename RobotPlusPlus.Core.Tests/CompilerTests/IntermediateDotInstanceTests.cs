@@ -9,7 +9,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 	public class IntermediateDotInstanceTests
 	{
 		[TestMethod]
-		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
+		[ExpectedException(typeof(CompileFunctionValueOfVoidException))]
 		public void Compile_CallOnVoidMethod()
 		{
 			// Arrange

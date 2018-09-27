@@ -122,9 +122,9 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return AssembleIntoString(NeedsCSSnippet);
 		}
 
-		public string AssembleIntoString(bool withCSSnipperChars)
+		public string AssembleIntoString(bool withCSSnippetChars)
 		{
-			return withCSSnipperChars
+			return withCSSnippetChars
 				? $"⊂{StringifyToken(Token)}⊃"
 				: StringifyToken(Token);
 		}
@@ -187,7 +187,12 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
                         CommandUnit cmdUnit = commandLookup[func];
 					    if (cmdUnit.Method.NeedsCSSnippet)
 					        csSnippet = true;
-			            return new CSharpType(cmdUnit.MethodInfo.GetValueType());
+					    Type returnType = cmdUnit.MethodInfo.GetValueType();
+					    if (returnType == null)
+					    {
+                            throw new CompileFunctionValueOfVoidException(cmdUnit.MethodInfo, cmdUnit.Token);
+					    }
+					    return new CSharpType(returnType);
 
 				    case IdentifierToken id:
 						// Check variables for registration
