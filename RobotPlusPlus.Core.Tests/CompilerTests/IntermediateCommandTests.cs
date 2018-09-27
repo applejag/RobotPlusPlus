@@ -142,7 +142,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "x = delay()";
 
 			// Act
-			Compiler.Compile(code);
+			string result = Compiler.Compile(code);
+
+            // Assert
+            Assert.Fail("Unexpected result: {0}", result);
 		}
 
 		[TestMethod]

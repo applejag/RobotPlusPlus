@@ -15,9 +15,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = Console.Write('hello world')";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_StandaloneCallOnVoidMethod()
