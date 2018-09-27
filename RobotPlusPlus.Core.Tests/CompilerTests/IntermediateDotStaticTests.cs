@@ -14,7 +14,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "x = Console.Write('hello world')";
-
+            
 		    // Act
 		    string result = Compiler.Compile(code);
 

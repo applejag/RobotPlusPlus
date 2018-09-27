@@ -188,7 +188,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					    if (cmdUnit.Method.NeedsCSSnippet)
 					        csSnippet = true;
 					    Type returnType = cmdUnit.MethodInfo.GetValueType();
-					    if (returnType == null)
+					    if (returnType == typeof(void))
 					    {
                             throw new CompileFunctionValueOfVoidException(cmdUnit.MethodInfo, cmdUnit.Token);
 					    }
