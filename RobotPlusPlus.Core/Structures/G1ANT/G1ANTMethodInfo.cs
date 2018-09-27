@@ -79,7 +79,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		public static bool MethodMatches(FunctionCallToken token, MethodInfo method, CommandUnit.Argument[] args)
 		{
 			/**
-			 * -TODO- Check for duplicate parameters
+			 * + Check for duplicate parameters
 			 * + Check if all required parameters are used
 			 * + Check if parameter types matches
 			 * + Check if too many arguments, i.e. non-existing parameters
@@ -87,6 +87,13 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			 */
 
 			List<ParameterInfo> actuals = method.GetParameters().ToList();
+
+		    foreach (var duplicates in actuals
+		        .GroupBy(a => a.Name)
+		        .Where(g => g.Count() > 1))
+		    {
+		        throw new CompileParameterDuplicateException(method, duplicates.First(), token);
+		    }
 
 			foreach (CommandUnit.Argument argument in args)
 			{
