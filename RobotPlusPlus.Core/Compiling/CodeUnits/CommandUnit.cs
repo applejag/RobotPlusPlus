@@ -224,13 +224,22 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
 			string argsString = string.Join(", ", args);
 
+		    bool isVoid = methodInfo.ReturnType == typeof(void);
+
 			// Static method stringification
 			if (methodInfo.IsStatic)
-				return $"{methodInfo.DeclaringType.FullName}.{methodInfo.Name}({argsString})";
-			
-			// Instance method stringification
-			methodExpression.NeedsCSSnippet = true;
-			return $"{methodExpression.AssembleIntoString(false)}({argsString})";
+			{
+			    string result = $"{methodInfo.DeclaringType.FullName}.{methodInfo.Name}({argsString})";
+			    return isVoid
+                    ? $"♥_=⊂new Func<int>(()=>{{{result};return 0;}})()⊃"
+                    : result;
+			}
+		    else
+		    {
+		        // Instance method stringification
+		        methodExpression.NeedsCSSnippet = true;
+		        return $"{methodExpression.AssembleIntoString(false)}({argsString})";
+		    }
 		}
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)

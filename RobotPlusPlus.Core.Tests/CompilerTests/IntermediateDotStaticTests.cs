@@ -27,7 +27,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "Console.Write('hello world')";
-			const string expected = "♥_=⊂new Func<int>(()=>{Console.Write(\"hello world\");return 0;})()⊃";
+			const string expected = "♥_=⊂new Func<int>(()=>{System.Console.Write(\"hello world\");return 0;})()⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);

@@ -27,7 +27,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "screen.Inflate(screen.Size)";
-			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.Inflate(♥screen.Size);return _;})()⊃";
+			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle, " +
+			                        "System.Drawing.Point, System.Drawing.Rectangle>" +
+			                        "((System.Drawing.Rectangle _, System.Drawing.Point a1)=>{" +
+			                        "_.Location.Offset(a1);" +
+			                        "return _;})(♥screen, ♥screen.Location)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -39,9 +43,13 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		[TestMethod]
 		public void Compile_PropertyCallOnVoidMethod()
 		{
-			// Arrange
+		    // Arrange
 			const string code = "screen.Location.Offset(screen.Location)";
-			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen.Location;_.Offset(♥screen.Location);return _;})()⊃";
+            const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle, " +
+                                    "System.Drawing.Rectangle>" +
+                                    "((System.Drawing.Rectangle _)=>{" +
+                                    "_.Location.Offset(♥screen.Location);" +
+                                    "return _;})(♥screen)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -55,7 +63,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		{
 			// Arrange
 			const string code = "screen.X = 1";
-			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle>(()=>{var _=♥screen;_.X=1;return _;})()⊃";
+            const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle, " +
+                                    "System.Drawing.Rectangle>(" +
+                                    "(System.Drawing.Rectangle _)=>{" +
+                                    "_.X=1;return _;})(♥screen)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
