@@ -60,7 +60,6 @@ namespace RobotPlusPlus.Core.Compiling
 
 			// Reset contexts
 			Context = GetPopulatedContext(G1ANTRepository, CSharpRepository);
-		    Context.RegisterValueDecayed(new Variable("_", null, null));
 
 			// Compile
 			CompileUnits(codeUnits, this);

@@ -28,10 +28,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "screen.Inflate(screen.Size)";
 			const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle, " +
-			                        "System.Drawing.Point, System.Drawing.Rectangle>" +
-			                        "((System.Drawing.Rectangle _, System.Drawing.Point a1)=>{" +
-			                        "_.Location.Offset(a1);" +
-			                        "return _;})(♥screen, ♥screen.Location)⊃";
+			                        "System.Drawing.Size, System.Drawing.Rectangle>" +
+			                        "((System.Drawing.Rectangle _, System.Drawing.Size a1)=>{" +
+			                        "_.Inflate(a1);" +
+			                        "return _;})(♥screen, ♥screen.Size)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);
@@ -46,10 +46,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		    // Arrange
 			const string code = "screen.Location.Offset(screen.Location)";
             const string expected = "♥screen=⊂new Func<System.Drawing.Rectangle, " +
-                                    "System.Drawing.Rectangle>" +
-                                    "((System.Drawing.Rectangle _)=>{" +
-                                    "_.Location.Offset(♥screen.Location);" +
-                                    "return _;})(♥screen)⊃";
+                                    "System.Drawing.Point, System.Drawing.Rectangle>" +
+                                    "((System.Drawing.Rectangle _, System.Drawing.Point a1)=>{" +
+                                    "_.Location.Offset(a1);" +
+                                    "return _;})(♥screen, ♥screen.Location)⊃";
 
 			// Act
 			string compiled = Compiler.Compile(code);

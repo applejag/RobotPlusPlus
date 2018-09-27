@@ -165,7 +165,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
         }
 
         [Pure, NotNull]
-		public string AssembleMethodIntoString(IEnumerable<Argument> allArguments)
+		public string AssembleMethodIntoString(List<Argument> allArguments)
 		{
 			switch (MethodInfo)
 			{
@@ -200,7 +200,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			return string.Join(' ', parts);
 		}
 
-		public static string StringifyCSMethod(ExpressionUnit methodExpression, MethodInfo methodInfo, IEnumerable<Argument> allArguments)
+		public static string StringifyCSMethod(ExpressionUnit methodExpression, MethodInfo methodInfo, List<Argument> allArguments)
 		{
 			var args = new List<string>();
 
@@ -238,6 +238,33 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		    {
 		        // Instance method stringification
 		        methodExpression.NeedsCSSnippet = true;
+		        if (isVoid)
+		        {
+		            string[] paramInTypes = allArguments
+		                .Select(a => a.expression.OutputType)
+		                .OfType<CSharpType>()
+		                .Select(t => t.Type.FullName)
+		                .ToArray();
+		            string[] paramInStrings = allArguments
+		                .Select(a => a.expression.AssembleIntoString(false))
+		                .ToArray();
+
+		            string containerType = ((CSharpType) methodExpression.ContainerType).Type.FullName;
+		            string containerName = methodExpression.ContainerToken.SourceCode;
+		            string methodName = methodExpression.AssembleIntoString(false).Substring(containerName.Length + 1);
+
+		            string funcArgsTypes = containerType + ", " + string.Join(string.Empty, paramInTypes.Select(t => t + ", "))
+		                                + containerType;
+
+		            string funcArgsValues = "♥" + containerName + string.Join(string.Empty, paramInStrings.Select(s => ", " + s));
+
+		            string innerFuncArgs = string.Join(", ", paramInTypes.Select((s, i) => $"a{i+1}"));
+		            string funcParams = $"{containerType} _" +
+		                                string.Join(string.Empty, paramInTypes.Select((s, i) => $", {s} a{i+1}"));
+
+
+                    return $"♥{containerName}=⊂new Func<{funcArgsTypes}>(({funcParams})=>{{_{methodName}({innerFuncArgs});return _;}})({funcArgsValues})⊃";
+		        }
 		        return $"{methodExpression.AssembleIntoString(false)}({argsString})";
 		    }
 		}

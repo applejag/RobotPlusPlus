@@ -90,11 +90,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				}
 			}, true);
 
-			if (Usage == UsageType.Write)
-			{
-				ContainerToken = GetLeftmostToken(Token);
-				ContainerType = EvalTokenReadType(ContainerToken, compiler, EmbeddedCommands);
+		    ContainerToken = GetLeftmostToken(Token);
+		    ContainerType = EvalTokenReadType(ContainerToken, compiler, EmbeddedCommands);
 
+            if (Usage == UsageType.Write)
+			{
 				Type inputType = (InputType as CSharpType)?.Type ?? InputType.GetType();
 				Type outputType = (OutputType as CSharpType)?.Type ?? OutputType.GetType();
 
