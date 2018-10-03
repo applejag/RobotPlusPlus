@@ -107,7 +107,11 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				string containerType = StringifyTypeFullName(cs.Type);
 				string property = LHSExpression.StringifyToken(LHSExpression.Token).Substring(container.Length);
 				string expression = RHSExpression.StringifyToken(RHSExpression.Token);
-				rows.AppendLine("{0}=⊂new Func<{3}>(()=>{{var _={0};_{1}={2};return _;}})()⊃", container, property, expression, containerType);
+				rows.AppendLine("{0}=⊂new Func<{3}, {3}>(({3} _)=>{{_{1}={2};return _;}})({0})⊃", 
+				    container,  // ♥myRect
+                    property, // .Width
+				    expression, // 50
+				    containerType); // System.Drawing.Rectangle
 			} else
 				rows.AppendLine("{0}={1}", LHSExpression.AssembleIntoString(), RHSExpression.AssembleIntoString());
 
