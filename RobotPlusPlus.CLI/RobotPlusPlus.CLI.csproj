@@ -21,10 +21,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="g1antpp.png" />
 		<None Remove="sample.robotpp" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="g1antpp.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<EmbeddedResource Include="sample.robotpp" Condition="'$(Configuration)'=='Debug'">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
@@ -67,6 +71,10 @@
 		<OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
 		<!-- Set to false to transform files even if the output appears to be up-to-date (default is true)  -->
 		<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+		<PackageIconUrl>g1antpp.png</PackageIconUrl>
+		<PackageProjectUrl>https://github.com/jilleJr/RobotPlusPlus</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/jilleJr/RobotPlusPlus/blob/master/LICENSE</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/jilleJr/RobotPlusPlus</RepositoryUrl>
 	</PropertyGroup>
 
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
