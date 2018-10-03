@@ -1,13 +1,14 @@
 ﻿
 x = "hello dog" + 250
-y = "00: "+dialog.ask("lorem ipsum")
+y = "00: "+dialog.ask("give me one")
 
-if x == "hello dog250" {
-    y += 10 + (x=": " + dialog.ask("how are you?"))
+if (x.ToLower().Trim() == "hello dog250" && y == "00: 1") {
+    y += 0 + (x=": " + dialog.ask("give me one again").PadLeft(2))
 
     if y == "00: 10: 01" 
         y+=x
-}
+} else
+	dialog("You've failed me. :(")
 
 pause("⋘enter⋙")
 
