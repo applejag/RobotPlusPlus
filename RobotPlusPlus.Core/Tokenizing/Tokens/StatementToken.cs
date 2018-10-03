@@ -97,7 +97,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 			if (PunctuatorToken.IsOpenParentasesOfChar(next, '{')
 				|| (next is OperatorToken op && op.OperatorType == OperatorToken.Type.Assignment)
-				|| next is StatementToken)
+				|| next is StatementToken
+			    || next is FunctionCallToken)
 				return parent.PopNext();
 
 			throw new ParseUnexpectedTrailingTokenException(this, next);
