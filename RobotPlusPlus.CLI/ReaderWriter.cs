@@ -79,8 +79,9 @@ namespace RobotPlusPlus.CLI
 			if (tokenizedCode == null)
 				throw new InvalidOperationException("Code haven't been tokenized yet!");
 
-			return TryExecAction("Parsing code", "parsing", () => Parser.Parse(tokenizedCode), out parsedCode, log: options.Verbose)
-				   && TryExecAction("Compiling code", "compilation", () => Compiler.Compile(parsedCode), out compiledCode);
+		    if (!TryExecAction("Parsing code", "parsing", () => Parser.Parse(tokenizedCode), out parsedCode, log: options.Verbose))
+		        return false;
+		    return TryExecAction("Compiling code", "compilation", () => Compiler.Compile(parsedCode), out compiledCode);
 		}
 
 		public bool WriteCompiledToDestination()
