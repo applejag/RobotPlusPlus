@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -32,7 +32,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -46,7 +46,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -60,7 +60,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -75,7 +75,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -89,7 +89,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -99,9 +99,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "++x";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileVariableUnassignedException))]
@@ -110,9 +113,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x++";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_PrefixVariable()
@@ -126,7 +132,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -141,7 +147,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -157,7 +163,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -173,7 +179,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -189,7 +195,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -205,7 +211,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 	}
 }

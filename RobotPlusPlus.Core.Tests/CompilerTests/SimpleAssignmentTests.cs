@@ -13,7 +13,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x=1");
 
 			// Assert
-			Assert.AreEqual("♥x=1", output);
+			Assert.That.AreCodeEqual("♥x=1", output);
 		}
 
 		[TestMethod]
@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x = 1");
 
 			// Assert
-			Assert.AreEqual("♥x=1", output);
+			Assert.That.AreCodeEqual("♥x=1", output);
 		}
 
 		[TestMethod]
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("	x   =		  1   ");
 
 			// Assert
-			Assert.AreEqual("♥x=1", output);
+			Assert.That.AreCodeEqual("♥x=1", output);
 		}
 
 		[TestMethod]
@@ -45,9 +45,9 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string pointb4 = Compiler.Compile("x = .0");
 
 			// Assert
-			Assert.AreEqual("♥x=1.0", pointzero);
-			Assert.AreEqual("♥x=1.0", pointnull);
-			Assert.AreEqual("♥x=0.0", pointb4);
+			Assert.That.AreCodeEqual("♥x=1.0", pointzero);
+			Assert.That.AreCodeEqual("♥x=1.0", pointnull);
+			Assert.That.AreCodeEqual("♥x=0.0", pointb4);
 		}
 
 		[TestMethod]
@@ -58,8 +58,8 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string suffixlower = Compiler.Compile("x = 1f");
 
 			// Assert
-			Assert.AreEqual("♥x=1.0", suffixupper);
-			Assert.AreEqual("♥x=1.0", suffixlower);
+			Assert.That.AreCodeEqual("♥x=1.0", suffixupper);
+			Assert.That.AreCodeEqual("♥x=1.0", suffixlower);
 		}
 
 		[TestMethod]
@@ -72,10 +72,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string pointnull_suffixlower = Compiler.Compile("x = 1.f");
 
 			// Assert
-			Assert.AreEqual("♥x=1.0", pointzero_suffixupper);
-			Assert.AreEqual("♥x=1.0", pointzero_suffixlower);
-			Assert.AreEqual("♥x=1.0", pointnull_suffixupper);
-			Assert.AreEqual("♥x=1.0", pointnull_suffixlower);
+			Assert.That.AreCodeEqual("♥x=1.0", pointzero_suffixupper);
+			Assert.That.AreCodeEqual("♥x=1.0", pointzero_suffixlower);
+			Assert.That.AreCodeEqual("♥x=1.0", pointnull_suffixupper);
+			Assert.That.AreCodeEqual("♥x=1.0", pointnull_suffixlower);
 		}
 
 		[TestMethod]
@@ -85,7 +85,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile(@"x = ""foo""");
 
 			// Assert
-			Assert.AreEqual("♥x=‴foo‴", output);
+			Assert.That.AreCodeEqual("♥x=‴foo‴", output);
 		}
 
 		[TestMethod]
@@ -95,7 +95,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x = true");
 
 			// Assert
-			Assert.AreEqual("♥x=true", output);
+			Assert.That.AreCodeEqual("♥x=true", output);
 		}
 
 	}

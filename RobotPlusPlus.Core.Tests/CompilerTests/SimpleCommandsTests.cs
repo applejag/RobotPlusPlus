@@ -16,8 +16,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "delay";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_0Args()
@@ -30,7 +33,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -44,7 +47,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -58,7 +61,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -72,7 +75,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -87,7 +90,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -102,7 +105,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -116,7 +119,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -130,7 +133,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -144,7 +147,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -159,7 +162,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -174,7 +177,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -185,8 +188,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "dialog(text: 'foo bar')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 
 		[TestMethod]
@@ -196,8 +202,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "opendialogbox(text: 'foo bar')";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 	}
 }

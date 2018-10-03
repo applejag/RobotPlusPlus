@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -32,7 +32,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -42,9 +42,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foo' - 5";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitAssignmentException))]
@@ -53,9 +56,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10; x = 'foo'";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_VariableReuseTypeNoConflict()
@@ -69,7 +75,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -79,9 +85,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 20; x += 'boo'";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeInvalidOperationException))]
@@ -90,9 +99,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 20; x -= 'boo'";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_CommandResultCorrectType()
@@ -106,7 +118,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -116,9 +128,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 90; x = dialog.ask('lorem')";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_CommandArgumentCorrectType()
@@ -131,7 +146,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -141,9 +156,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "dialog(true)";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -152,9 +170,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10; if x {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -163,9 +184,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if 10 {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -174,9 +198,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10; while x {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -185,9 +212,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "while 10 {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -196,9 +226,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10; do {} while x";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeConvertImplicitException))]
@@ -207,9 +240,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "do {} while 10";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 	}
 }

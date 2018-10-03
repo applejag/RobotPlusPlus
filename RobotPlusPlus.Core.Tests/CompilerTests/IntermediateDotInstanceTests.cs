@@ -37,7 +37,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -54,9 +54,9 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Act
 			string compiled = Compiler.Compile(code);
 
-			// Assert
-			Assert.AreEqual(expected, compiled);
-		}
+		    // Assert
+		    Assert.That.AreCodeEqual(expected, compiled);
+        }
 		
 		[TestMethod]
 		public void Compile_PropertyAssignment()
@@ -72,7 +72,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 	}
 }

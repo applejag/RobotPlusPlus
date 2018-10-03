@@ -20,7 +20,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -34,7 +34,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -44,9 +44,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = screen.Lorem";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileVariableUnassignedException))]
@@ -55,9 +58,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = lorem.Width";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
@@ -66,9 +72,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'hello'.Empty";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
@@ -77,9 +86,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = screen.Size.Lorem";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
@@ -88,9 +100,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = screen.Lorem.Width";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_PropertyOfMethodResult()
@@ -103,7 +118,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -117,7 +132,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -131,7 +146,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -155,9 +170,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foo'.LoremIpsum()";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_CallOnNumber_0Arg()
@@ -170,7 +188,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -184,7 +202,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -194,9 +212,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 10.LoremIpsum()";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_CallOnVariable_0Arg()
@@ -210,7 +231,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -225,7 +246,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -239,7 +260,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -262,9 +283,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "x = 'foovar'; y = x.LoremIpsum()";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_UseCallResultInIf()
@@ -278,7 +302,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -288,9 +312,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if 'a'.ToUpper() {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_UsePropertyResultInIf()
@@ -304,7 +331,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -314,9 +341,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if 'a'.Length {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_CallOnProperty()
@@ -329,7 +359,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 	}
 }

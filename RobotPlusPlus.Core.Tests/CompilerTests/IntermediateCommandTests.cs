@@ -16,8 +16,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "program()";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileParameterRequiredMissingException))]
@@ -27,8 +30,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "test.equals(current: 5)";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileParameterRequiredMissingException))]
@@ -38,8 +44,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "program(wait: true)";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_RequiredValid()
@@ -52,7 +61,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -63,8 +72,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "excel.getvalue(row: 1)";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_RequiredGroupValid_1()
@@ -77,7 +89,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -91,7 +103,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -102,8 +114,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "excel.getvalue(row: 1, colindex: 1, colname: 'A')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_ReturnValue()
@@ -116,7 +131,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -131,7 +146,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -160,7 +175,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -176,7 +191,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -187,8 +202,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "directory.filescount(path: 'c:/', result: 'foo')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileExpressionCannotAssignException))]
@@ -198,8 +216,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "x = 'foo'; directory.filescount(path: 'c:/', result: x + 'bar')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_ResultVariable()
@@ -212,7 +233,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -223,8 +244,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "dialog(message: 'foo', message: 'bar')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileParameterNamedDoesntExistException))]
@@ -234,8 +258,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "dialog('foo', message: 'bar')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_ReuseTempVariable()
@@ -250,7 +277,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		//TODO:
@@ -277,7 +304,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -292,7 +319,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -303,7 +330,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "debug.trace(bar)";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 	}
 }

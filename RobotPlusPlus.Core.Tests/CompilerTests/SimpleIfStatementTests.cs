@@ -14,9 +14,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if {}";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(ParseUnexpectedTrailingTokenException))]
@@ -25,9 +28,12 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Arrange
 			const string code = "if 1 > 0";
 
-			// Act
-			Compiler.Compile(code);
-		}
+		    // Act
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_IfCodeBlockEmpty()
@@ -41,7 +47,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -57,7 +63,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -74,7 +80,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -90,7 +96,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -107,7 +113,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -125,7 +131,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -143,7 +149,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -161,7 +167,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 
@@ -178,7 +184,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 	}
 }

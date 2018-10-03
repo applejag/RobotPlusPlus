@@ -10,51 +10,61 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		[TestMethod]
 		public void Compile_MultipleAssignmentsSpace()
 		{
-			// Act
-			string output = Compiler.Compile("a = 1 b = 2");
+            const string expected = "♥a=1\n♥b=2";
 
-			// Assert
-			Assert.AreEqual("♥a=1\n♥b=2", output);
-		}
+			// Act
+			string actual = Compiler.Compile("a = 1 b = 2");
+
+            // Assert
+		    Assert.That.AreCodeEqual(expected, actual);
+        }
 
 		[TestMethod]
 		public void Compile_MultipleAssignmentsNewLine()
 		{
-			// Act
-			string output = Compiler.Compile("a = 1\nb = 2");
+            const string expected = "♥a=1\n♥b=2";
 
-			// Assert
-			Assert.AreEqual("♥a=1\n♥b=2", output);
+			// Act
+			string actual = Compiler.Compile("a = 1\nb = 2");
+
+            // Assert
+		    Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
 		public void Compile_MultipleAssignmentsSemicolon()
 		{
-			// Act
-			string output = Compiler.Compile("a = 1;b = 2");
+            const string expected = "♥a=1\n♥b=2";
 
-			// Assert
-			Assert.AreEqual("♥a=1\n♥b=2", output);
+			// Act
+			string actual = Compiler.Compile("a = 1;b = 2");
+
+            // Assert
+		    Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
 		public void Compile_StringEscape()
 		{
-			// Act
-			string output = Compiler.Compile(@"x = ""foo\nbar""");
+            const string expected = @"♥x=⊂""foo\nbar""⊃";
 
-			// Assert
-			Assert.AreEqual(@"♥x=⊂""foo\nbar""⊃", output);
+			// Act
+			string actual = Compiler.Compile(@"x = ""foo\nbar""");
+
+            // Assert
+		    Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
 		public void Compile_StringAndNumber()
 		{
+            const string expected = @"♥x=⊂""foo""+5⊃";
+
 			// Act
-			string output = Compiler.Compile(@"x = ""foo"" + 5");
+			string actual = Compiler.Compile(@"x = ""foo"" + 5");
 
 			// Assert
-			Assert.AreEqual(@"♥x=⊂""foo""+5⊃", output);
+		    Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -62,16 +72,22 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		public void Compile_VariableUnassigned()
 		{
 			// Act
-			Compiler.Compile("x = y");
-		}
+			string result = Compiler.Compile("x = y");
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileVariableUnassignedException))]
 		public void Compile_VariableSelfAssign()
 		{
 			// Act
-			Compiler.Compile("x = x");
-		}
+			string result = Compiler.Compile("x = x");
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 
 		[TestMethod]
@@ -79,27 +95,30 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		public void Compile_VariableSelfIncrementAssign()
 		{
 			// Act
-			Compiler.Compile("x += 10");
-		}
+			string result = Compiler.Compile("x += 10");
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_VariableAssigned()
 		{
 			// Act
-			string output = Compiler.Compile("y = 42     x = y");
+			string actual = Compiler.Compile("y = 42     x = y");
 
 			// Assert
-			Assert.AreEqual("♥y=42\n♥x=♥y", output);
+			Assert.That.AreCodeEqual("♥y=42\n♥x=♥y", actual);
 		}
 
 		[TestMethod]
 		public void Compile_NestedAssignment()
 		{
 			// Act
-			string output = Compiler.Compile("y = x = 10");
+			string actual = Compiler.Compile("y = x = 10");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥y=♥x", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥y=♥x", actual);
 		}
 
 		[TestMethod]
@@ -109,38 +128,42 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			// Act
 			// Should compile to y = ((5 + x) = 10), which is invalid
 			// You can't set (5 + x) = 10, need solo variable
-			Compiler.Compile("y = 5 + x = 10");
+		    string result = Compiler.Compile("y = 5 + x = 10");
 
-			// Assert
-		}
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_NestedAlteredAssignment()
 		{
 			// Act
-			string output = Compiler.Compile("y = 5 + (x = 10)");
+			string actual = Compiler.Compile("y = 5 + (x = 10)");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥y=5+♥x", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥y=5+♥x", actual);
 		}
 
 		[TestMethod]
 		public void Compile_NestedMultipleAssignment()
 		{
 			// Act
-			string output = Compiler.Compile("y = x = z = 10");
+			string actual = Compiler.Compile("y = x = z = 10");
 
 			// Assert
-			Assert.AreEqual("♥z=10\n♥x=♥z\n♥y=♥x", output);
+			Assert.That.AreCodeEqual("♥z=10\n♥x=♥z\n♥y=♥x", actual);
 		}
 		
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypeReadOnlyException))]
 		public void Compile_AssignStaticValue()
 		{
-			// Act
-			Compiler.Compile("string = 'foo'");
-		}
+		    // Act
+		    string result = Compiler.Compile("string = 'foo'");
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 	}
 }

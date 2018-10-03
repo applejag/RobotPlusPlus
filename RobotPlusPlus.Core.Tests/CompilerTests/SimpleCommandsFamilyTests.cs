@@ -16,8 +16,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "excel.open";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_Family_0Args()
@@ -30,7 +33,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -44,7 +47,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -59,7 +62,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -74,7 +77,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -88,7 +91,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -102,7 +105,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -116,7 +119,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -131,7 +134,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -146,7 +149,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string compiled = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, compiled);
+			Assert.That.AreCodeEqual(expected, compiled);
 		}
 
 		[TestMethod]
@@ -157,8 +160,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "excel.open(text: 'c:/some/file')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileVariableUnassignedException))]
@@ -168,8 +174,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "computer.open(something: 'c:/some/file')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		[ExpectedException(typeof(CompileTypePropertyDoesNotExistException))]
@@ -179,7 +188,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "dialog.prompt(something: 'c:/some/file')";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 	}
 }

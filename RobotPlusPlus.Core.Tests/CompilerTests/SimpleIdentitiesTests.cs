@@ -13,7 +13,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			string output = Compiler.Compile(code);
 
-			Assert.AreEqual("♥a=1\n♥A2=2", output);
+			Assert.That.AreCodeEqual("♥a=1\n♥A2=2", output);
 		}
 
 		[TestMethod]
@@ -23,7 +23,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x = 10 { x = 15 }");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥x=15", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥x=15", output);
 		}
 
 		[TestMethod]
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("{ x = 10 } x = 15");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥x2=15", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥x2=15", output);
 		}
 
 		[TestMethod]
@@ -43,7 +43,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("{ x = 10 } { x = 15 }");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥x2=15", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥x2=15", output);
 		}
 
 		[TestMethod]
@@ -53,7 +53,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("{ { x = 10 y = 2 } x = 15 } y = 8");
 
 			// Assert
-			Assert.AreEqual("♥x=10\n♥y=2\n♥x2=15\n♥y2=8", output);
+			Assert.That.AreCodeEqual("♥x=10\n♥y=2\n♥x2=15\n♥y2=8", output);
 		}
 
 		[TestMethod]
@@ -63,7 +63,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			string output = Compiler.Compile(code);
 
-			Assert.AreEqual("♥a=1", output);
+			Assert.That.AreCodeEqual("♥a=1", output);
 		}
 
 		[TestMethod]
@@ -73,7 +73,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 
 			string output = Compiler.Compile(code);
 
-			Assert.AreEqual("♥a=1\n♥a2=5", output);
+			Assert.That.AreCodeEqual("♥a=1\n♥a2=5", output);
 		}
 	}
 }
