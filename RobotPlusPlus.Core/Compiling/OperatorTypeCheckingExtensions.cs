@@ -49,7 +49,17 @@ namespace RobotPlusPlus.Core.Compiling
 				case "==": return TypeChecking.CanEqual(LHS, RHS);
 				case "!=": return TypeChecking.CanNotEqual(LHS, RHS);
 
-				default:
+			    case "&&": return TypeChecking.CanConditionalAnd(LHS, RHS);
+			    case "||": return TypeChecking.CanConditionalOr(LHS, RHS);
+
+			    case "&": return TypeChecking.CanLogicalAnd(LHS, RHS);
+			    case "|": return TypeChecking.CanLogicalAnd(LHS, RHS);
+			    case "^": return TypeChecking.CanLogicalXor(LHS, RHS);
+
+                case ">>": return TypeChecking.CanShiftRight(LHS, RHS);
+                case "<<": return TypeChecking.CanShiftLeft(LHS, RHS);
+
+			    default:
 					throw new NotImplementedException();
 			}
 		}
