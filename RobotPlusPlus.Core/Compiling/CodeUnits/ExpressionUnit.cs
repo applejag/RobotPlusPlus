@@ -66,10 +66,10 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		{
 			NeedsCSSnippet = false;
 
-			// Keep track of commands
-			EmbeddedCommands.Clear();
-			// Extract function calls
-			Token = ExtractInnerCommands(compiler, Token);
+            // Keep track of commands
+            EmbeddedCommands.Clear();
+            // Extract function calls
+            Token = ExtractInnerCommands(compiler, Token);
 
 			foreach (CodeUnit pre in PreUnits)
 				pre.Compile(compiler);
@@ -459,8 +459,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 				EmbeddedCommands[func] = cmd;
 				cmd.Compile(compiler);
 
-				// Only extract g1ant methods
-				if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
+                // Copy its pre/post units
+			    foreach (CodeUnit preUnit in cmd.Method.PreUnits)
+			        PreUnits.Add(preUnit);
+			    foreach (CodeUnit postUnit in cmd.Method.PostUnits)
+			        PostUnits.Add(postUnit);
+
+                // Only extract g1ant methods
+                if (cmd.MethodInfo is G1ANTMethodInfo && parent != null)
 				{
 				    (CodeUnit unit, IdentifierTempToken temp) =
 				        AssignmentUnit.CreateTemporaryAssignment(token, this);
