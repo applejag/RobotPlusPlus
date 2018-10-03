@@ -163,15 +163,15 @@ namespace RobotPlusPlus.CLI
 				console.ForegroundColor = color;
 				console.Write(status);
 
-				if (options.Verbose)
-				{
+				//if (options.Verbose)
+				//{
 					watch.Stop();
 					console.ForegroundColor = ConsoleColor.DarkGray;
 					console.WriteLine($" (Took {watch.ElapsedMilliseconds}ms)");
 					console.ResetColor();
-				}
-				else
-					console.WriteLine();
+				//}
+				//else
+				//	console.WriteLine();
 			}
 
 			try
