@@ -14,21 +14,21 @@ namespace RobotPlusPlus.CLI
 		#region Private option fields
 		[Required]
 		[FileExists]
-		[FileExtensions(Extensions = ".robotpp")]
+		[FileExtensions(Extensions = "robotpp,g1antpp")]
 		[Argument(0, Name = "Script",
 			Description = "Required. The `.robotpp` script to be parsed.")]
 		private string OptScript { get; } = null;
 
 		[ValidPathCharacters(ErrorMessage = "The output folder must not contains invalid characters!")]
 		[Option("-d --dest <FOLDER>",
-			Description = "The destination for the compiled `.robot` script.\r\n" +
+			Description = "The destination for the compiled `.g1ant` script.\r\n" +
 						  "Default: Same folder as <Script>.")]
 		private string OptDestinationFolder { get; } = null;
 
 		[ValidFileNameCharacters(ErrorMessage = "The output filename must not contains invalid characters!")]
 		[Option("-n --name <FILENAME>",
-			Description = "The output filename. The extension `.robot` will be added if one is omitted.\r\n" +
-						  "Default: Same name as <Script> but with `.robot` extension.")]
+			Description = "The output filename. The extension `.g1ant` will be added if one is omitted.\r\n" +
+						  "Default: Same name as <Script> but with `.g1ant` extension.")]
 		private string OptDestinationFileName { get; } = null;
 
 		[Option("-np --nopause",
@@ -161,7 +161,7 @@ namespace RobotPlusPlus.CLI
 			string folder = OptDestinationFolder;
 
 			if (filename == null)
-				filename = Path.ChangeExtension(Path.GetFileName(source), ".robot");
+				filename = Path.ChangeExtension(Path.GetFileName(source), ".g1ant");
 
 			if (folder == null)
 				folder = Path.GetDirectoryName(source);
@@ -171,14 +171,14 @@ namespace RobotPlusPlus.CLI
 
 		public enum Encodings
 		{
-			UTF7 = 65000,
-			UTF8 = 65001,
-			UTF16 = 1200,
-			Windows1252 = 1252,
-			UTF32 = 12000,
-			UTF32BE = 12001,
-			ASCII = 20127,
-			ISO_8859_1 = 28591,
+			[UsedImplicitly] UTF7 = 65000,
+			[UsedImplicitly] UTF8 = 65001,
+		    [UsedImplicitly] UTF16 = 1200,
+		    [UsedImplicitly] Windows1252 = 1252,
+		    [UsedImplicitly] UTF32 = 12000,
+		    [UsedImplicitly] UTF32BE = 12001,
+		    [UsedImplicitly] ASCII = 20127,
+		    [UsedImplicitly] ISO_8859_1 = 28591,
 		}
 	}
 }
