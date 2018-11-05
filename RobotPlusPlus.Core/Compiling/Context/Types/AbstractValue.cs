@@ -12,7 +12,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		public string Identifier { get; }
 		[NotNull]
 		public string Generated { get; }
-
+		
 		protected AbstractValue(
 			[NotNull] string generated,
 			[NotNull] string identifier)
@@ -40,6 +40,7 @@ namespace RobotPlusPlus.Core.Compiling.Context.Types
 		{
 			if (string.IsNullOrWhiteSpace(Identifier))
 				return string.IsNullOrWhiteSpace(Generated) ? "<null>" : Generated;
+			if (Identifier == Generated) return Identifier;
 			return string.IsNullOrWhiteSpace(Generated) ? Identifier : $"{Identifier}<{Generated}>";
 		}
 

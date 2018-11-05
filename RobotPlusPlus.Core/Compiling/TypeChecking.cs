@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Exceptions;
+using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
 
@@ -10,26 +13,112 @@ namespace RobotPlusPlus.Core.Compiling
 {
 	public static class TypeChecking
 	{
-		[Pure]
-		public static bool CanImplicitlyConvert(Type from, Type to)
+		[CanBeNull, Pure]
+		public static Type GetValueType([NotNull] this MemberInfo info)
 		{
-			// I feel filthy using this try-catch method, but until a better solution comes...
-			try
+			switch (info)
 			{
-				// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-				Expression.Convert(Expression.Parameter(from, null), to);
-				return true;
-			}
-			catch
-			{
-				return false;
+				case FieldInfo field:
+					return field.FieldType;
+
+				case PropertyInfo property:
+					return property.PropertyType;
+
+				case G1ANTMethodInfo g1antMethod:
+					return g1antMethod.ResultType;
+
+				case MethodInfo method:
+					return method.ReturnType;
+
+				default:
+					throw new NotImplementedException();
 			}
 		}
 
-		/// <summary>
-		/// x&gt;y, x&gt;=y, x&lt;y, x&lt;=y
-		/// </summary>
-		[CanBeNull, Pure]
+		[Pure]
+		public static bool CanRead([NotNull] this MemberInfo info)
+		{
+			switch (info)
+			{
+				case FieldInfo field:
+					return field.IsPublic;
+
+				case PropertyInfo property:
+					return property.CanRead;
+
+				case MethodInfo method:
+					return method.IsPublic;
+
+				default:
+					return false;
+			}
+		}
+
+		[Pure]
+		public static bool CanWrite([NotNull] this MemberInfo info)
+		{
+			switch (info)
+			{
+				case FieldInfo field:
+					return !field.IsInitOnly && !field.IsLiteral;
+
+				case PropertyInfo property:
+					return property.CanWrite;
+
+				default:
+					return false;
+			}
+		}
+
+		[Pure]
+		public static bool CanImplicitlyConvert(Type from, Type to)
+		{
+		    return to.IsAssignableFrom(from) || from.HasCastDefined(to, true);
+        }
+
+	    static bool HasCastDefined(this Type from, Type to, bool implicitly)
+	    {
+	        if ((from.IsPrimitive || from.IsEnum) && (to.IsPrimitive || to.IsEnum))
+	        {
+	            if (!implicitly)
+	                return from == to || (from != typeof(bool) && to != typeof(bool));
+
+	            Type[][] typeHierarchy = {
+	                new[] { typeof(byte),  typeof(sbyte), typeof(char) },
+	                new[] { typeof(short), typeof(ushort) },
+	                new[] { typeof(int), typeof(uint) },
+	                new[] { typeof(long), typeof(ulong) },
+	                new[] { typeof(float) },
+	                new[] { typeof(double) }
+	            };
+	            IEnumerable<Type> lowerTypes = Enumerable.Empty<Type>();
+	            foreach (Type[] types in typeHierarchy)
+	            {
+	                if (types.Any(t => t == to))
+	                    return lowerTypes.Any(t => t == from);
+	                lowerTypes = lowerTypes.Concat(types);
+	            }
+
+	            return false;   // IntPtr, UIntPtr, Enum, Boolean
+	        }
+	        return IsCastDefined(to, m => m.GetParameters()[0].ParameterType, _ => from, implicitly, false)
+	               || IsCastDefined(from, _ => to, m => m.ReturnType, implicitly, true);
+	    }
+
+	    static bool IsCastDefined(Type type, Func<MethodInfo, Type> baseType,
+	        Func<MethodInfo, Type> derivedType, bool implicitly, bool lookInBase)
+	    {
+	        var bindinFlags = BindingFlags.Public | BindingFlags.Static
+	                                              | (lookInBase ? BindingFlags.FlattenHierarchy : BindingFlags.DeclaredOnly);
+	        return type.GetMethods(bindinFlags).Any(
+	            m => (m.Name == "op_Implicit" || (!implicitly && m.Name == "op_Explicit"))
+	                 && baseType(m).IsAssignableFrom(derivedType(m)));
+	    }
+
+        /// <summary>
+        /// x&gt;y, x&gt;=y, x&lt;y, x&lt;=y
+        /// </summary>
+        [CanBeNull, Pure]
 		public static Type CanGreaterThan(Type x, Type y)
 		{
 			try

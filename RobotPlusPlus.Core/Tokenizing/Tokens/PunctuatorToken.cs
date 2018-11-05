@@ -187,6 +187,27 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			return parentasesPairs[c];
 		}
 
+		public override string ToString()
+		{
+			switch (PunctuatorType)
+			{
+				case Type.Dot:
+					return DotLHS + base.ToString() + DotRHS;
+
+				case Type.Colon:
+					return ColonName + base.ToString() + TrailingWhitespace;
+
+				case Type.OpeningParentases:
+					if (Count == 0)
+						return Character.ToString() + GetMatchingParentases(Character);
+					
+					return Character + this.Aggregate(this[0].LeadingWhitespace, (s, t) => s + t + t.TrailingWhitespace) + GetMatchingParentases(Character);
+
+				default:
+					return base.ToString();
+			}
+		}
+
 		public enum Type
 		{
 			OpeningParentases,

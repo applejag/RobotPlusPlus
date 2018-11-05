@@ -9,7 +9,7 @@ namespace RobotPlusPlus.Core.Exceptions
 		{ }
 
 		public CompileVariableUnassignedException(IdentifierToken variable, Exception innerException)
-			: base($"Use of unassigned variable <{variable.Identifier}>.", variable, innerException)
+			: base($"Use of unassigned variable <{(variable is IdentifierTempToken ? variable.ToString() : variable.Identifier)}>.", variable, innerException)
 		{ }
 	}
 }

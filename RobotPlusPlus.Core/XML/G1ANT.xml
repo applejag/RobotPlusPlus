@@ -55,6 +55,7 @@
 	<Commands>
 
 		<GlobalArguments>
+			<Argument Name="timeout" Type="integer"/>
 			<Argument Name="errorjump" Type="label"/>
 			<Argument Name="errormessage" Type="string"/>
 			<Argument Name="if" Type="boolean"/>
@@ -64,7 +65,6 @@
 			<Argument Name="position" Type="point" Required="true"/>
 			<Argument Name="result" Type="variable"/>
 			<Argument Name="relative" Type="boolean"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="color">
@@ -73,7 +73,6 @@
 				<Argument Name="color" Type="string" Required="true"/>
 				<Argument Name="relative" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 
 			<Command Name="find">
@@ -82,31 +81,26 @@
 				<Argument Name="direction" Type="string"/>
 				<Argument Name="relative" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="point"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<Command Name="database">
 			<Argument Name="connection" Type="string" Required="true"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="debug">
 			<Command Name="trace">
 				<Argument Name="variablename" Type="variablename" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<Command Name="delay">
 			<Argument Name="seconds" Type="integer"/>
 			<Argument Name="milliseconds" Type="integer"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<Command Name="dialog">
 			<Argument Name="message" Type="string"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="dialog">
@@ -120,7 +114,6 @@
 			<Argument Name="path" Type="string" Required="true"/>
 			<Argument Name="pattern" Type="string"/>
 			<Argument Name="result" Type="variable" VariableType="list"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="directory">
@@ -128,19 +121,16 @@
 				<Argument Name="path" Type="string" Required="true"/>
 				<Argument Name="pattern" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<Command Name="chrome">
 			<Argument Name="url" Type="string" Required="true"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="is">
 			<Command Name="accessible">
 				<Argument Name="hostname" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
 			</Command>
 		</CommandFamily>
@@ -156,7 +146,6 @@
 				<Argument Name="subject" Type="string"/>
 				<Argument Name="body" Type="string"/>
 				<Argument Name="attachments" Type="list"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
@@ -165,7 +154,6 @@
 				<Argument Name="area" Type="rectangle" Required="true"/>
 				<Argument Name="relative" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 				<Argument Name="language" Type="string"/>
 			</Command>
 			<Command Name="find">
@@ -173,27 +161,23 @@
 				<Argument Name="area" Type="rectangle"/>
 				<Argument Name="relative" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="rectangle"/>
-				<Argument Name="timeout" Type="integer"/>
 				<Argument Name="language" Type="string"/>
 			</Command>
 		</CommandFamily>
 
 		<Command Name="pause">
 			<Argument Name="key" Type="string"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<Command Name="ping">
 			<Argument Name="ip" Type="string"/>
 			<Argument Name="repeats" Type="integer"/>
-			<Argument Name="timeout" Type="integer"/>
 			<Argument Name="result" Type="variable" VariableType="integer"/>
 		</Command>
 
 		<Command Name="program">
 			<Argument Name="name" Type="string" Required="true"/>
 			<Argument Name="arguments" Type="string"/>
-			<Argument Name="timeout" Type="integer"/>
 			<Argument Name="wait" Type="boolean"/>
 		</Command>
 
@@ -205,14 +189,12 @@
 				<Argument Name="usechars" Type="boolean"/>
 				<Argument Name="casesensitivity" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<Command Name="rest">
 			<Argument Name="method" Type="string" Required="true"/>
 			<Argument Name="url" Type="string" Required="true"/>
-			<Argument Name="timeout" Type="integer"/>
 			<Argument Name="headers" Type="list"/>
 			<Argument Name="parameters" Type="list"/>
 			<Argument Name="result" Type="variable" VariableType="string"/>
@@ -221,18 +203,15 @@
 
 		<Command Name="stop">
 			<Argument Name="silentmode" Type="boolean"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<Command Name="test">
 			<Argument Name="condition" Type="boolean" Required="true"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<Command Name="window">
 			<Argument Name="title" Type="string"/>
 			<Argument Name="style" Type="string"/>
-			<Argument Name="timeout" Type="integer"/>
 		</Command>
 
 		<CommandFamily Name="vnc">
@@ -240,7 +219,6 @@
 				<Argument Name="host" Type="string" Required="true"/>
 				<Argument Name="port" Type="string" Required="true"/>
 				<Argument Name="password" Type="string"/>
-				<Argument Name="timeout" Type="integer"/>
 				<Argument Name="result" Type="variable" VariableType="boolean"/>
 			</Command>
 		</CommandFamily>
@@ -248,49 +226,48 @@
 		<CommandFamily Name="as400">
 			<Command Name="open">
 				<Argument Name="host" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="excel">
 			<Command Name="activatesheet">
 				<Argument Name="name" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="addsheet">
 				<Argument Name="name" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="close">
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="duplicaterow">
 				<Argument Name="source" Type="integer" Required="true"/>
 				<Argument Name="destination" Type="integer" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="export">
 				<Argument Name="path" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="getformula">
 				<Argument Name="row" Type="integer" Required="true"/>
-				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
+				<Overload>
+					<Argument Name="row" Type="integer" Required="true"/>
+					<Argument Name="colindex" Type="integer" Required="true"/>
+					<Argument Name="result" Type="variable" VariableType="string"/>
+				</Overload>
 			</Command>
 			<Command Name="getrow">
 				<Argument Name="row" Type="integer" Required="true"/>
 				<Argument Name="result" Type="variable" VariableType="list"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="getvalue">
 				<Argument Name="row" Type="integer" Required="true"/>
-				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
+				<Overload>
+					<Argument Name="row" Type="integer" Required="true"/>
+					<Argument Name="colindex" Type="integer" Required="true"/>
+					<Argument Name="result" Type="variable" VariableType="string"/>
+				</Overload>
 			</Command>
 			<Command Name="importtext">
 				<Argument Name="path" Type="string" Required="true"/>
@@ -299,55 +276,54 @@
 				<Argument Name="name" Type="string"/>
 				<Argument Name="resultrows" Type="variable" VariableType="integer"/>
 				<Argument Name="resultcolumns" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="insertcolumn">
-				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
+				<Argument Name="colname" Type="string" Required="true"/>
 				<Argument Name="where" Type="string"/>
-				<Argument Name="timeout" Type="integer"/>
+				<Overload>
+					<Argument Name="colindex" Type="integer" Required="true"/>
+					<Argument Name="where" Type="string"/>
+				</Overload>
 			</Command>
 			<Command Name="insertrow">
 				<Argument Name="row" Type="integer" Required="true"/>
 				<Argument Name="where" Type="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="open">
 				<Argument Name="path" Type="string"/>
 				<Argument Name="inbackground" Type="boolean"/>
 				<Argument Name="sheet" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="removecolumn">
-				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
-				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="colname" Type="string" Required="true"/>
+				<Overload>
+					<Argument Name="colindex" Type="integer" Required="true"/>
+				</Overload>
 			</Command>
 			<Command Name="removerow">
 				<Argument Name="row" Type="integer" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="runmacro">
 				<Argument Name="name" Type="string" Required="true"/>
 				<Argument Name="args" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="save">
 				<Argument Name="path" Type="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="setvalue">
 				<Argument Name="value" Type="string" Required="true"/>
 				<Argument Name="row" Type="integer" Required="true"/>
-				<Argument Name="colindex" Type="integer" Required="true" RequiredGroup="1"/>
-				<Argument Name="colname" Type="string" Required="true" RequiredGroup="1"/>
-				<Argument Name="timeout" Type="integer"/>
+				<Argument Name="colname" Type="string" Required="true"/>
+				<Overload>
+					<Argument Name="value" Type="string" Required="true"/>
+					<Argument Name="row" Type="integer" Required="true"/>
+					<Argument Name="colindex" Type="integer" Required="true"/>
+				</Overload>
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="integer" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
@@ -356,78 +332,64 @@
 				<Argument Name="path" Type="string" Required="true"/>
 				<Argument Name="destinationpath" Type="string" Required="true"/>
 				<Argument Name="overwrite" Type="boolean"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="delete">
 				<Argument Name="filename" Type="string" Required="true"/>
 				<Argument Name="result" Type="variable" VariableType="boolean"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="download">
 				<Argument Name="url" Type="string" Required="true"/>
 				<Argument Name="filename" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="exists">
 				<Argument Name="filename" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="googlesheet">
 			<Command Name="close">
 				<Argument Name="id" Type="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="download">
 				<Argument Name="path" Type="string" Required="true"/>
 				<Argument Name="type" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="find">
 				<Argument Name="value" Type="string" Required="true"/>
 				<Argument Name="sheetname" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="findall">
 				<Argument Name="value" Type="string" Required="true"/>
 				<Argument Name="sheetname" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="gettitle">
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="getvalue">
 				<Argument Name="range" Type="string" Required="true"/>
 				<Argument Name="sheetname" Type="string"/>
 				<Argument Name="result" Type="variable" VariableType="string"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="open">
 				<Argument Name="id" Type="string" Required="true"/>
 				<Argument Name="isshared" Type="boolean"/>
 				<Argument Name="result" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="settitle">
 				<Argument Name="title" Type="string" Required="true"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="setvalue">
 				<Argument Name="cell" Type="string" Required="true"/>
 				<Argument Name="value" Type="string" Required="true"/>
 				<Argument Name="sheetname" Type="string"/>
 				<Argument Name="numeric" Type="boolean"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="string" Required="true"/>
 				<Argument Name="result" Type="variable" VariableType="integer"/>
-				<Argument Name="timeout" Type="integer"/>
 			</Command>
 		</CommandFamily>
 
@@ -435,25 +397,20 @@
 			<Command Name="activatetab">
 				<Argument Name="phrase" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="attach">
 				<Argument Name="phrase" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="click">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
 				<Argument Name="nowait" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="close">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="detach">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="fireevent">
 				<Argument Name="eventname" Type="string" Required="true" />
@@ -461,38 +418,31 @@
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
 				<Argument Name="nowait" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="getattribute">
 				<Argument Name="name" Type="string" Required="true" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="string" />
 				<Argument Name="nowait" Type="boolean" />
 			</Command>
 			<Command Name="gettitle">
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="url" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="nowait" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
 				<Argument Name="autodetachonclose" Type="boolean" />
 			</Command>
 			<Command Name="refresh">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="runscript">
 				<Argument Name="script" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="saveas">
 				<Argument Name="path" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="setattribute">
 				<Argument Name="name" Type="string" Required="true" />
@@ -500,24 +450,19 @@
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
 				<Argument Name="nowait" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="seturl">
 				<Argument Name="url" Type="string" Required="true" />
 				<Argument Name="nowait" Type="boolean" />
-				<Argument Name="timeout" Type="integer" Required="true" />
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="variable" VariableType="integer" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="waitforcomplete">
-				<Argument Name="timeout" Type="integer" Required="true" />
 			</Command>
 			<Command Name="waitforvalue">
 				<Argument Name="script" Type="string" Required="true" />
 				<Argument Name="expectedvalue" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -529,7 +474,6 @@
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="threshold" Type="float" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="find">
 				<Argument Name="image1" Type="string" Required="true" />
@@ -541,12 +485,10 @@
 				<Argument Name="offsetx" Type="integer" />
 				<Argument Name="offsety" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="point" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="sharpen">
 				<Argument Name="path" Type="string" Required="true" />
 				<Argument Name="outputpath" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -554,17 +496,14 @@
 			<Command Name="capslock">
 				<Argument Name="state" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="numlock">
 				<Argument Name="state" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="scrolllock">
 				<Argument Name="state" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -573,27 +512,23 @@
 				<Argument Name="list1" Type="list" Required="true" />
 				<Argument Name="list2" Type="list" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="list" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="create">
 				<Argument Name="text" Type="string" Required="true" />
 				<Argument Name="separator" Type="string" Required="true" />
 				<Argument Name="type" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="list" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="indexof">
 				<Argument Name="list" Type="list" Required="true" />
 				<Argument Name="value" Type="list" Required="true" />
 				<Argument Name="alloccurances" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="list" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="remove">
 				<Argument Name="list" Type="list" Required="true" />
 				<Argument Name="toremove" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="list" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -605,13 +540,11 @@
 				<Argument Name="type" Type="string" />
 				<Argument Name="count" Type="integer" />
 				<Argument Name="mousedelay" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="move">
 				<Argument Name="position" Type="point" Required="true" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="wait" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="wheel">
 				<Argument Name="position" Type="point" />
@@ -619,7 +552,6 @@
 				<Argument Name="verticalsteps" Type="integer" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="mousedelay" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -628,7 +560,6 @@
 				<Argument Name="area" Type="rectangle" Required="true" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="languages" Type="list" />
 			</Command>
 			<Command Name="find">
@@ -636,7 +567,6 @@
 				<Argument Name="area" Type="rectangle" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="rectangle" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="languages" Type="list" />
 			</Command>
 			<Command Name="findpoint">
@@ -644,25 +574,21 @@
 				<Argument Name="area" Type="rectangle" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="point" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="languages" Type="list" />
 			</Command>
 			<Command Name="login">
 				<Argument Name="jsoncredential" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="outlook">
 			<Command Name="close">
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="findmails">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="showmail" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="newmessage">
 				<Argument Name="to" Type="string" />
@@ -670,37 +596,30 @@
 				<Argument Name="body" Type="string" />
 				<Argument Name="attachments" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="send">
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="pdf">
 			<Command Name="close">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="path" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="saveas">
 				<Argument Name="path" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="process">
 			<Command Name="kill">
 				<Argument Name="name" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -708,7 +627,6 @@
 			<Command Name="activatetab">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" Required="true" />
 			</Command>
 			<Command Name="callfunction">
 				<Argument Name="functionname" Type="string" Required="true" />
@@ -716,36 +634,29 @@
 				<Argument Name="type" Type="string" Required="true" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="click">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="close">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="getattribute">
 				<Argument Name="name" Type="string" Required="true" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="string" />
 			</Command>
 			<Command Name="gettitle">
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="newtab">
 				<Argument Name="url" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="nowait" Type="boolean" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="type" Type="string" Required="true" />
 				<Argument Name="url" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="nowait" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
 			</Command>
@@ -753,61 +664,51 @@
 				<Argument Name="key" Type="string" Required="true" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="refresh">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="runscript">
 				<Argument Name="script" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="setattribute">
 				<Argument Name="name" Type="string" Required="true" />
 				<Argument Name="value" Type="string" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="seturl">
 				<Argument Name="url" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="nowait" Type="boolean" />
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="integer" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="type">
 				<Argument Name="text" Type="string" Required="true" />
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="by" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="waitforvalue">
 				<Argument Name="script" Type="string" Required="true" />
 				<Argument Name="expectedvalue" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
-		<CommandFamily Name="string">
+		<!--<CommandFamily Name="string">
 			<Command Name="getsimilarity">
 				<Argument Name="phrase1" Type="string" Required="true" />
 				<Argument Name="phrase2" Type="string" Required="true" />
 				<Argument Name="ignorecase" Type="boolean" Required="true" />
 				<Argument Name="normalize" Type="boolean" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="float" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
-		</CommandFamily>
+		</CommandFamily>-->
 
 		<CommandFamily Name="test">
 			<Command Name="equals">
 				<Argument Name="current" Type="undefined" Required="true" />
 				<Argument Name="expected" Type="undefined" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -815,7 +716,6 @@
 			<Command Name="download">
 				<Argument Name="url" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="find">
 				<Argument Name="text" Type="string" Required="true" />
@@ -825,19 +725,16 @@
 				<Argument Name="regex" Type="string" />
 				<Argument Name="casesensitivity" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="matches">
 				<Argument Name="text" Type="string" Required="true" />
 				<Argument Name="regexes" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="read">
 				<Argument Name="filename" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
 				<Argument Name="encodingculture" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="replace">
 				<Argument Name="text" Type="string" Required="true" />
@@ -845,14 +742,12 @@
 				<Argument Name="regex" Type="string" />
 				<Argument Name="replace" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="write">
 				<Argument Name="text" Type="string" Required="true" />
 				<Argument Name="filename" Type="string" Required="true" />
 				<Argument Name="encodingculture" Type="string" />
 				<Argument Name="writemode" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
@@ -861,12 +756,10 @@
 				<Argument Name="position" Type="point" Required="true" />
 				<Argument Name="color" Type="string" Required="true" />
 				<Argument Name="relative" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="boolean" />
 			</Command>
 			<Command Name="file">
 				<Argument Name="path" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" Required="true" />
 			</Command>
 			<Command Name="image">
 				<Argument Name="image" Type="string" Required="true" />
@@ -876,12 +769,10 @@
 				<Argument Name="centerresult" Type="boolean" />
 				<Argument Name="offsetx" Type="integer" />
 				<Argument Name="offsety" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
 			</Command>
 			<Command Name="window">
 				<Argument Name="title" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="string" />
 			</Command>
 		</CommandFamily>
@@ -892,7 +783,6 @@
 				<Argument Name="apikey" Type="string" Required="true" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="threshold" Type="float" />
-				<Argument Name="timeout" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="string" />
 			</Command>
 			<Command Name="speechtotext">
@@ -902,113 +792,93 @@
 				<Argument Name="result" Type="variable" VariableType="string" />
 				<Argument Name="threshold" Type="float" />
 				<Argument Name="language" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="word">
 			<Command Name="close">
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="export">
 				<Argument Name="path" Type="string" Required="true" />
 				<Argument Name="type" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="gettext">
 				<Argument Name="result" Type="variable" VariableType="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="inserttext">
 				<Argument Name="text" Type="string" Required="true" />
 				<Argument Name="replacealltext" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="path" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="replace">
 				<Argument Name="from" Type="string" Required="true" />
 				<Argument Name="to" Type="string" Required="true" />
 				<Argument Name="matchcase" Type="boolean" />
 				<Argument Name="wholewords" Type="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="runmacro">
 				<Argument Name="name" Type="string" Required="true" />
 				<Argument Name="args" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="save">
 				<Argument Name="path" Type="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="integer" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="ocrabbyy">
 			<Command Name="close">
 				<Argument Name="document" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="exportxml">
 				<Argument Name="path" Type="string" Required="true" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="filter">
 				<Argument Name="documentid" Type="integer" Required="true" />
 				<Argument Name="filter" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="find">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="documentid" Type="integer" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="fromscreen">
 				<Argument Name="area" Type="rectangle" Required="true" />
 				<Argument Name="relative" Type="boolean" />
 				<Argument Name="language" Type="boolean" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="getcellinfo">
 				<Argument Name="documentid" Type="integer" Required="true" />
 				<Argument Name="tableindex" Type="integer" Required="true" />
 				<Argument Name="position" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="getdocument">
 				<Argument Name="documentid" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="gettableposition">
 				<Argument Name="search" Type="string" Required="true" />
 				<Argument Name="documentid" Type="integer" Required="true" />
 				<Argument Name="tableindex" Type="integer" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="point" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="gettextparagraphs">
 				<Argument Name="documentid" Type="integer" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="plaintext">
 				<Argument Name="documentid" Type="integer" />
 				<Argument Name="method" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="processfile">
 				<Argument Name="path" Type="string" Required="true" />
@@ -1019,7 +889,6 @@
 				<Argument Name="languageweight" Type="integer" />
 				<Argument Name="dictionary" Type="list" />
 				<Argument Name="dictionaryweight" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="processscreen">
 				<Argument Name="area" Type="rectangle" />
@@ -1029,7 +898,6 @@
 				<Argument Name="languageweight" Type="integer" />
 				<Argument Name="dictionary" Type="list" />
 				<Argument Name="dictionaryweight" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="readcell">
 				<Argument Name="documentid" Type="integer" Required="true" />
@@ -1037,55 +905,45 @@
 				<Argument Name="position" Type="string" Required="true" />
 				<Argument Name="offset" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="readtables">
 				<Argument Name="documentid" Type="integer" />
 				<Argument Name="result" Type="variable" VariableType="list" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 
 		<CommandFamily Name="xls">
 			<Command Name="close">
 				<Argument Name="id" Type="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="countrows">
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="find">
 				<Argument Name="value" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="boolean" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="getvalue">
 				<Argument Name="position" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="string" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="open">
 				<Argument Name="path" Type="string" Required="true" />
 				<Argument Name="accessmode" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="setsheet">
 				<Argument Name="name" Type="string" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="setvalue">
 				<Argument Name="value" Type="string" Required="true" />
 				<Argument Name="position" Type="string" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 			<Command Name="switch">
 				<Argument Name="id" Type="integer" Required="true" />
 				<Argument Name="result" Type="variable" VariableType="integer" />
-				<Argument Name="timeout" Type="integer" />
 			</Command>
 		</CommandFamily>
 	</Commands>

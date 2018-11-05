@@ -51,7 +51,7 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		public bool GeneratedExists([NotNull] string generated)
 		{
 			return decayed.ContainsGenerated(generated, generatedComparer)
-				   || layers.Any(layer => layer.ContainsGenerated(generated, generatedComparer));
+				|| layers.Any(layer => layer.ContainsGenerated(generated, generatedComparer));
 		}
 
 		[CanBeNull, Pure]

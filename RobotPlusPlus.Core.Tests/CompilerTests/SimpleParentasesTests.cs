@@ -14,7 +14,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x=(1)");
 
 			// Assert
-			Assert.AreEqual("♥x=1", output);
+			Assert.That.AreCodeEqual("♥x=1", output);
 		}
 
 		[TestMethod]
@@ -24,7 +24,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x=((1))");
 
 			// Assert
-			Assert.AreEqual("♥x=1", output);
+			Assert.That.AreCodeEqual("♥x=1", output);
 		}
 
 		[TestMethod]
@@ -36,7 +36,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			                        "➜ifend";
 
 			// Assert
-			Assert.AreEqual(expected, output);
+			Assert.That.AreCodeEqual(expected, output);
 		}
 
 		[TestMethod]
@@ -48,7 +48,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			                        "➜ifend";
 
 			// Assert
-			Assert.AreEqual(expected, output);
+			Assert.That.AreCodeEqual(expected, output);
 		}
 
 		[TestMethod]
@@ -58,7 +58,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x=(1*5)+5");
 
 			// Assert
-			Assert.AreEqual("♥x=1*5+5", output);
+			Assert.That.AreCodeEqual("♥x=1*5+5", output);
 		}
 
 		[TestMethod]
@@ -68,7 +68,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string output = Compiler.Compile("x=1*(5+5)");
 
 			// Assert
-			Assert.AreEqual("♥x=1*(5+5)", output);
+			Assert.That.AreCodeEqual("♥x=1*(5+5)", output);
 		}
 	}
 }

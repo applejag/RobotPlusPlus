@@ -37,11 +37,6 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 			switch (token)
 			{
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.Assignment:
-					if (!(op.LHS is IdentifierToken lhs))
-						throw new CompileUnexpectedTokenException(op.LHS);
-					if (op.RHS is FunctionCallToken rhs)
-						return new CommandUnit(rhs, lhs, parent);
-
 					return new AssignmentUnit(op, parent);
 
 				case OperatorToken op when op.OperatorType == OperatorToken.Type.PreExpression
@@ -69,7 +64,7 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 					throw new CompileUnexpectedTokenException(st);
 
 				case FunctionCallToken func:
-					return new CommandUnit(func, null, parent);
+					return new CommandUnit(func, parent);
 
 				default:
 					throw new CompileUnexpectedTokenException(token);

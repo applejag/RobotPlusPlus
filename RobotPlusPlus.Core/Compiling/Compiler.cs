@@ -5,8 +5,10 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling.CodeUnits;
 using RobotPlusPlus.Core.Compiling.Context;
+using RobotPlusPlus.Core.Compiling.Context.Types;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Structures;
+using RobotPlusPlus.Core.Structures.CSharp;
 using RobotPlusPlus.Core.Structures.G1ANT;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
@@ -21,6 +23,7 @@ namespace RobotPlusPlus.Core.Compiling
 		public ValueContext Context { get; private set; }
 
 		public G1ANTRepository G1ANTRepository { get; private set; }
+		public CSharpRepository CSharpRepository { get; private set; }
 
 		public Compiler()
 		{
@@ -51,20 +54,12 @@ namespace RobotPlusPlus.Core.Compiling
 
 		public void Compile()
 		{
-			// Reset contexts
-			Context = new ValueContext();
-
 			// Load predefined values
 			G1ANTRepository = G1ANTRepository.FromEmbeddedXML();
+			CSharpRepository = new CSharpRepository();
 
-			var source = new TokenSource("", "_G1ANT", -1, 1);
-			foreach (G1ANTRepository.VariableElement variable in G1ANTRepository.Variables.Variables)
-			{
-				source.code = variable.Name;
-				Type varType = variable.EvaluateType();
-				var token = new IdentifierToken(source) {IsParsed = true};
-				Context.RegisterVariableGlobally(token, varType);
-			}
+			// Reset contexts
+			Context = GetPopulatedContext(G1ANTRepository, CSharpRepository);
 
 			// Compile
 			CompileUnits(codeUnits, this);
@@ -76,6 +71,38 @@ namespace RobotPlusPlus.Core.Compiling
 			{
 				unit.Compile(compiler);
 			}
+		}
+
+		public static ValueContext GetPopulatedContext(params IRepository[] repositories)
+		{
+			var context = new ValueContext();
+
+			// Load predefined variables from repositories
+			foreach (IRepository repository in repositories)
+			{
+				var source = new TokenSource("", "_" + repository.GetType().Name, -1, 1);
+
+				void RegisterVariable(string name, Type type, bool isReadOnly, bool isStaticType)
+				{
+					source.code = name;
+					var token = new IdentifierToken(source) { IsParsed = true };
+					var value = new Variable(name, token, type, isReadOnly, isStaticType);
+					context.RegisterValueGlobally(value);
+				}
+
+				foreach (var (name, type) in repository.RegisterVariables())
+					RegisterVariable(name, type, false, false);
+
+				foreach (var (name, type) in repository.RegisterReadOnlyVariables())
+					RegisterVariable(name, type, true, false);
+
+				foreach (var (name, type) in repository.RegisterStaticTypes())
+					RegisterVariable(name, type, true, true);
+
+				repository.RegisterOther(context);
+			}
+
+			return context;
 		}
 
 		public string AssembleIntoString()

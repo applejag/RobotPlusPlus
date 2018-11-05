@@ -32,15 +32,16 @@ namespace RobotPlusPlus.CLI
 				console.Write((i+1).ToString().PadLeft(totalLinesWidth) + ':');
 
 				console.ForegroundColor = ConsoleColor.Gray;
-				console.Write(lines[i].TrimEnd());
+			    string trimmedLine = lines[i].TrimEnd();
+			    console.WriteLine(trimmedLine);
 
 				if (errHere)
 				{
+				    var padding = new string(' ', totalLinesWidth + trimmedLine.Length + 1);
+                    console.ResetColor();
 					console.ForegroundColor = ConsoleColor.Red;
-					console.WriteLine(" // {0}", e.Message);
+				    console.WriteLine($"{padding}^ {e.Message}");
 				}
-				else
-					console.WriteLine();
 			}
 
 			console.ResetColor();

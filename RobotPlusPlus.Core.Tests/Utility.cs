@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotPlusPlus.Core.Exceptions;
 using RobotPlusPlus.Core.Tokenizing;
 using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Tokenizing.Tokens.Literals;
+using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Tests
 {
@@ -181,6 +185,54 @@ namespace RobotPlusPlus.Core.Tests
 				}
 			}
 		}
+
+        [AssertionMethod]
+	    public static void AreCodeEqual(this Assert assert, 
+	        [CanBeNull] string expected, [CanBeNull] string actual)
+        {
+            if (actual == expected) return;
+            if (expected == null && actual != null)
+                throw new AssertFailedException($"Failed code assertion. Expected: <null> Actual:\n```\n{FormatCodeLines(actual.Split('\n'))}\n```");
+            if (expected != null && actual == null)
+                throw new AssertFailedException($"Failed code assertion. Expected:\n```\n{FormatCodeLines(expected.Split('\n'))}\n```\nActual: <null>");
+
+            string[] expectedLines = expected.Split('\n');
+            string[] actualLines = actual.Split('\n');
+            for (var line = 0; line < expectedLines.Length; line++)
+            {
+                if (line >= actualLines.Length)
+                    throw new AssertFailedException(
+                        $"Failed code assertion. Too few lines.\nExpected {expectedLines.Length} lines:\n```\n{actual}\n```\nActually {actualLines.Length} lines:\n```\n{actual}\n```");
+
+                if (expectedLines[line] != actualLines[line])
+                {
+                    var point = new Point(expectedLines[line].IndexOfFirstMismatch(actualLines[line]), line);
+                    throw new AssertFailedException(
+                        $"Failed code assertion. Mismatch on line {line+1}.\nExpected <{expectedLines[line][point.X]}>:\n```\n{FormatCodeLines(expectedLines, point)}\n```\nActual <{actualLines[line][point.X]}>:\n```\n{FormatCodeLines(actualLines, point)}\n```");
+                }
+            }
+
+            if (expectedLines.Length > actualLines.Length)
+                throw new AssertFailedException(
+                    $"Failed code assertion. Too many lines.\nExpected {expectedLines.Length} lines:\n```\n{actual}\n```\nActually {actualLines.Length} lines:\n```\n{actual}\n```");
+
+            string FormatCodeLines(string[] codeLines, Point? pointOut = null)
+            {
+                var sb = new StringBuilder();
+                for (var i = 0; i < codeLines.Length; i++)
+                {
+                    if (sb.Length > 0) sb.Append('\n');
+                    string prefix = $"[{i + 1}] ";
+                    sb.Append(prefix);
+                    sb.Append(codeLines[i]);
+
+                    if (pointOut?.Y == i)
+                        sb.Append($"\n{new string(' ', prefix.Length + pointOut.Value.X)}^");
+                }
+
+                return sb.ToString();
+            }
+        }
 		
 	}
 }

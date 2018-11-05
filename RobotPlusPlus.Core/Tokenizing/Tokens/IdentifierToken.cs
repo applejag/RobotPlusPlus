@@ -10,6 +10,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	public class IdentifierToken : Token
 	{
 		public virtual string Identifier => SourceCode;
+		public string GeneratedName { get; internal set; }
 
 		public IdentifierToken(TokenSource source) : base(source)
 		{ }

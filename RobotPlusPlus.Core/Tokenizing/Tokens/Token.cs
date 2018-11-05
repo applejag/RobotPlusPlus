@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using RobotPlusPlus.Core.Compiling;
 using RobotPlusPlus.Core.Parsing;
 using RobotPlusPlus.Core.Structures;
@@ -14,8 +15,14 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 		public int SourceLine => source.line;
 		public int SourceColumn => source.column;
 		public int NewLines => source.NewLines;
+		[CanBeNull]
 		public WhitespaceToken LeadingWhitespaceToken { get; set; }
+		[CanBeNull]
 		public WhitespaceToken TrailingWhitespaceToken { get; set; }
+		[NotNull]
+		public string LeadingWhitespace => LeadingWhitespaceToken?.ToString() ?? "";
+		[NotNull]
+		public string TrailingWhitespace => TrailingWhitespaceToken?.ToString() ?? "";
 		public bool IsParsed { get; internal set; }
 
 		protected Token(TokenSource source)
@@ -27,9 +34,7 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override string ToString()
 		{
-			return Count == 0 
-				? SourceCode
-				: $"{SourceCode}[{string.Join(", ", this.Select(t => t?.ToString() ?? "null"))}]";
+			return SourceCode;
 		}
 
 	}

@@ -3,8 +3,8 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp2.0</TargetFramework>
-		<RuntimeIdentifiers>win10-x64;win10-x86;osx-x64;ubuntu-x64</RuntimeIdentifiers>
+		<TargetFramework>netcoreapp2.1</TargetFramework>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<StartupObject>RobotPlusPlus.CLI.Program</StartupObject>
 	</PropertyGroup>
 
@@ -21,17 +21,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="g1antpp.png" />
 		<None Remove="sample.robotpp" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="g1antpp.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<EmbeddedResource Include="sample.robotpp" Condition="'$(Configuration)'=='Debug'">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0-beta" />
+		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -67,6 +71,10 @@
 		<OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
 		<!-- Set to false to transform files even if the output appears to be up-to-date (default is true)  -->
 		<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+		<PackageIconUrl>g1antpp.png</PackageIconUrl>
+		<PackageProjectUrl>https://github.com/jilleJr/RobotPlusPlus</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/jilleJr/RobotPlusPlus/blob/master/LICENSE</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/jilleJr/RobotPlusPlus</RepositoryUrl>
 	</PropertyGroup>
 
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

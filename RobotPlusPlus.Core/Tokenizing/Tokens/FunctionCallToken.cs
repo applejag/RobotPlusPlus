@@ -28,5 +28,10 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 
 		public override void ParseToken(IteratedList<Token> parent)
 		{ }
+
+		public override string ToString()
+		{
+			return LHS.ToString() + ParentasesGroup;
+		}
 	}
 }

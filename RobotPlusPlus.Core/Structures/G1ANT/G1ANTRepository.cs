@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+using RobotPlusPlus.Core.Compiling.Context;
 using RobotPlusPlus.Core.Compiling.Context.Types;
-using RobotPlusPlus.Core.Tokenizing.Tokens;
 using RobotPlusPlus.Core.Utility;
 
 namespace RobotPlusPlus.Core.Structures.G1ANT
 {
 	[XmlRoot("G1ANT", Namespace = "my://g1ant")]
 	[Serializable]
-	public class G1ANTRepository
+	public class G1ANTRepository : IRepository
 	{
 		[XmlElement("Variables")]
 		public VariablesElement Variables { get; set; }
@@ -22,28 +23,47 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 		[XmlElement("Commands")]
 		public CommandsElement Commands { get; set; }
 
-		[CanBeNull]
-		public CommandElement FindCommand([NotNull] string commandName, [CanBeNull] string familyName = null)
-		{
-			List<CommandElement> pool = familyName != null
-				? FindCommandFamily(familyName)?.Commands
-				: Commands.Commands;
-
-			return pool?.FirstOrDefault(c => c.Name == commandName);
-		}
-
-		[CanBeNull]
-		public CommandFamilyElement FindCommandFamily([NotNull] string familyName)
-		{
-			return Commands.CommandFamilies.FirstOrDefault(fam => fam.Name == familyName);
-		}
-
 		[NotNull, ItemNotNull]
 		public List<ArgumentElement> ListCommandArguments([NotNull] CommandElement command, bool includeGlobal = true)
 		{
 			return command.Arguments
 				.Concat(Commands.GlobalArguments.Arguments)
 				.ToList();
+		}
+
+		public IEnumerable<(string id, Type type)> RegisterVariables()
+		{
+			return Variables.Variables
+				.Select(v => (v.Name, v.EvaluateType()));
+		}
+
+		public IEnumerable<(string id, Type type)> RegisterReadOnlyVariables()
+		{
+			return new(string, Type)[0];
+		}
+
+		public IEnumerable<(string id, Type type)> RegisterStaticTypes()
+		{
+			return new(string id, Type type)[0];
+		}
+
+		public void RegisterOther(ValueContext context)
+		{
+			foreach (CommandElement command in Commands.Commands
+				.Where(c => Commands.CommandFamilies.All(f => f.Name != c.Name)))
+			{
+				context.RegisterValueGlobally(new G1ANTCommand(command, Commands.GlobalArguments));
+			}
+
+			foreach (CommandFamilyElement family in Commands.CommandFamilies)
+			{
+				// Register hybrid family-command elements
+				if (Commands.Commands.TryFirst(c => c.Name == family.Name, out CommandElement cmd))
+					context.RegisterValueGlobally(new G1ANTFamilyCommand(family, Commands.GlobalArguments, cmd));
+				// Register normal family
+				else
+					context.RegisterValueGlobally(new G1ANTFamily(family, Commands.GlobalArguments));
+			}
 		}
 
 		#region Static creators
@@ -173,17 +193,20 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlElement("Argument")]
 			public List<ArgumentElement> Arguments { get; set; }
 
-			[XmlIgnore]
-			public List<List<ArgumentElement>> RequiredArguments => 
-				Arguments.Where(a => a.Required)
-					.GroupBy(a => a.RequiredGroup == -1 ? a.Name.GetHashCode() : a.RequiredGroup,
-						(k, elmList) => elmList.ToList())
-					.ToList();
+			[XmlElement("Overload")]
+			public List<ArgumentOverloadElement> Overloads { get; set; }
 
 			public override string ToString()
 			{
 				return $"{Name}({string.Join(", ", Arguments)}";
 			}
+		}
+
+		[Serializable]
+		public class ArgumentOverloadElement
+		{
+			[XmlElement("Argument")]
+			public List<ArgumentElement> Arguments { get; set; }
 		}
 
 		[Serializable]
@@ -201,9 +224,6 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlAttribute("Required")]
 			public bool Required { get; set; } = false;
 
-			[XmlAttribute("RequiredGroup")]
-			public int RequiredGroup { get; set; } = -1;
-
 			public Type EvaluateType()
 			{
 				return G1ANTRepository.EvaluateType(Type);
@@ -211,7 +231,9 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 			public Type EvaluateVariableType()
 			{
-				return G1ANTRepository.EvaluateType(VariableType);
+				if (Type == Structure.Variable)
+					return G1ANTRepository.EvaluateType(VariableType);
+				return EvaluateType();
 			}
 
 			public override string ToString()
@@ -220,7 +242,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 
 				sb.Append(Type);
 				if (Type == Structure.Variable)
-					sb.AppendFormat("<{0}>",VariableType);
+					sb.AppendFormat("<{0}>", VariableType);
 				if (!Required)
 					sb.Append('?');
 				sb.Append(' ');
@@ -277,7 +299,7 @@ namespace RobotPlusPlus.Core.Structures.G1ANT
 			[XmlEnum("procedure")]
 			Procedure,
 		}
-		
+
 		#endregion
 	}
 }

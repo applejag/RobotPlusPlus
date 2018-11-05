@@ -142,5 +142,21 @@ namespace RobotPlusPlus.Core.Utility
 
 			return c;
 		}
-	}
+
+        [Pure]
+	    public static int IndexOfFirstMismatch(this string s, string other)
+	    {
+	        string first = s.Length < other.Length ? s : other;
+	        string second = s.Length > other.Length ? s : other;
+            
+	        for (int counter = 0; counter < first.Length; counter++)
+	        {
+	            if (first[counter] != second[counter])
+	            {
+	                return counter;
+	            }
+	        }
+	        return -1;
+	    }
+    }
 }

@@ -15,14 +15,14 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		public static string GenerateVariableName([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return token is IdentifierTempToken tmp
-				? tmp.GeneratedName = context.GenerateName("tmp")
-				: context.GenerateName(token.Identifier);
+			return token.GeneratedName = (token is IdentifierTempToken
+				? context.GenerateName("tmp")
+				: context.GenerateName(token.Identifier));
 		}
 
 		[NotNull]
 		public static Variable RegisterVariable([NotNull] this ValueContext context,
-			[NotNull] IdentifierToken token, [NotNull] Type type)
+			[NotNull] IdentifierToken token, [CanBeNull] Type type)
 		{
 			var value = new Variable(GenerateVariableName(context, token), token, type);
 
@@ -33,7 +33,7 @@ namespace RobotPlusPlus.Core.Compiling.Context
 
 		[NotNull]
 		public static Variable RegisterVariableGlobally([NotNull] this ValueContext context,
-			[NotNull] IdentifierToken token, [NotNull] Type type)
+			[NotNull] IdentifierToken token, [CanBeNull] Type type)
 		{
 			var value = new Variable(GenerateVariableName(context, token), token, type);
 
@@ -43,19 +43,22 @@ namespace RobotPlusPlus.Core.Compiling.Context
 		}
 
 		[CanBeNull, Pure]
-		public static Variable FindVariable([NotNull] this ValueContext context,
+		public static AbstractValue FindIdentifier([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return token is IdentifierTempToken
+			AbstractValue value = token is IdentifierTempToken
 				? context.DecayedValues.OfType<Variable>().FirstOrDefault(x => x.Token == token)
-				: context.FindValue(token.Identifier) as Variable;
+				: context.FindValue(token.Identifier);
+
+			if (value != null && value.Generated != null) token.GeneratedName = value.Generated;
+			return value;
 		}
 
 		[Pure]
 		public static bool VariableExists([NotNull] this ValueContext context,
 			[NotNull] IdentifierToken token)
 		{
-			return FindVariable(context, token) != null;
+			return FindIdentifier(context, token) != null;
 		}
 
 		#endregion

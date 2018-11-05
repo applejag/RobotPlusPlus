@@ -209,7 +209,8 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 					break;
 
 				case Type.Assignment:
-					if (parent.Previous is IdentifierToken)
+					if (parent.Previous is IdentifierToken
+					|| PunctuatorToken.IsPunctuatorOfType(parent.Previous, PunctuatorToken.Type.Dot))
 						LHS = parent.PopPrevious();
 					else
 						throw new ParseUnexpectedLeadingTokenException(this, parent.Previous);
@@ -264,6 +265,15 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 			});
 
 			return ass;
+		}
+
+		public override string ToString()
+		{
+			if (OperatorType == Type.PreExpression
+			    || OperatorType == Type.Unary)
+				return UnaryValue + base.ToString();
+
+			return LHS + base.ToString() + RHS;
 		}
 
 		public enum Type

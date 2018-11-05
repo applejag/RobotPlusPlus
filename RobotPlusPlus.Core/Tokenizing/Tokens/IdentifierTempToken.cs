@@ -6,9 +6,12 @@ namespace RobotPlusPlus.Core.Tokenizing.Tokens
 	{
 		public override string Identifier => GeneratedName;
 
-		public string GeneratedName { get; internal set; }
-
 		public IdentifierTempToken(TokenSource source) : base(source)
 		{ }
+
+		public override string ToString()
+		{
+			return "$tmp";
+		}
 	}
 }

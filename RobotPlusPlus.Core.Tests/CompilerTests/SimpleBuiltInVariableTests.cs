@@ -18,7 +18,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -29,8 +29,11 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "x = tripboard";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 
 		[TestMethod]
 		public void Compile_VariableWriteString()
@@ -43,7 +46,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -57,7 +60,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -71,7 +74,7 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			string actual = Compiler.Compile(code);
 
 			// Assert
-			Assert.AreEqual(expected, actual);
+			Assert.That.AreCodeEqual(expected, actual);
 		}
 
 		[TestMethod]
@@ -82,7 +85,10 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 			const string code = "clipboard = 205";
 
 			// Act
-			Compiler.Compile(code);
-		}
+		    string result = Compiler.Compile(code);
+
+		    // Assert
+		    Assert.Fail("Unexpected result: {0}", result);
+        }
 	}
 }
