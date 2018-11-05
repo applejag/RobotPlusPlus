@@ -5,7 +5,7 @@
 	// https://chordious.com/2017/01/10/what-the-chordious-version-numbers-mean/
 
     int major    = 0;
-    int minor    = 3; // Official == even, Preview == odd
+    int minor    = 4; // Official == even, Preview == odd
     int build    = 0;
     int revision = 0;
 

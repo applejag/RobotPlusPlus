@@ -199,7 +199,7 @@ namespace RobotPlusPlus.CLI
 				LogError($"Error while {onErrorVerb}!");
 
 				console.WriteLine();
-				LogError($"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}:{e.Line}: {e.Message}");
+				LogError($"{(options.Verbose ? sourceFile : Path.GetFileName(sourceFile))}:{e.Line}:{e.Column}: {e.Message}");
 
 				PrettyConsoleWriter.WriteCodeHighlightError(sourceCode, e, options.Verbose ? -1 : 12, console);
 
