@@ -243,13 +243,13 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		            string[] paramInTypes = allArguments
 		                .Select(a => a.expression.OutputType)
 		                .OfType<CSharpType>()
-		                .Select(t => t.Type.FullName)
+		                .Select(t => StringifyType(t.Type))
 		                .ToArray();
 		            string[] paramInStrings = allArguments
 		                .Select(a => a.expression.AssembleIntoString(false))
 		                .ToArray();
 
-		            string containerType = ((CSharpType) methodExpression.ContainerType).Type.FullName;
+		            string containerType = StringifyType(((CSharpType) methodExpression.ContainerType).Type);
 		            string containerName = methodExpression.ContainerToken.SourceCode;
 		            string methodName = methodExpression.AssembleIntoString(false).Substring(containerName.Length + 1);
 
@@ -268,6 +268,14 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 		        return $"{methodExpression.AssembleIntoString(false)}({argsString})";
 		    }
 		}
+
+	    private static string StringifyType(Type type)
+	    {
+            string fullName = type.FullName;
+            return type.IsGenericType 
+	            ? $"{fullName.Substring(0, fullName.IndexOf('`'))}<{string.Join(", ", type.GenericTypeArguments.Select(StringifyType))}>" 
+	            : fullName;
+	    }
 
 		private List<Argument> SplitArguments(PunctuatorToken parentases)
 		{
