@@ -11,8 +11,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("0.3.18276.1709")]
-[assembly: AssemblyFileVersion("0.3.18276.1709")]
+[assembly: AssemblyVersion("0.3.18309.1036")]
+[assembly: AssemblyFileVersion("0.3.18309.1036")]
 
 [assembly: AssemblyTitle("Robot++ CLI")]
 [assembly: AssemblyDescription("Command-line interface for the Robot++ language compiler.")]
