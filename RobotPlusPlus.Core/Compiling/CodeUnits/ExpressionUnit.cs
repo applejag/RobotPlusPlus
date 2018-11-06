@@ -68,10 +68,15 @@ namespace RobotPlusPlus.Core.Compiling.CodeUnits
 
             // Keep track of commands
             EmbeddedCommands.Clear();
-            // Extract function calls
+
+		    List<CodeUnit> assignmentPreUnits = PreUnits.ToList();
+		    foreach (CodeUnit preUnit in assignmentPreUnits)
+		        preUnit.Compile(compiler);
+
+		    // Extract function calls
             Token = ExtractInnerCommands(compiler, Token);
 
-			foreach (CodeUnit pre in PreUnits)
+			foreach (CodeUnit pre in PreUnits.Except(assignmentPreUnits))
 				pre.Compile(compiler);
 
 
