@@ -165,5 +165,50 @@ namespace RobotPlusPlus.Core.Tests.CompilerTests
 		    Assert.Fail("Unexpected result: {0}", result);
         }
 
-	}
+	    [TestMethod]
+	    public void Compile_AssignInCondition()
+	    {
+	        const string code = "if (x = true) {}";
+	        const string expected = "♥x=true\n" +
+	                                "jump label ➜ifend if ⊂♥x⊃\n" +
+	                                "➜ifend";
+
+	        // Act
+	        string actual = Compiler.Compile(code);
+
+	        // Assert
+	        Assert.That.AreCodeEqual(expected, actual);
+	    }
+
+	    [TestMethod]
+	    public void Compile_AssignInConditionWithComparison()
+	    {
+	        const string code = "if ((x = true) == true) {}";
+	        const string expected = "♥x=true\n" +
+	                                "jump label ➜ifend if ⊂♥x==true⊃\n" +
+	                                "➜ifend";
+
+	        // Act
+	        string actual = Compiler.Compile(code);
+
+	        // Assert
+	        Assert.That.AreCodeEqual(expected, actual);
+	    }
+
+	    [TestMethod]
+	    public void Compile_AssignInConditionWithComparisonAndMethod()
+	    {
+	        const string code = "if ((x = true).ToString() == 'true') {}";
+	        const string expected = "♥x=true\n" +
+	                                "jump label ➜ifend if ⊂♥x.ToString()==\"true\"⊃\n" +
+	                                "➜ifend";
+
+	        // Act
+	        string actual = Compiler.Compile(code);
+
+	        // Assert
+	        Assert.That.AreCodeEqual(expected, actual);
+	    }
+
+    }
 }
